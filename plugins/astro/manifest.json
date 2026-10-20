@@ -1,0 +1,100 @@
+{
+  "id": "astro",
+  "publisher": "gode",
+  "version": "0.0.2",
+  "minimumAppVersion": "0.1.19-beta.84",
+  "capabilities": ["language-server"],
+  "languages": ["astro"],
+  "main": "main.js",
+  "name": "name",
+  "description": "description",
+  "about": "about",
+  "includes": [
+    {
+      "name": "@astrojs/language-server",
+      "version": "2.17.1",
+      "license": "MIT",
+      "url": "https://github.com/withastro/astro"
+    },
+    {
+      "name": "TypeScript",
+      "version": "5.9.3",
+      "license": "Apache-2.0",
+      "url": "https://github.com/microsoft/TypeScript"
+    }
+  ],
+  "groups": [],
+  "actions": [],
+  "strings": {
+    "en": {
+      "name": "Astro",
+      "description": "Code intelligence for Astro files.",
+      "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Astro files. The language server starts when an Astro file opens in a project and stops when none are open.",
+      "ready": "Ready to assist with Astro.",
+      "failed": "The Astro language server could not start."
+    },
+    "de": {
+      "name": "Astro",
+      "description": "Codeunterstützung für Astro-Dateien.",
+      "about": "Im Editor von Gode kannst du für Astro-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Astro-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+      "ready": "Bereit für Astro.",
+      "failed": "Der Astro-Sprachserver konnte nicht gestartet werden."
+    },
+    "es": {
+      "name": "Astro",
+      "description": "Asistencia de código para archivos de Astro.",
+      "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos de Astro. El servidor se inicia al abrir un archivo de Astro en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+      "ready": "Listo para trabajar con Astro.",
+      "failed": "No se pudo iniciar el servidor de lenguaje de Astro."
+    },
+    "fr": {
+      "name": "Astro",
+      "description": "Assistance au code pour les fichiers Astro.",
+      "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Astro. Le serveur démarre quand vous ouvrez un fichier Astro dans un projet et s’arrête quand aucun n’est ouvert.",
+      "ready": "Prêt à vous aider avec Astro.",
+      "failed": "Le serveur de langage Astro n’a pas pu démarrer."
+    },
+    "ja": {
+      "name": "Astro",
+      "description": "Astroファイルのコード作成を支援します。",
+      "about": "GodeのエディタでAstroファイルのコード補完、入力中のエラーと警告、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。Astroファイルをプロジェクトで開くと起動し、開いているAstroファイルがなくなると停止します。",
+      "ready": "Astroのコードを支援できます。",
+      "failed": "Astro言語サーバを起動できませんでした。"
+    },
+    "ko": {
+      "name": "Astro",
+      "description": "Astro 파일의 코드 작성을 지원합니다.",
+      "about": "Astro 파일을 편집할 때 Gode 에디터에서 코드 자동 완성, 입력 중 오류와 경고, 커서를 올렸을 때 정보, 정의로 이동, 참조 찾기와 이름 변경을 사용할 수 있습니다. 프로젝트에서 Astro 파일을 열면 언어 서버가 시작되고, 열린 Astro 파일이 없어지면 종료됩니다.",
+      "ready": "Astro 코드 작성을 지원할 준비가 되었습니다.",
+      "failed": "Astro 언어 서버를 시작할 수 없습니다."
+    },
+    "pt-BR": {
+      "name": "Astro",
+      "description": "Assistência para programar em arquivos Astro.",
+      "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos Astro. O servidor inicia quando você abre um arquivo Astro em um projeto e para quando não há mais nenhum aberto.",
+      "ready": "Pronto para ajudar com Astro.",
+      "failed": "Não foi possível iniciar o servidor de linguagem Astro."
+    },
+    "ru": {
+      "name": "Astro",
+      "description": "Помощь при работе с кодом в файлах Astro.",
+      "about": "В редакторе Gode для файлов Astro доступны автодополнение, ошибки и предупреждения при вводе, подсказки при наведении, переход к определению, поиск мест использования и переименование символов. Сервер запускается, когда вы открываете файл Astro в проекте, и останавливается, когда открытых файлов не остается.",
+      "ready": "Готов помогать с Astro.",
+      "failed": "Не удалось запустить языковой сервер Astro."
+    },
+    "zh-Hans": {
+      "name": "Astro",
+      "description": "为 Astro 文件提供代码辅助。",
+      "about": "在 Gode 的编辑器中，编辑 Astro 文件时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。语言服务器会在项目中打开 Astro 文件时启动，并在没有 Astro 文件打开时停止。",
+      "ready": "已准备好辅助编写 Astro 代码。",
+      "failed": "无法启动 Astro 语言服务器。"
+    },
+    "zh-Hant": {
+      "name": "Astro",
+      "description": "為 Astro 檔案提供程式碼輔助。",
+      "about": "在 Gode 的編輯器中，編輯 Astro 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Astro 檔案時啟動，並在沒有 Astro 檔案開啟時停止。",
+      "ready": "已準備好輔助編寫 Astro 程式碼。",
+      "failed": "無法啟動 Astro 語言伺服器。"
+    }
+  }
+}

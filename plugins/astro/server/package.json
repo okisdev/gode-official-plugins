@@ -1,0 +1,9 @@
+{
+  "name": "gode-astro-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@astrojs/language-server": "2.17.1",
+    "typescript": "5.9.3"
+  }
+}

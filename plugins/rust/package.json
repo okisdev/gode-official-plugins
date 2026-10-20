@@ -1,0 +1,20 @@
+{
+  "name": "@gode/plugin-rust",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --configLoader runner"
+  },
+  "dependencies": {
+    "@gode/plugin-sdk": "link:../../../gode/packages/plugin-sdk"
+  },
+  "devDependencies": {
+    "@gode/format": "link:../../../gode/packages/format",
+    "@types/node": "catalog:",
+    "esbuild": "0.28.2",
+    "typescript": "catalog:",
+    "vitest": "^5.0.2"
+  }
+}

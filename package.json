@@ -1,0 +1,28 @@
+{
+  "name": "gode-official-plugins",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test && vitest run --configLoader runner --dir scripts",
+    "typecheck": "pnpm -r typecheck && tsc --noEmit -p scripts",
+    "lint": "oxlint && oxfmt --check",
+    "lint:fix": "oxlint --fix && oxfmt",
+    "index": "node scripts/index.mjs",
+    "release": "node scripts/release.mjs",
+    "catalog": "node scripts/catalog.mjs"
+  },
+  "devDependencies": {
+    "@gode/plugin-sdk": "link:../gode/packages/plugin-sdk",
+    "@types/node": "catalog:",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "typescript": "catalog:",
+    "vitest": "^5.0.2",
+    "wrangler": "4.141.0"
+  }
+}

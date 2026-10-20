@@ -1,0 +1,8 @@
+{
+  "name": "gode-python-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "basedpyright": "1.40.2"
+  }
+}

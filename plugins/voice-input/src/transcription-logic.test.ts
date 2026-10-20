@@ -1,0 +1,70 @@
+import { expect, test } from 'vitest'
+import {
+  apiURL,
+  applyVocabulary,
+  cleanTranscript,
+  formatBytes,
+  responseJSON,
+  transcriptionRequest,
+} from './transcription-logic'
+
+test.each([
+  ['language Chinese<asr_text>把 hook 抽出来', true, '把 hook 抽出来'],
+  ['language English<asr_text>Um, run make test.', true, 'run make test.'],
+  ['嗯，把 hook 抽出来，呃，然后跑 make test。', true, '把 hook 抽出来，然后跑 make test。'],
+  ['嗯 呃 额 啊', true, ''],
+  ['嗯哼，啊哈，余额，语气啊。', true, '嗯哼，啊哈，余额，语气啊。'],
+  ['Um, run, uh, make test. Erm, hmm.', true, 'run, make test.'],
+  ['album thumb summer rhythm uh_huh umami', true, 'album thumb summer rhythm uh_huh umami'],
+  ['language English<asr_text>um, keep this.', false, 'um, keep this.'],
+  ['Wait... really?!', true, 'Wait... really?!'],
+])('cleans %s', (text, remove, expected) => expect(cleanTranscript(text, remove)).toBe(expected))
+
+test('multipart carries WAV, vocabulary, language and secret without setting a boundary', async () => {
+  const init = transcriptionRequest(
+    { audio: new Uint8Array([82, 73, 70, 70]), vocabulary: ['useComposerText', 'make test'] },
+    { model: 'asr', language: 'zh', apiKey: 'secret' },
+  )
+  const request = new Request('http://127.0.0.1/v1/audio/transcriptions', init)
+  const body = init.body as FormData
+  const file = body.get('file') as File
+  expect(file.name).toBe('audio.wav')
+  expect(file.type).toBe('audio/wav')
+  expect([...new Uint8Array(await file.arrayBuffer())]).toEqual([82, 73, 70, 70])
+  expect(body.get('model')).toBe('asr')
+  expect(body.get('prompt')).toBe('useComposerText, make test')
+  expect(body.get('language')).toBe('zh')
+  expect(request.headers.get('authorization')).toBe('Bearer secret')
+  const automatic = transcriptionRequest(
+    { audio: new Uint8Array(), vocabulary: [] },
+    { model: 'asr', language: 'auto' },
+  )
+  expect((automatic.body as FormData).has('language')).toBe(false)
+  expect((automatic.body as FormData).has('prompt')).toBe(false)
+  expect(automatic.headers).toEqual({})
+})
+
+test('API paths preserve the base and errors preserve the server message', async () => {
+  expect(apiURL('https://api.example/v1/', 'audio/transcriptions')).toBe(
+    'https://api.example/v1/audio/transcriptions',
+  )
+  expect(() => apiURL('file:///tmp', 'models')).toThrow()
+  await expect(
+    responseJSON(
+      new Response(JSON.stringify({ error: { message: 'Bad API key' } }), { status: 401 }),
+    ),
+  ).rejects.toThrow('Bad API key')
+  expect(formatBytes(2520744288, 'en')).toBe('2.5 GB')
+  expect(formatBytes(2520744288, 'de')).toContain('2,5')
+})
+
+test.each([
+  ['我们有一个 G O D E One，这个 GODE One', ['Gode One'], '我们有一个 Gode One，这个 GODE One'],
+  ['还有 Agent Doc 这个东西', ['agentdoc'], '还有 agentdoc 这个东西'],
+  ['重新部署一些 Relay', ['relay'], '重新部署一些 Relay'],
+  ['把 use composer text 抽出来', ['useComposerText'], '把 useComposerText 抽出来'],
+  ['agent documentation', ['agentdoc'], 'agent documentation'],
+  ['a b', ['ab'], 'a b'],
+])('applies vocabulary to %s', (text, vocabulary, expected) =>
+  expect(applyVocabulary(text, vocabulary)).toBe(expected),
+)

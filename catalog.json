@@ -1,0 +1,46 @@
+{
+  "plugins": [
+    {
+      "publisher": "gode",
+      "id": "voice-input",
+      "source": "gode/voice-input/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "typescript",
+      "source": "gode/typescript/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "vue",
+      "source": "gode/vue/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "svelte",
+      "source": "gode/svelte/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "astro",
+      "source": "gode/astro/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "python",
+      "source": "gode/python/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "rust",
+      "source": "gode/rust/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    }
+  ]
+}

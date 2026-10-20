@@ -1,0 +1,39 @@
+{
+  "models": [
+    {
+      "file": "Qwen3-ASR-1.7B-Q8_0.gguf",
+      "url": "https://huggingface.co/ggml-org/Qwen3-ASR-1.7B-GGUF/resolve/36a678687ba7d07a74ca70ccb0e36902e005fb80/Qwen3-ASR-1.7B-Q8_0.gguf",
+      "size": 2165034944,
+      "sha256": "58e22d0532d4eacaf034cfac17a6fed159f37c41390c710186783be439d1fc57"
+    },
+    {
+      "file": "mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+      "url": "https://huggingface.co/ggml-org/Qwen3-ASR-1.7B-GGUF/resolve/36a678687ba7d07a74ca70ccb0e36902e005fb80/mmproj-Qwen3-ASR-1.7B-Q8_0.gguf",
+      "size": 355709344,
+      "sha256": "46c1d533af3f354ceb37ce855dbceff7da7fa7cf1e6a523df3b13440bd164c0d"
+    }
+  ],
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release": "b11724",
+    "directory": "llama-b11724",
+    "platforms": {
+      "darwin-arm64": {
+        "file": "llama-b11724-bin-macos-arm64.tar.gz",
+        "sha256": "4e3c2951302b5fcee8d65327c6e2b28c382d4be87d9ca3af1346a7c092cd3335"
+      },
+      "darwin-x64": {
+        "file": "llama-b11724-bin-macos-x64.tar.gz",
+        "sha256": "a21403b0f4f9eb3804307008680d712332060e3e23b1dc258afdc08c0be85cd0"
+      },
+      "linux-x64": {
+        "file": "llama-b11724-bin-ubuntu-x64.tar.gz",
+        "sha256": "8ea5309848578510085c772dff6615167fee12888233d29508d06b81436d6678"
+      },
+      "linux-arm64": {
+        "file": "llama-b11724-bin-ubuntu-arm64.tar.gz",
+        "sha256": "58ea04bb8b8f7e51cdfefdfad0cffb937e87eadf2dc256f280752f5a7886e128"
+      }
+    }
+  }
+}

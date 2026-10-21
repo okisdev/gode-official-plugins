@@ -33,6 +33,8 @@ pnpm --dir plugins/<id> build                # every platform
 pnpm --dir plugins/<id> build darwin-arm64   # one platform
 ```
 
+The language plugins build with `gode-plugin build`. Their `build.ts` stages the server into the SDK's archive layout, and `scripts/plugins.test.ts` checks every plugin's manifest, translations and package boundaries.
+
 ## Adding a capability
 
 A capability is a change to Gode itself, made before any plugin offers it. Add it to `pluginCapabilities` with its methods in `CapabilityMethods`, `capabilityOfMethod` and `capabilityResultSchemas` in the SDK's `src/contract.ts`, and build its commands and controls in the desktop app, shown only while a ready plugin offers it. Raise `minimumAppVersion` in the plugins that use it to the first Gode that has it.

@@ -1,13 +1,10 @@
 {
   "id": "python",
   "publisher": "gode",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "minimumAppVersion": "0.1.19-beta.84",
   "capabilities": ["language-server"],
   "languages": ["python"],
-  "main": "main.js",
-  "name": "name",
-  "description": "description",
   "about": "about",
   "includes": [
     {
@@ -17,8 +14,6 @@
       "url": "https://github.com/DetachHead/basedpyright"
     }
   ],
-  "groups": [],
-  "actions": [],
   "strings": {
     "en": {
       "name": "Python",

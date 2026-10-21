@@ -12,6 +12,11 @@ export interface ModelFile {
   sha256: string
 }
 
+export interface ModelSet {
+  id: string
+  files: readonly ModelFile[]
+}
+
 export async function modelsPresent(
   directory: string,
   models: readonly ModelFile[],

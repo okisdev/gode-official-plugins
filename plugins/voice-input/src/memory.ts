@@ -1,4 +1,5 @@
 import { join } from 'node:path'
+import type { PluginViewPage } from '@gode/plugin-sdk'
 import type { SetPluginView } from '@gode/plugin-sdk/plugin'
 import manifest from '../manifest.json'
 import { AtomicFile } from './atomic-file'
@@ -125,6 +126,19 @@ export class VoiceMemory {
     return this.file.dispose()
   }
 
+  query(search: string, cursor: string | null, limit: number): PluginViewPage {
+    const matches = this.learned().filter((term) =>
+      surface(term).toLowerCase().includes(search.toLowerCase()),
+    )
+    const offset = cursor === null ? 0 : Number(cursor)
+    const page = matches.slice(offset, offset + limit)
+    const next = offset + page.length
+    return {
+      items: page.map((term) => this.item(term)),
+      cursor: next < matches.length ? String(next) : null,
+    }
+  }
+
   private learned(): Term[] {
     return [...this.terms.values()]
       .filter((term) => term.count >= 2)
@@ -142,19 +156,25 @@ export class VoiceMemory {
   }
 
   private publish(): void {
+    const learned = this.learned()
+    this.setView('memory', {
+      items: learned.slice(0, 20).map((term) => this.item(term)),
+      total: learned.length,
+      empty: 'view.memory.empty',
+    })
+  }
+
+  private item(term: Term): PluginViewPage['items'][number] {
     const strings: Record<string, string> =
       manifest.strings[this.locale as keyof typeof manifest.strings] ?? manifest.strings.en
     const plurals = new Intl.PluralRules(this.locale)
     const numbers = new Intl.NumberFormat(this.locale)
-    this.setView('memory', {
-      items: this.learned().map((term) => ({
-        id: term.key,
-        text: surface(term),
-        detail: (
-          strings[`memory.heard.${plurals.select(term.count)}`] ?? strings['memory.heard.other']!
-        ).replace('{count}', numbers.format(term.count)),
-      })),
-      empty: 'view.memory.empty',
-    })
+    return {
+      id: term.key,
+      text: surface(term),
+      detail: (
+        strings[`memory.heard.${plurals.select(term.count)}`] ?? strings['memory.heard.other']!
+      ).replace('{count}', numbers.format(term.count)),
+    }
   }
 }

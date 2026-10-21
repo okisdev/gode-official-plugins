@@ -71,7 +71,7 @@ async function setup(
     await writeFile(join(directory, 'stats.json'), options.stored)
   }
   const setView = vi.fn<SetPluginView>()
-  const plugin = createVoicePlugin(() => {}, setView, models)
+  const plugin = createVoicePlugin(() => {}, setView, [{ id: 'qwen3-asr-1.7b', files: models }])
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
     type: 'start',
@@ -168,22 +168,24 @@ test('declares usage views with the SDK schema and sends empty views without cre
       kind: 'list',
       title: 'view.history',
       description: 'view.history.description',
-      itemActions: [{ id: 'deleteEntry', title: 'action.deleteEntry' }],
+      itemActions: [{ id: 'deleteEntry', title: 'action.deleteEntry', destructive: true }],
+      actions: ['clearHistory'],
     },
     {
       id: 'memory',
       kind: 'list',
       title: 'view.memory',
       description: 'view.memory.description',
-      itemActions: [{ id: 'forgetTerm', title: 'action.forgetTerm' }],
+      itemActions: [{ id: 'forgetTerm', title: 'action.forgetTerm', destructive: true }],
+      actions: ['clearMemory'],
     },
   ])
   const { setView, directory } = await setup()
   expect(setView.mock.calls).toEqual([
     ['usage', figures(0, 0, 0, 0)],
     ['activity', { unit: 'view.activity.unit', days: [] }],
-    ['history', { items: [], empty: 'view.history.empty' }],
-    ['memory', { items: [], empty: 'view.memory.empty' }],
+    ['history', { items: [], total: 0, empty: 'view.history.empty' }],
+    ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
   ])
   for (const [id, data] of setView.mock.calls)
     expect(
@@ -287,8 +289,8 @@ test.each([
     expect(setView.mock.calls).toEqual([
       ['usage', figures(0, 0, 0, 0)],
       ['activity', { unit: 'view.activity.unit', days: [] }],
-      ['history', { items: [], empty: 'view.history.empty' }],
-      ['memory', { items: [], empty: 'view.memory.empty' }],
+      ['history', { items: [], total: 0, empty: 'view.history.empty' }],
+      ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
     ])
     await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   },
@@ -522,14 +524,16 @@ test('statistics survive restart and publish totals and calendar days using the 
   await plugin.dispose()
   vi.setSystemTime(new Date('2026-01-02T12:30:00Z'))
   const replacementViews = vi.fn<SetPluginView>()
-  const replacement = createVoicePlugin(() => {}, replacementViews, models)
+  const replacement = createVoicePlugin(() => {}, replacementViews, [
+    { id: 'qwen3-asr-1.7b', files: models },
+  ])
   cleanups.push(() => replacement.dispose())
   await replacement.start(start)
   expect(replacementViews.mock.calls).toEqual([
     ['usage', figures(0, 9, 2.5, 1)],
     ['activity', { unit: 'view.activity.unit', days: [{ date: '2026-01-02', value: 9 }] }],
     setView.mock.calls.findLast(([id]) => id === 'history'),
-    ['memory', { items: [], empty: 'view.memory.empty' }],
+    ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
   ])
   text = 'Hello again'
   await dictate(replacement, 1.25, [])

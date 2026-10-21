@@ -54,6 +54,7 @@ async function setup(
     local?: boolean
     locale?: Extract<HostMessage, { type: 'start' }>['locale']
     history?: string
+    memory?: string
   } = {},
 ) {
   const directory = await mkdtemp(join(tmpdir(), 'gode-voice-records-'))
@@ -71,6 +72,7 @@ async function setup(
   }
   if (options.history !== undefined)
     await writeFile(join(directory, 'history.json'), options.history)
+  if (options.memory !== undefined) await writeFile(join(directory, 'memory.json'), options.memory)
   const response = { text: 'useComposerText', status: 200 }
   vi.stubGlobal(
     'fetch',
@@ -88,7 +90,7 @@ async function setup(
   }
   const launch = async () => {
     const setView = vi.fn<SetPluginView>()
-    const plugin = createVoicePlugin(() => {}, setView, models)
+    const plugin = createVoicePlugin(() => {}, setView, [{ id: 'qwen3-asr-1.7b', files: models }])
     cleanups.push(() => plugin.dispose())
     await plugin.start(start)
     const view = (id: 'history' | 'memory') =>
@@ -138,7 +140,7 @@ async function dictate(
 
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
-  expect(parsed.version).toBe('0.0.6')
+  expect(parsed.version).toBe('0.0.7')
   expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual(
     ['keepHistory', 'learnTerms'].map((key) => ({
       key,
@@ -150,13 +152,13 @@ test('declares enabled settings and list actions, and publishes valid empty and 
   )
   expect(parsed.actions).toEqual(
     expect.arrayContaining([
-      { id: 'clearHistory', title: 'action.clearHistory' },
-      { id: 'clearMemory', title: 'action.clearMemory' },
+      { id: 'clearHistory', title: 'action.clearHistory', confirm: 'confirm.clearHistory' },
+      { id: 'clearMemory', title: 'action.clearMemory', confirm: 'confirm.clearMemory' },
     ]),
   )
   const { plugin, setView, view, directory } = await setup()
-  expect(view('history')).toEqual({ items: [], empty: 'view.history.empty' })
-  expect(view('memory')).toEqual({ items: [], empty: 'view.memory.empty' })
+  expect(view('history')).toEqual({ items: [], total: 0, empty: 'view.history.empty' })
+  expect(view('memory')).toEqual({ items: [], total: 0, empty: 'view.memory.empty' })
   expect(await readdir(directory)).toEqual(['models'])
   await dictate(plugin)
   await dictate(plugin)
@@ -167,6 +169,8 @@ test('declares enabled settings and list actions, and publishes valid empty and 
   expect(view('memory').items).toEqual([
     { id: 'usecomposertext', text: 'useComposerText', detail: 'Heard in 2 dictations' },
   ])
+  expect(view('history').total).toBe(2)
+  expect(view('memory').total).toBe(1)
 })
 
 test('saves only finished text with its recording duration, newest first, and restores it', async () => {
@@ -190,17 +194,95 @@ test('saves only finished text with its recording duration, newest first, and re
   expect(replacement.view('history')).toEqual(view('history'))
 })
 
-test('keeps only the newest 200 dictations', async () => {
-  const { plugin, response, view, directory } = await setup()
-  for (let index = 0; index < 203; index++) {
-    response.text = `recording ${index}`
-    await dictate(plugin)
-  }
-  expect(view('history').items).toHaveLength(200)
-  expect(view('history').items[0]?.text).toBe('recording 202')
-  expect(view('history').items.at(-1)?.text).toBe('recording 3')
+test('keeps the newest 10,000 dictations and evicts the oldest', async () => {
+  const history = JSON.stringify(
+    Array.from({ length: 10_001 }, (_, index) => ({
+      id: String(index),
+      text: `recording ${index}`,
+      time: index,
+      seconds: 1,
+    })),
+  )
+  const { plugin, response, view, directory } = await setup({ history })
+  expect(view('history').items).toHaveLength(20)
+  expect(view('history').total).toBe(10_000)
+  expect(view('history').items[0]?.text).toBe('recording 10000')
+  expect(view('history').items.at(-1)?.text).toBe('recording 9981')
+  response.text = 'newest recording'
+  await dictate(plugin)
+  expect(view('history').total).toBe(10_000)
   await plugin.dispose()
-  expect(JSON.parse(await readFile(join(directory, 'history.json'), 'utf8'))).toHaveLength(200)
+  const stored = JSON.parse(await readFile(join(directory, 'history.json'), 'utf8'))
+  expect(stored).toHaveLength(10_000)
+  expect(stored[0].text).toBe('newest recording')
+  expect(stored.at(-1).text).toBe('recording 2')
+})
+
+test('pages history newest first, searches without case, and deletes an entry from a later page', async () => {
+  const history = JSON.stringify(
+    Array.from({ length: 55 }, (_, index) => ({
+      id: String(index),
+      text: `${index % 2 ? 'Beta' : 'Alpha'} recording ${index}`,
+      time: index,
+      seconds: 1,
+    })),
+  )
+  const { plugin, view } = await setup({ history })
+  const query = (search: string, cursor: string | null, limit: number, list = 'history') =>
+    plugin.query({ type: 'query', id: 1, view: list, search, cursor, limit })
+  expect(view('history').total).toBe(55)
+  expect(view('history').items).toHaveLength(20)
+  const first = await query('', null, 20)
+  const second = await query('', first.cursor, 20)
+  const last = await query('', second.cursor, 20)
+  expect([first.cursor, second.cursor, last.cursor]).toEqual(['20', '40', null])
+  expect([...first.items, ...second.items, ...last.items].map((item) => item.id)).toEqual(
+    Array.from({ length: 55 }, (_, index) => String(54 - index)),
+  )
+  expect(await query('', '999', 20)).toEqual({ items: [], cursor: null })
+  const matches = await query('aLpHa', null, 10)
+  expect(matches.items).toHaveLength(10)
+  expect(matches.cursor).toBe('10')
+  expect((await query('aLpHa', matches.cursor, 30)).items).toHaveLength(18)
+  expect(await query('not present', null, 20)).toEqual({ items: [], cursor: null })
+  const deep = last.items[0]!.id
+  await plugin.action('deleteEntry', deep)
+  expect(view('history').total).toBe(54)
+  expect((await query('', '40', 20)).items.map((item) => item.id)).not.toContain(deep)
+  expect(() => query('', null, 20, 'unknown')).toThrow('Unknown view: unknown')
+})
+
+test('pages learned terms by count and searches their text without case', async () => {
+  const memory = JSON.stringify({
+    terms: Array.from({ length: 25 }, (_, index) => ({
+      key: `term${index}`,
+      count: 26 - index,
+      time: index,
+      forms: { [`Term${index}`]: 26 - index },
+    })),
+    forgotten: [],
+  })
+  const { plugin, view } = await setup({ memory })
+  const query = (search: string, cursor: string | null, limit: number) =>
+    plugin.query({ type: 'query', id: 1, view: 'memory', search, cursor, limit })
+  expect(view('memory').total).toBe(25)
+  expect(view('memory').items).toHaveLength(20)
+  const first = await query('', null, 10)
+  const second = await query('', first.cursor, 10)
+  const last = await query('', second.cursor, 10)
+  expect([first.cursor, second.cursor, last.cursor]).toEqual(['10', '20', null])
+  expect([...first.items, ...second.items, ...last.items].map((item) => item.id)).toEqual(
+    Array.from({ length: 25 }, (_, index) => `term${index}`),
+  )
+  expect((await query('TERM2', null, 10)).items.map((item) => item.id)).toEqual([
+    'term2',
+    'term20',
+    'term21',
+    'term22',
+    'term23',
+    'term24',
+  ])
+  expect(await query('', '999', 10)).toEqual({ items: [], cursor: null })
 })
 
 test('turning history off stops saving, keeps existing entries, and allows delete and clear actions', async () => {
@@ -335,13 +417,22 @@ test('learning can be stopped while existing memory is used, forgotten across re
 test.each([true, false])(
   'learned terms reach recognition with request vocabulary (local: %s)',
   async (local) => {
-    const { plugin, response, view } = await setup({ local })
+    const { plugin, response } = await setup({ local })
     response.text =
       Array.from({ length: 55 }, (_, index) => `term${index}`).join(' ') + ' useComposerText'
     await dictate(plugin)
     await dictate(plugin)
     response.text = 'use composer text and G O D E'
-    const words = view('memory').items.map((item) => item.text)
+    const words = (
+      await plugin.query({
+        type: 'query',
+        id: 1,
+        view: 'memory',
+        search: '',
+        cursor: null,
+        limit: 100,
+      })
+    ).items.map((item) => item.text)
     const request = ['Gode', words[0]!.toUpperCase()]
     await expect(dictate(plugin, request)).resolves.toEqual({ text: 'useComposerText and Gode' })
     const body = vi.mocked(fetch).mock.calls.at(-1)![1]!.body as FormData
@@ -374,7 +465,7 @@ test.each(['en', 'de', 'zh-Hans', 'zh-Hant'] as const)(
 
 test('retains full long transcriptions on disk while publishing within SDK bounds', async () => {
   const { plugin, response, view, directory } = await setup()
-  response.text = 'hello '.repeat(2000).trim()
+  response.text = 'hello world '.repeat(2000).trim()
   await dictate(plugin)
   expect(view('history').items[0]?.text).toHaveLength(10_000)
   await plugin.dispose()

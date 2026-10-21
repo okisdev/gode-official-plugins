@@ -3,11 +3,14 @@ import { join } from 'node:path'
 import type { HostMessage, PluginStatus } from '@gode/plugin-sdk'
 import { afterEach, expect, test, vi } from 'vitest'
 import { createVoicePlugin } from './plugin'
+import { LocalEngine } from './engine'
 import { fixture, model, pcm } from './test-fixtures'
 
 const cleanups: (() => Promise<void>)[] = []
 afterEach(async () => {
   for (const cleanup of cleanups.splice(0).reverse()) await cleanup()
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 async function setup(listener: Parameters<typeof fixture>[0]) {
@@ -17,10 +20,12 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
   const models = ['model.gguf', 'projector.gguf'].map((file) =>
     model(file, server.url, 'model bytes'),
   )
+  const polish = { id: 'qwen3.5-2b', files: [model('polish.gguf', server.url, 'polish bytes')] }
   const plugin = createVoicePlugin(
     (status) => statuses.push(status),
     () => {},
-    models,
+    [{ id: 'qwen3-asr-1.7b', files: models }],
+    polish,
   )
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
@@ -31,7 +36,7 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
     paths: { data: server.directory, plugin: server.directory },
   }
   await plugin.start(start)
-  return { server, statuses, plugin, start }
+  return { server, statuses, plugin, start, polish }
 }
 
 test('missing, downloading, ready and removal use manifest states and localized sizes', async () => {
@@ -100,7 +105,7 @@ test('server settings, check, transcription and API failures use the contract', 
           ? { error: { message: 'Invalid key' } }
           : request.url?.endsWith('/models')
             ? { data: [] }
-            : { text: 'language English<asr_text>Um, make test.' },
+            : { text: 'language English<asr_text>um, make test.' },
       ),
     )
   })
@@ -197,4 +202,134 @@ test('a missing local executable produces error.engine', async () => {
   await expect(
     plugin.call({ type: 'call', id: 1, method: 'dictation.finish', params: { session: 'local' } }),
   ).rejects.toMatchObject({ text: { message: 'error.engine' } })
+})
+
+async function finish(plugin: Awaited<ReturnType<typeof setup>>['plugin']) {
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session: 'tidy', vocabulary: ['agentdoc'] },
+  })
+  await plugin.call({
+    type: 'call',
+    id: 2,
+    method: 'dictation.append',
+    params: { session: 'tidy', audio: pcm(1) },
+  })
+  return plugin.call({
+    type: 'call',
+    id: 3,
+    method: 'dictation.finish',
+    params: { session: 'tidy' },
+  })
+}
+
+test.each([
+  ['accepted', 'Please send to Agent Doc on Thursday.', 'Please send to agentdoc on Thursday.'],
+  ['rejected', 'Paris', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
+  ['failed', '', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
+  ['timeout', '', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
+])(
+  'finish uses a tidy edit or falls back when the reply is %s',
+  async (caseName, reply, expected) => {
+    const requests: { url: string; body: string }[] = []
+    const { server, plugin, start, statuses, polish } = await setup(async (request, response) => {
+      let body = ''
+      for await (const chunk of request) body += chunk
+      requests.push({ url: request.url!, body })
+      if (request.url?.endsWith('/audio/transcriptions')) {
+        response.end(
+          JSON.stringify({ text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' }),
+        )
+      } else if (caseName === 'failed') {
+        response.writeHead(500)
+        response.end('error')
+      } else if (caseName !== 'timeout') {
+        response.end(JSON.stringify({ choices: [{ message: { content: reply } }] }))
+      }
+    })
+    await mkdir(join(server.directory, 'models'), { recursive: true })
+    await writeFile(join(server.directory, 'models', polish.files[0]!.file), 'polish bytes')
+    const used = vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async function (
+      this: LocalEngine,
+      work,
+    ) {
+      return work(`${server.url}/v1`)
+    })
+    await plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: { engine: 'server', serverURL: `${server.url}/v1`, polish: true },
+    })
+    expect(statuses.at(-1)?.state).toBe('ready')
+    await expect(finish(plugin)).resolves.toEqual({ text: expected })
+    expect(used).toHaveBeenCalled()
+    const sent = requests.find((request) => request.url === '/v1/chat/completions')
+    expect(sent).toBeDefined()
+    expect(JSON.parse(sent!.body)).toMatchObject({
+      temperature: 0,
+      max_tokens: Math.min(
+        512,
+        2 * 'Please send to Agent Doc on Wednesday, I mean Thursday.'.length + 16,
+      ),
+      chat_template_kwargs: { enable_thinking: false },
+    })
+    expect(JSON.parse(sent!.body).messages.at(-1)).toEqual({
+      role: 'user',
+      content: '<transcript>Please send to Agent Doc on Wednesday, I mean Thursday.</transcript>',
+    })
+  },
+  8000,
+)
+
+test('polish off never starts the tidy engine or sends a chat request', async () => {
+  const requests: string[] = []
+  const { server, plugin, start, polish } = await setup((request, response) => {
+    requests.push(request.url!)
+    response.end(
+      JSON.stringify({ text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' }),
+    )
+  })
+  await mkdir(join(server.directory, 'models'), { recursive: true })
+  await writeFile(join(server.directory, 'models', polish.files[0]!.file), 'polish bytes')
+  const used = vi.spyOn(LocalEngine.prototype, 'use')
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: { engine: 'server', serverURL: `${server.url}/v1`, polish: false },
+  })
+  await expect(finish(plugin)).resolves.toEqual({
+    text: 'Please send to agentdoc on Wednesday, I mean Thursday.',
+  })
+  expect(used).not.toHaveBeenCalled()
+  expect(requests).toEqual(['/v1/audio/transcriptions'])
+})
+
+test('local recognition also tidies only the final transcript', async () => {
+  const requests: string[] = []
+  const { server, plugin, start, polish } = await setup((request, response) => {
+    requests.push(request.url!)
+    response.end(
+      JSON.stringify(
+        request.url?.endsWith('/chat/completions')
+          ? { choices: [{ message: { content: 'Please send to Agent Doc on Thursday.' } }] }
+          : { text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' },
+      ),
+    )
+  })
+  await mkdir(join(server.directory, 'models'), { recursive: true })
+  for (const file of ['model.gguf', 'projector.gguf'])
+    await writeFile(join(server.directory, 'models', file), 'model bytes')
+  await writeFile(join(server.directory, 'models', polish.files[0]!.file), 'polish bytes')
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async function (
+    this: LocalEngine,
+    work,
+  ) {
+    return work(`${server.url}/v1`)
+  })
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
+  await expect(finish(plugin)).resolves.toEqual({ text: 'Please send to agentdoc on Thursday.' })
+  expect(requests).toContain('/v1/audio/transcriptions')
+  expect(requests).toContain('/v1/chat/completions')
 })

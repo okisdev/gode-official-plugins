@@ -4,11 +4,13 @@ import { join } from 'node:path'
 import type { HostMessage, PluginStatus } from '@gode/plugin-sdk'
 import { afterEach, expect, test, vi } from 'vitest'
 import { createVoicePlugin } from './plugin'
+import { LocalEngine } from './engine'
 import { model, pcm } from './test-fixtures'
 
 const cleanups: (() => Promise<void>)[] = []
 afterEach(async () => {
   for (const cleanup of cleanups.splice(0).reverse()) await cleanup()
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
@@ -19,10 +21,21 @@ async function setup() {
   const models = ['model.gguf', 'projector.gguf'].map((name) =>
     model(name, 'http://127.0.0.1/model', 'model bytes'),
   )
+  const smaller = ['small-model.gguf', 'small-projector.gguf'].map((name) =>
+    model(name, 'http://127.0.0.1/small', 'small'),
+  )
+  const polish = {
+    id: 'qwen3.5-2b',
+    files: [model('polish.gguf', 'http://127.0.0.1/polish', 'polish bytes')],
+  }
   const plugin = createVoicePlugin(
     (status) => statuses.push(status),
     () => {},
-    models,
+    [
+      { id: 'qwen3-asr-1.7b', files: models },
+      { id: 'qwen3-asr-0.6b', files: smaller },
+    ],
+    polish,
   )
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
@@ -33,8 +46,154 @@ async function setup() {
     paths: { plugin: directory, data: directory },
   }
   await plugin.start(start)
-  return { plugin, statuses, directory, start }
+  return { plugin, statuses, directory, start, models, smaller, polish }
 }
+
+test('missing tidy model leaves recognition ready, and download and removal use the same verified files', async () => {
+  const { plugin, statuses, directory, start, models, polish } = await setup()
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
+  expect(statuses.at(-1)).toMatchObject({ state: 'setup', message: 'status.modelMissing' })
+  for (const file of models) await writeFile(join(directory, 'models', file.file), 'model bytes')
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
+  expect(statuses.at(-1)).toMatchObject({
+    state: 'ready',
+    message: 'status.polishMissing',
+    action: 'downloadPolishModel',
+  })
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response('polish bytes')),
+  )
+  await plugin.action('downloadPolishModel')
+  await vi.waitFor(() => expect(statuses.at(-1)?.message).toBe('status.localReady'))
+  expect(
+    statuses
+      .filter((status) => status.message === 'status.polishDownloading')
+      .map((status) => status.progress),
+  ).toEqual([0, 1])
+  expect(await readdir(join(directory, 'models'))).toContain(polish.files[0]!.file)
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: { engine: 'local', polish: false },
+  })
+  expect(await readdir(join(directory, 'models'))).toContain(polish.files[0]!.file)
+  await plugin.action('removePolishModel')
+  expect(await readdir(join(directory, 'models'))).toEqual(models.map((file) => file.file))
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
+  expect(statuses.at(-1)?.message).toBe('status.polishMissing')
+})
+
+test('a failed tidy model download leaves dictation ready for a retry', async () => {
+  const { plugin, statuses, directory, start, models } = await setup()
+  for (const file of models) await writeFile(join(directory, 'models', file.file), 'model bytes')
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response('bad bytes')),
+  )
+  await plugin.action('downloadPolishModel')
+  await vi.waitFor(() =>
+    expect(statuses.at(-1)).toMatchObject({
+      state: 'ready',
+      message: 'status.polishDownloadFailed',
+      action: 'downloadPolishModel',
+    }),
+  )
+  expect(await readdir(join(directory, 'models'))).toEqual(models.map((file) => file.file))
+  await expect(
+    plugin.call({
+      type: 'call',
+      id: 1,
+      method: 'dictation.start',
+      params: { session: 'after-failure', vocabulary: [] },
+    }),
+  ).resolves.toBeNull()
+})
+
+test('selected model controls setup, download and removal while both sets can coexist', async () => {
+  const { plugin, statuses, directory, start, models, smaller } = await setup()
+  const fetchModel = vi.fn(async (_url: string, _init?: RequestInit) => new Response('small'))
+  vi.stubGlobal('fetch', fetchModel)
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: { engine: 'local', localModel: 'qwen3-asr-0.6b' },
+  })
+  expect(statuses.at(-1)).toMatchObject({
+    state: 'setup',
+    message: 'status.modelMissing',
+    values: { size: '10 Byte' },
+  })
+  await plugin.action('downloadModel')
+  await vi.waitFor(() => expect(statuses.at(-1)?.message).toBe('status.localReady'))
+  expect(fetchModel).toHaveBeenCalledTimes(2)
+  expect(fetchModel.mock.calls.every(([url]) => url === 'http://127.0.0.1/small')).toBe(true)
+  expect(await readdir(join(directory, 'models'))).toEqual(smaller.map((file) => file.file))
+  for (const file of models) await writeFile(join(directory, 'models', file.file), 'model bytes')
+  await plugin.action('removeModel')
+  expect(statuses.at(-1)?.message).toBe('status.modelMissing')
+  expect((await readdir(join(directory, 'models'))).sort()).toEqual(
+    models.map((file) => file.file).sort(),
+  )
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local' } })
+  expect(statuses.at(-1)?.message).toBe('status.localReady')
+})
+
+test('switching models cancels a pending download and restarts with the selected paths', async () => {
+  const { plugin, statuses, directory, start, models, smaller } = await setup()
+  for (const file of models) await writeFile(join(directory, 'models', file.file), 'model bytes')
+  for (const file of smaller) await writeFile(join(directory, 'models', file.file), 'small')
+  const paths: string[][] = []
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async function (
+    this: LocalEngine,
+    work,
+  ) {
+    const options = (this as unknown as { options: { model: string; projector: string } }).options
+    paths.push([options.model, options.projector])
+    return work('http://127.0.0.1/v1')
+  })
+  const stopped = vi.spyOn(LocalEngine.prototype, 'stop')
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(new Error('aborted')), {
+            once: true,
+          })
+        }),
+    ),
+  )
+  await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local' } })
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session: 'default', vocabulary: [] },
+  })
+  await vi.waitFor(() => expect(paths).toHaveLength(1))
+  expect(paths[0]).toEqual(models.map((file) => join(directory, 'models', file.file)))
+  await plugin.action('downloadModel')
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: { engine: 'local', localModel: 'qwen3-asr-0.6b' },
+  })
+  expect(statuses.at(-1)?.message).toBe('status.localReady')
+  expect(stopped).toHaveBeenCalledTimes(2)
+  expect((await readdir(join(directory, 'models'))).sort()).toEqual(
+    [...models, ...smaller].map((file) => file.file).sort(),
+  )
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session: 'small', vocabulary: [] },
+  })
+  await vi.waitFor(() => expect(paths).toHaveLength(2))
+  expect(paths[1]).toEqual(smaller.map((file) => join(directory, 'models', file.file)))
+})
 
 test('local lifecycle publishes setup, progress, ready and removal without losing control messages', async () => {
   const { plugin, statuses, directory, start } = await setup()
@@ -227,16 +386,29 @@ test('startup removes stale partials and recognizes previously verified models',
   for (const file of ['model.gguf', 'projector.gguf'])
     await writeFile(join(directory, 'models', file), 'model bytes')
   await writeFile(join(directory, 'models/model.gguf.partial'), 'incomplete')
+  await writeFile(join(directory, 'models/small-model.gguf.partial'), 'incomplete')
   const statuses: PluginStatus[] = []
   const replacement = createVoicePlugin(
     (status) => statuses.push(status),
     () => {},
-    ['model.gguf', 'projector.gguf'].map((name) =>
-      model(name, 'http://127.0.0.1/model', 'model bytes'),
-    ),
+    [
+      {
+        id: 'qwen3-asr-1.7b',
+        files: ['model.gguf', 'projector.gguf'].map((name) =>
+          model(name, 'http://127.0.0.1/model', 'model bytes'),
+        ),
+      },
+      {
+        id: 'qwen3-asr-0.6b',
+        files: ['small-model.gguf', 'small-projector.gguf'].map((name) =>
+          model(name, 'http://127.0.0.1/small', 'small'),
+        ),
+      },
+    ],
   )
   cleanups.push(() => replacement.dispose())
   await replacement.start(start)
   expect(statuses.at(-1)?.message).toBe('status.localReady')
   expect(await readdir(join(directory, 'models'))).not.toContain('model.gguf.partial')
+  expect(await readdir(join(directory, 'models'))).not.toContain('small-model.gguf.partial')
 })

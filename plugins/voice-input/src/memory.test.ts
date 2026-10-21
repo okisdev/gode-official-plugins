@@ -96,10 +96,11 @@ test('evicts the least recently heard learned term, regardless of count', async 
   memory.record('term300', [])
   memory.record('term300', [])
   const words = view().items.map((item) => item.text)
-  expect(words).toHaveLength(300)
+  expect(words).toHaveLength(20)
+  expect(view().total).toBe(300)
   expect(words).toContain('term0')
-  expect(words).toContain('term300')
-  expect(words).not.toContain('term1')
+  expect(memory.query('', null, 100).items.map((item) => item.text)).toContain('term300')
+  expect(memory.query('', null, 100).items.map((item) => item.text)).not.toContain('term1')
   expect(words[0]).toBe('term0')
 })
 
@@ -156,7 +157,7 @@ test.each([
   '{"terms":[],"forgotten":[1]}',
 ])('corrupt memory starts empty: %s', async (stored) => {
   const { memory, view } = await setup('en', stored)
-  expect(view()).toEqual({ items: [], empty: 'view.memory.empty' })
+  expect(view()).toEqual({ items: [], total: 0, empty: 'view.memory.empty' })
   memory.record('API', [])
   memory.record('API', [])
   expect(view().items[0]?.text).toBe('API')
@@ -170,7 +171,8 @@ test('caps restored learned terms and rejects terms whose ids exceed the list co
     forms: { [`term${index}`]: 2 },
   }))
   const { memory, view } = await setup('en', JSON.stringify({ terms, forgotten: [] }))
-  expect(view().items).toHaveLength(300)
+  expect(view().items).toHaveLength(20)
+  expect(view().total).toBe(300)
   expect(memory.vocabulary([])).not.toContain('term0')
   const long = `gpt${'4'.repeat(201)}`
   expect(extractTerms(long, [])).toEqual([])

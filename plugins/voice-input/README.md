@@ -6,7 +6,7 @@ The plugin behind Gode's dictation. It offers the `dictation` capability (see th
 
 The Recognize On setting chooses the engine:
 
-- **This Computer** (the default) runs Qwen3-ASR 1.7B through llama.cpp's `llama-server`. The archive carries `llama-server` and its libraries for the platform; the model and its audio projector (2.5 GB together) download into the plugin's data folder when the person runs Download Model, as `.partial` files that are checked against the SHA-256 in `resources.json` before taking their names; an interrupted download starts over. `llama-server` starts on `127.0.0.1` at the first recording and stops after five idle minutes.
+- **This Computer** (the default) runs the selected local model through llama.cpp's `llama-server`. Qwen3-ASR 1.7B is recommended for the best recognition (2.5 GB download); Qwen3-ASR 0.6B is faster and needs less memory and disk space (1.0 GB download). The archive carries `llama-server` and its libraries for the platform. Download Model fetches only the selected model and its audio projector into `paths.data/models` as `.partial` files, checks them against the SHA-256 pins in `resources.json`, then gives them their final names. An interrupted download starts over. Both model sets can remain on disk; Remove Model removes only the selected set. `llama-server` starts on `127.0.0.1` at the first recording and stops after five idle minutes. Changing the local model stops the current engine and starts the selected model on the next recording.
 - **OpenAI-Compatible Server** sends the recording to any OpenAI-compatible `/audio/transcriptions` endpoint, such as OpenAI's or a speech server on the local network, with the URL, API key and model the person gives. Check Server lists the server's models to confirm the URL and key.
 
 Both engines receive the language setting (Automatic or one language). Only an OpenAI-compatible server receives Gode's vocabulary and up to 50 learned terms, ranked by dictation count, as the `prompt`. The local model does not use the prompt for vocabulary recognition and can echo it as speech, so the plugin omits it. After recognition, both engines use the full vocabulary and all learned terms to rewrite words the model spelled out or split, such as `G O D E`, as written in the vocabulary. Remove Filler Words drops sounds such as “um” and “嗯”.
@@ -25,7 +25,7 @@ Statistics are stored in `stats.json` in the plugin's data folder, using atomic 
 
 ## History
 
-Keep Dictation History is on by default. Each non-empty final transcription saves its text, timestamp and recording length in `history.json` under `paths.data`, on this computer. The newest 200 entries are kept; audio is not saved. Dictation History shows entries newest first, with recording lengths in the plugin's language. Turn the setting off to stop saving new entries while keeping existing ones, use Delete Entry to remove one, or Clear History to remove all. Transcriptions longer than 10,000 characters remain complete on disk but show only their first 10,000 characters in the list.
+Keep Dictation History is on by default. Each non-empty final transcription saves its text, timestamp and recording length in `history.json` under `paths.data`, on this computer. The newest 10,000 entries are kept; audio is not saved. Dictation History shows recent entries newest first, with recording lengths in the plugin's language. Gode opens the full history on its own page with search and pages of entries. Turn the setting off to stop saving new entries while keeping existing ones, use Delete to remove one, or Clear History to remove all. Transcriptions longer than 10,000 characters remain complete on disk but show only their first 10,000 characters in the list.
 
 ## Memory
 
@@ -38,7 +38,7 @@ Candidates, spelling frequencies, dictation counts and forgotten terms are store
 | Path | What it holds |
 | --- | --- |
 | `manifest.json` | Settings, actions, views, statuses and their words in every language. |
-| `resources.json` | The pinned model files and `llama-server` archives, by URL, size and SHA-256. `setupBytes` in the manifest is the models' total size, and the build checks that it matches. |
+| `resources.json` | The pinned model sets and `llama-server` archives, by URL, size and SHA-256. `setupBytes` in the manifest is the default model set's total size, and the build checks that it matches. |
 | `src/main.ts` | The process entry, which hands `createVoicePlugin` to `definePlugin`. |
 | `src/plugin.ts` | Settings, actions, statuses and the `dictation` calls. |
 | `src/engine.ts` | Starts and stops the local `llama-server`. |
@@ -50,7 +50,7 @@ Candidates, spelling frequencies, dictation counts and forgotten terms are store
 | `src/memory.ts` | Learned terms, forgotten terms and the memory list. |
 | `src/memory-logic.ts` | Candidate term extraction. |
 | `src/atomic-file.ts` | Serialized atomic persistence shared by statistics, history and memory. |
-| `scripts/build.mjs` | Fetches the pinned `llama-server` for each platform, bundles `src/main.ts` and packs the archive with `packPlugin`. |
+| `build.ts` | Fetches the pinned `llama-server` for each platform and stages its runtime files for the SDK build. |
 
 ## Commands
 

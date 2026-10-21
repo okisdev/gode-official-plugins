@@ -9,25 +9,45 @@ export function formatBytes(bytes: number, locale: string): string {
   }).format(bytes / 1000 ** index)
 }
 
+const latinFillers = /(?<![\p{L}\p{N}_'’])(?:um+|uh+|uhm|erm|er|hmm+|mm+)(?![\p{L}\p{N}_'’])/giu
+const standaloneFillers =
+  /(?<=^|[\s\p{P}])(?:[嗯呃额啊]|えー+と|えっと|ええと|えー+っと|えー+|あのー+|うー+ん|음+|어+|으+음)(?=$|[\s\p{P}])/gu
+const leadingJapaneseFillers =
+  /(?<=^|[\s\p{P}])(?:えー+と|えっと|ええと|えー+っと|あのー+|うー+ん)/gu
+const repeatedWord = /\b([\p{L}'’]+)(?:\s+\1\b)+/giu
+
 export function cleanTranscript(text: string, removeFillers: boolean): string {
   const stripped = text.replace(/^\s*language\s+[^<>\r\n]+<asr_text>\s*/i, '').trim()
   if (!removeFillers) return stripped
   const marked = stripped
-    .replace(/(?<![\p{L}\p{N}_'’])(?:um|uh|erm|hmm)(?![\p{L}\p{N}_'’])/giu, '\0')
-    .replace(/(?<=^|[\s\p{P}])[嗯呃额啊](?=$|[\s\p{P}])/gu, '\0')
+    .replace(/(?<=\p{Script=Han})呃+(?=\p{Script=Han})/gu, '')
+    .replace(/((?![哈呵嘿嘻谢])\p{Script=Han})\1{2,}/gu, '$1')
+    .replace(repeatedWord, (whole: string, word: string) =>
+      /^(?:had|that|is)$/i.test(word) ? whole : word,
+    )
+    .replace(latinFillers, '\0')
+    .replace(standaloneFillers, '\0')
+    .replace(leadingJapaneseFillers, '\0')
   if (marked === stripped) return stripped
-  return marked
+  const cleaned = marked
     .replace(
-      /([,，。.!！?？;；:：])?[ \t]*\0(?:[ \t,，;；:：]*\0)*[ \t]*([,，。.!！?？;；:：])?/gu,
+      /([,，、。.!！?？;；:：])?[ \t]*\0(?:[ \t,，、;；:：]*\0)*[ \t]*([,，、。.!！?？;；:：])?/gu,
       (whole: string, before: string | undefined, after: string | undefined) => {
         const punctuation = before && /[。.!！?？]/u.test(before) ? before : (after ?? before)
         return punctuation ? punctuation + (/\s$/u.test(whole) ? ' ' : '') : ' '
       },
     )
-    .replace(/^[\s,，。.!！?？;；:：]+/u, '')
-    .replace(/[,，;；:：]\s*$/u, '')
+    .replace(/^[\s,，、。.!！?？;；:：]+/u, '')
+    .replace(/[,，、;；:：]\s*$/u, '')
     .replace(/[ \t]{2,}/g, ' ')
+    .replace(
+      /(?<=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]) (?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}])/gu,
+      '',
+    )
     .trim()
+  return /^\p{Lu}/u.test(stripped)
+    ? cleaned.replace(/^\p{Ll}/u, (letter) => letter.toUpperCase())
+    : cleaned
 }
 
 const separators = (text: string) => text.match(/[\s\-_.]/gu)?.length ?? 0

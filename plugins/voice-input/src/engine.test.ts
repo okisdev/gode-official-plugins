@@ -69,6 +69,7 @@ test('concurrent prepare and transcribe share startup; idle shutdown restarts on
     '/data/models/model.gguf',
     '--mmproj',
     '/data/models/projector.gguf',
+    '--jinja',
     '--host',
     '127.0.0.1',
     '--port',
@@ -80,6 +81,27 @@ test('concurrent prepare and transcribe share startup; idle shutdown restarts on
   expect(child().kill).toHaveBeenCalledWith('SIGTERM')
   await engine.use(async () => null)
   expect(harness.spawn).toHaveBeenCalledTimes(2)
+  await engine.stop()
+})
+
+test('text model starts without a projector', async () => {
+  setup()
+  const engine = new LocalEngine({
+    executable: '/plugin/bin/llama-server',
+    model: '/data/models/polish.gguf',
+  })
+  await engine.use(async () => null)
+  expect(harness.spawn.mock.calls[0]?.[1]).toEqual([
+    '-m',
+    '/data/models/polish.gguf',
+    '--jinja',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '12345',
+    '-c',
+    '4096',
+  ])
   await engine.stop()
 })
 

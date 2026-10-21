@@ -28,7 +28,7 @@ export class LocalEngine {
     private readonly options: {
       executable: string
       model: string
-      projector: string
+      projector?: string
       idleMs?: number
       startupMs?: number
     },
@@ -67,8 +67,8 @@ export class LocalEngine {
         [
           '-m',
           this.options.model,
-          '--mmproj',
-          this.options.projector,
+          ...(this.options.projector ? ['--mmproj', this.options.projector] : []),
+          '--jinja',
           '--host',
           '127.0.0.1',
           '--port',

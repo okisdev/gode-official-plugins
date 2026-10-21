@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm -r test && vitest run --configLoader runner --dir scripts",
+    "test": "pnpm -r --workspace-concurrency=1 test && vitest run --configLoader runner --dir scripts",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p scripts",
     "lint": "oxlint && oxfmt --check",
     "lint:fix": "oxlint --fix && oxfmt",
@@ -16,6 +16,7 @@
     "catalog": "node scripts/catalog.mjs"
   },
   "devDependencies": {
+    "@gode/format": "link:../gode/packages/format",
     "@gode/plugin-sdk": "link:../gode/packages/plugin-sdk",
     "@types/node": "catalog:",
     "oxfmt": "^0.73.0",

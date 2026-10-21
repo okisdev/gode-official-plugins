@@ -10,14 +10,27 @@ import {
 
 test.each([
   ['language Chinese<asr_text>把 hook 抽出来', true, '把 hook 抽出来'],
-  ['language English<asr_text>Um, run make test.', true, 'run make test.'],
+  ['language English<asr_text>Um, run make test.', true, 'Run make test.'],
   ['嗯，把 hook 抽出来，呃，然后跑 make test。', true, '把 hook 抽出来，然后跑 make test。'],
   ['嗯 呃 额 啊', true, ''],
   ['嗯哼，啊哈，余额，语气啊。', true, '嗯哼，啊哈，余额，语气啊。'],
-  ['Um, run, uh, make test. Erm, hmm.', true, 'run, make test.'],
+  ['Um, run, uh, make test. Erm, hmm.', true, 'Run, make test.'],
   ['album thumb summer rhythm uh_huh umami', true, 'album thumb summer rhythm uh_huh umami'],
   ['language English<asr_text>um, keep this.', false, 'um, keep this.'],
   ['Wait... really?!', true, 'Wait... really?!'],
+  ['我们呃来测试一下', true, '我们来测试一下'],
+  ['我我我想说的是，哈哈哈，谢谢谢谢', true, '我想说的是，哈哈哈，谢谢谢谢'],
+  ['Um, so I think, uh, we should ship it.', true, 'So I think, we should ship it.'],
+  ['so the the API is er broken', true, 'so the API is broken'],
+  [
+    'what it is is fine and that that works, I had had enough',
+    true,
+    'what it is is fine and that that works, I had had enough',
+  ],
+  ['えーと、あの、明日の会議は明後日です。', true, 'あの、明日の会議は明後日です。'],
+  ['えっとテストします。あのー、もう一度', true, 'テストします。もう一度'],
+  ['음, 내일 회의는 어 모레입니다', true, '내일 회의는 모레입니다'],
+  ['あの人は 어머니 errand ermine', true, 'あの人は 어머니 errand ermine'],
 ])('cleans %s', (text, remove, expected) => expect(cleanTranscript(text, remove)).toBe(expected))
 
 test('multipart carries WAV, vocabulary, language and secret without setting a boundary', async () => {

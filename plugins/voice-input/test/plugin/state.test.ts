@@ -6,7 +6,7 @@ import type { PluginContext } from '@gode/plugin-sdk/plugin'
 import { afterEach, expect, test, vi } from '@gode/plugin-sdk/test'
 import { createVoicePlugin } from '../../src/plugin.ts'
 import { LocalEngine } from '../../src/models/engine.ts'
-import { model, pcm, settings } from '../fixtures/index.ts'
+import { emptyStores, model, pcm, settings, testSynced } from '../fixtures/index.ts'
 
 const cleanups: (() => Promise<void>)[] = []
 afterEach(async () => {
@@ -31,7 +31,7 @@ async function setup() {
     files: [model('polish.gguf', 'http://127.0.0.1/polish', 'polish bytes')],
   }
   const plugin = createVoicePlugin(
-    { setStatus: (status) => statuses.push(status), setView: () => {}, log },
+    { setStatus: (status) => statuses.push(status), setView: () => {}, log, synced: testSynced() },
     [
       { id: 'qwen3-asr-1.7b', files: models },
       { id: 'qwen3-asr-0.6b', files: smaller },
@@ -45,6 +45,7 @@ async function setup() {
     secrets: {},
     locale: 'de',
     paths: { plugin: directory, data: directory },
+    stores: emptyStores(),
   }
   await plugin.start(start)
   return { plugin, statuses, directory, start, models, smaller, polish, log }
@@ -549,7 +550,12 @@ test('startup removes stale partials and recognizes previously verified models',
   await writeFile(join(directory, 'models/small-model.gguf.partial'), 'incomplete')
   const statuses: PluginStatus[] = []
   const replacement = createVoicePlugin(
-    { setStatus: (status) => statuses.push(status), setView: () => {}, log: () => {} },
+    {
+      setStatus: (status) => statuses.push(status),
+      setView: () => {},
+      log: () => {},
+      synced: testSynced(),
+    },
     [
       {
         id: 'qwen3-asr-1.7b',

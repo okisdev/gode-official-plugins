@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import type { PluginViewPage } from '@gode/plugin-sdk'
-import type { SetPluginView } from '@gode/plugin-sdk/plugin'
+import type { PluginContext, SetPluginView, SyncedMap, SyncedSet } from '@gode/plugin-sdk/plugin'
 import de from '../../i18n/de.json'
 import en from '../../i18n/en.json'
 import es from '../../i18n/es.json'
@@ -35,14 +35,24 @@ interface Term {
   forms: Record<string, number>
 }
 
+function validKey(key: unknown): key is string {
+  return typeof key === 'string' && key.length > 0 && key.length <= 200 && key === key.toLowerCase()
+}
+
+function validSyncedTerm(key: string, spelling: unknown): spelling is string {
+  return (
+    validKey(key) &&
+    typeof spelling === 'string' &&
+    spelling.length <= 1000 &&
+    spelling.toLowerCase() === key
+  )
+}
+
 function validTerm(value: unknown): value is Term {
   if (!value || typeof value !== 'object') return false
   const term = value as Term
   return (
-    typeof term.key === 'string' &&
-    term.key.length > 0 &&
-    term.key.length <= 200 &&
-    term.key === term.key.toLowerCase() &&
+    validKey(term.key) &&
     Number.isSafeInteger(term.count) &&
     term.count > 0 &&
     Number.isSafeInteger(term.time) &&
@@ -66,36 +76,92 @@ export class VoiceMemory {
   private terms = new Map<string, Term>()
   private forgotten = new Set<string>()
   private readonly file: AtomicFile
+  private readonly syncedTerms: SyncedMap
+  private readonly syncedForgotten: SyncedSet
+  private migrated = false
+  private unlisten: (() => void)[] = []
 
   constructor(
     directory: string,
     private readonly locale: string,
     private readonly setView: SetPluginView<Names>,
+    synced: PluginContext<Names>['synced'],
   ) {
     this.file = new AtomicFile(join(directory, 'memory.json'))
+    this.syncedTerms = synced('terms')
+    this.syncedForgotten = synced('forgotten')
   }
 
   async read(): Promise<void> {
-    const value = (await this.file.read()) as { terms?: unknown; forgotten?: unknown } | undefined
+    const value = (await this.file.read()) as
+      | { terms?: unknown; forgotten?: unknown; migrated?: unknown }
+      | undefined
     if (
       value &&
       Array.isArray(value.terms) &&
       value.terms.every(validTerm) &&
       Array.isArray(value.forgotten) &&
-      value.forgotten.every(
-        (key): key is string =>
-          typeof key === 'string' &&
-          key.length > 0 &&
-          key.length <= 200 &&
-          key === key.toLowerCase(),
-      )
+      value.forgotten.every(validKey)
     ) {
+      this.migrated = value.migrated === true
       this.forgotten = new Set(value.forgotten)
-      this.terms = new Map(
-        value.terms.filter((term) => !this.forgotten.has(term.key)).map((term) => [term.key, term]),
-      )
-      this.prune()
+      this.terms = new Map(value.terms.map((term) => [term.key, term]))
+      this.pruneForgotten(false)
+      if (!this.migrated) {
+        for (const term of this.learned()
+          .filter((term) => !this.forgotten.has(term.key))
+          .sort((a, b) => b.time - a.time)
+          .slice(0, 300)) {
+          const spelling = surface(term)
+          if (validSyncedTerm(term.key, spelling) && !this.syncedTerms.has(term.key))
+            this.syncedTerms.set(term.key, spelling)
+        }
+        const forgotten = new Set(this.syncedForgotten.values())
+        for (const key of this.forgotten) {
+          forgotten.delete(key)
+          forgotten.add(key)
+        }
+        while (forgotten.size > 1000) forgotten.delete(forgotten.values().next().value!)
+        for (const key of this.syncedForgotten.values()) {
+          if (!forgotten.has(key)) this.syncedForgotten.delete(key)
+        }
+        for (const key of forgotten) this.syncedForgotten.add(key)
+        this.migrated = true
+        this.save()
+      }
     }
+    this.reconcile()
+    if (value || this.terms.size || this.forgotten.size) {
+      this.migrated = true
+      this.save()
+    }
+    this.unlisten.push(
+      this.syncedTerms.onChange(({ changed, deleted }) => {
+        for (const key of changed) {
+          const spelling = this.syncedTerms.get(key)
+          if (this.forgotten.has(key)) this.syncedTerms.delete(key)
+          else if (validSyncedTerm(key, spelling)) this.learn(key, spelling)
+          else if ((this.terms.get(key)?.count ?? 0) >= 2) this.terms.delete(key)
+        }
+        for (const key of deleted) {
+          if ((this.terms.get(key)?.count ?? 0) >= 2) this.terms.delete(key)
+        }
+        this.prune()
+        this.changed()
+      }),
+      this.syncedForgotten.onChange(({ added, deleted }) => {
+        for (const key of added) {
+          if (!validKey(key)) continue
+          this.terms.delete(key)
+          this.syncedTerms.delete(key)
+          this.forgotten.delete(key)
+          this.forgotten.add(key)
+        }
+        for (const key of deleted) this.forgotten.delete(key)
+        this.pruneForgotten()
+        this.changed()
+      }),
+    )
     this.publish()
   }
 
@@ -118,6 +184,11 @@ export class VoiceMemory {
     }
     if (!seen.size) return
     this.prune()
+    for (const key of seen) {
+      const term = this.terms.get(key)
+      if (term && term.count >= 2 && this.syncedTerms.get(key) !== surface(term))
+        this.syncedTerms.set(key, surface(term))
+    }
     this.changed()
   }
 
@@ -135,17 +206,24 @@ export class VoiceMemory {
   forget(key: string): void {
     if (!this.terms.has(key)) return
     this.terms.delete(key)
+    this.syncedTerms.delete(key)
     this.forgotten.add(key)
+    this.pruneForgotten()
+    this.syncedForgotten.add(key)
     this.changed()
   }
 
   clear(): void {
     this.terms.clear()
     this.forgotten.clear()
+    this.syncedTerms.clear()
+    this.syncedForgotten.clear()
     this.changed()
   }
 
   dispose(): Promise<void> {
+    for (const unlisten of this.unlisten) unlisten()
+    this.unlisten = []
     return this.file.dispose()
   }
 
@@ -170,12 +248,64 @@ export class VoiceMemory {
 
   private prune(): void {
     const recent = this.learned().sort((a, b) => b.time - a.time)
-    for (const term of recent.slice(300)) this.terms.delete(term.key)
+    for (const term of recent.slice(300)) {
+      this.terms.delete(term.key)
+      this.syncedTerms.delete(term.key)
+    }
+  }
+
+  private pruneForgotten(sync = true): void {
+    while (this.forgotten.size > 1000) {
+      const oldest = this.forgotten.values().next().value!
+      this.forgotten.delete(oldest)
+      if (sync) this.syncedForgotten.delete(oldest)
+    }
+  }
+
+  private learn(key: string, spelling: string): void {
+    const previous = this.terms.get(key)
+    if (previous && previous.count >= 2 && surface(previous) === spelling) return
+    const count = Math.max(2, previous?.count ?? 0)
+    this.terms.set(key, {
+      key,
+      count,
+      time: previous?.time ?? Date.now(),
+      forms: {
+        ...previous?.forms,
+        [spelling]: Math.max(0, ...Object.values(previous?.forms ?? {})) + 1,
+      },
+    })
+  }
+
+  private reconcile(): void {
+    this.forgotten = new Set(this.syncedForgotten.values().filter(validKey))
+    this.pruneForgotten()
+    for (const [key, term] of this.terms) {
+      if (
+        this.forgotten.has(key) ||
+        (term.count >= 2 && !validSyncedTerm(key, this.syncedTerms.get(key)))
+      )
+        this.terms.delete(key)
+    }
+    for (const [key, spelling] of this.syncedTerms.entries()) {
+      if (this.forgotten.has(key)) this.syncedTerms.delete(key)
+      else if (validSyncedTerm(key, spelling)) this.learn(key, spelling)
+    }
+    this.prune()
   }
 
   private changed(): void {
     this.publish()
-    this.file.write({ terms: [...this.terms.values()], forgotten: [...this.forgotten] })
+    this.migrated = true
+    this.save()
+  }
+
+  private save(): void {
+    this.file.write({
+      terms: [...this.terms.values()],
+      forgotten: [...this.forgotten],
+      migrated: this.migrated,
+    })
   }
 
   private publish(): void {

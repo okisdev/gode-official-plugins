@@ -4,7 +4,7 @@ import type { HostMessage, PluginStatus } from '@gode/plugin-sdk'
 import { afterEach, expect, test, vi } from '@gode/plugin-sdk/test'
 import { createVoicePlugin } from '../../src/plugin.ts'
 import { LocalEngine } from '../../src/models/engine.ts'
-import { fixture, model, pcm, settings } from '../fixtures/index.ts'
+import { emptyStores, fixture, model, pcm, settings, testSynced } from '../fixtures/index.ts'
 
 const cleanups: (() => Promise<void>)[] = []
 afterEach(async () => {
@@ -22,7 +22,12 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
   )
   const polish = { id: 'qwen3.5-2b', files: [model('polish.gguf', server.url, 'polish bytes')] }
   const plugin = createVoicePlugin(
-    { setStatus: (status) => statuses.push(status), setView: () => {}, log: () => {} },
+    {
+      setStatus: (status) => statuses.push(status),
+      setView: () => {},
+      log: () => {},
+      synced: testSynced(),
+    },
     [{ id: 'qwen3-asr-1.7b', files: models }],
     polish,
   )
@@ -33,6 +38,7 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
     secrets: {},
     locale: 'de',
     paths: { data: server.directory, plugin: server.directory },
+    stores: emptyStores(),
   }
   await plugin.start(start)
   return { server, statuses, plugin, start, polish }

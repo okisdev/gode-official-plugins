@@ -19,6 +19,7 @@ Gode's own plugins, each a workspace package in `plugins/` laid out as the SDK R
 - Pin every file a plugin or its build downloads by URL and SHA-256, verify it before use, and never leave a partial file under its final name.
 - Write what a person needs to diagnose a failure to the plugin's log with `log`, and never a secret or what the person said or typed, because people share logs to get help.
 - Keep what a plugin downloads or keeps in `paths.data`, never in the read-only `paths.plugin`, let every call stand on its own because calls overlap, and stop the programs it started when Gode sends `SIGTERM`.
+- Keep in a store only what should follow the person to their other computers, never a record of what they said or typed such as dictation history, because a store syncs through their account.
 - Raise `minimumAppVersion` to the first Gode that has each capability the plugin uses.
 - Raise a plugin's `version` for every change that ships, because Gode installs a version once and updates only to a newer one.
 - Release with `pnpm release <id>` and upload the catalog with `pnpm catalog` only when the owner asks, because every installed copy offers the new version to its person within six hours.

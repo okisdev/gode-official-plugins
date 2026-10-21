@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { PluginSettingValue } from '@gode/plugin-sdk'
+import type { PluginContext, SyncedMap, SyncedSet } from '@gode/plugin-sdk/plugin'
 import de from '../../i18n/de.json'
 import en from '../../i18n/en.json'
 import es from '../../i18n/es.json'
@@ -17,6 +18,7 @@ import zhHant from '../../i18n/zh-Hant.json'
 import pageSettings from '../../page/settings.ts'
 import actions from '../../page/actions.ts'
 import views from '../../page/views.ts'
+import sync from '../../page/sync.ts'
 import identity from '../../plugin.json'
 import type { Names } from '../../src/names.ts'
 import type { ModelFile } from '../../src/models/download.ts'
@@ -26,6 +28,7 @@ export const manifest = {
   groups: pageSettings,
   actions,
   views,
+  stores: sync,
   strings: {
     de,
     en,
@@ -159,4 +162,55 @@ export function settings(
     ),
     ...overrides,
   } as Record<Names['settings'], PluginSettingValue>
+}
+
+export function testSynced(): PluginContext<Names>['synced'] {
+  const terms = new Map<string, string>()
+  const forgotten = new Set<string>()
+  const map: SyncedMap = {
+    get size() {
+      return terms.size
+    },
+    has: (key) => terms.has(key),
+    get: (key) => terms.get(key),
+    entries: () => [...terms],
+    set: (key, value) => {
+      if (!terms.has(key) && terms.size === 1000) throw new RangeError('Store is full')
+      terms.set(key, value)
+    },
+    delete: (key) => {
+      terms.delete(key)
+    },
+    clear: () => {
+      terms.clear()
+    },
+    onChange: () => () => {},
+  }
+  const set: SyncedSet = {
+    get size() {
+      return forgotten.size
+    },
+    has: (key) => forgotten.has(key),
+    values: () => [...forgotten],
+    add: (key) => {
+      if (!forgotten.has(key) && forgotten.size === 1000) throw new RangeError('Store is full')
+      forgotten.add(key)
+    },
+    delete: (key) => {
+      forgotten.delete(key)
+    },
+    clear: () => {
+      forgotten.clear()
+    },
+    onChange: () => () => {},
+  }
+  return ((id: 'terms' | 'forgotten') =>
+    id === 'terms' ? map : set) as PluginContext<Names>['synced']
+}
+
+export function emptyStores() {
+  return {
+    terms: { kind: 'map' as const, entries: {} },
+    forgotten: { kind: 'set' as const, entries: {} },
+  }
 }

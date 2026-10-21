@@ -4,7 +4,16 @@ import { join } from 'node:path'
 import { pluginManifestSchema, pluginViewDataSchemas, type HostMessage } from '@gode/plugin-sdk'
 import type { SetPluginView } from '@gode/plugin-sdk/plugin'
 import { afterEach, expect, test, vi } from '@gode/plugin-sdk/test'
-import { manifest, model, noise, pcm, wav, settings } from '../fixtures/index.ts'
+import {
+  emptyStores,
+  manifest,
+  model,
+  noise,
+  pcm,
+  wav,
+  settings,
+  testSynced,
+} from '../fixtures/index.ts'
 
 const disk = {
   failNext: false,
@@ -71,7 +80,8 @@ async function setup(
     await writeFile(join(directory, 'stats.json'), options.stored)
   }
   const setView = vi.fn<SetPluginView>()
-  const plugin = createVoicePlugin({ setStatus: () => {}, setView, log: () => {} }, [
+  const synced = testSynced()
+  const plugin = createVoicePlugin({ setStatus: () => {}, setView, log: () => {}, synced }, [
     { id: 'qwen3-asr-1.7b', files: models },
   ])
   cleanups.push(() => plugin.dispose())
@@ -85,9 +95,10 @@ async function setup(
     secrets: { apiKey: 'secret' },
     locale: 'en',
     paths: { data: directory, plugin: root },
+    stores: emptyStores(),
   }
   await plugin.start(start)
-  return { directory, plugin, start, models, setView }
+  return { directory, plugin, start, models, setView, synced }
 }
 
 function figures(today: number, total: number, seconds: number, dictations: number) {
@@ -357,7 +368,12 @@ test('noise does not consume the preview throttle or borrow speech from another 
 })
 
 test('start and append return null while not ready, and finish reports not ready', async () => {
-  const plugin = createVoicePlugin({ setStatus: () => {}, setView: () => {}, log: () => {} })
+  const plugin = createVoicePlugin({
+    setStatus: () => {},
+    setView: () => {},
+    log: () => {},
+    synced: testSynced(),
+  })
   await expect(begin(plugin)).resolves.toBeTypeOf('string')
   await expect(append(plugin, 'missing', pcm(1))).resolves.toBeNull()
   await expect(finish(plugin, 'missing')).rejects.toMatchObject({
@@ -634,7 +650,7 @@ test('statistics survive restart and publish totals and calendar days using the 
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-01-01T12:30:00Z'))
   let text = '今天用 Gode 写了 3 个 tests.'
-  const { plugin, start, models, setView, directory } = await setup(
+  const { plugin, start, models, setView, directory, synced } = await setup(
     async () => new Response(JSON.stringify({ text })),
   )
   await dictate(plugin)
@@ -651,7 +667,7 @@ test('statistics survive restart and publish totals and calendar days using the 
   vi.setSystemTime(new Date('2026-01-02T12:30:00Z'))
   const replacementViews = vi.fn<SetPluginView>()
   const replacement = createVoicePlugin(
-    { setStatus: () => {}, setView: replacementViews, log: () => {} },
+    { setStatus: () => {}, setView: replacementViews, log: () => {}, synced },
     [{ id: 'qwen3-asr-1.7b', files: models }],
   )
   cleanups.push(() => replacement.dispose())

@@ -17,7 +17,7 @@ import { reason } from './recognition/transcription-logic'
 import { createVoiceStatus } from './status'
 
 export function createVoicePlugin(
-  { setStatus, setView, log }: PluginContext<Names>,
+  { setStatus, setView, log, synced }: PluginContext<Names>,
   models: readonly ModelSet[] = resources.models,
   polish: ModelSet = resources.polish,
 ): Required<
@@ -121,7 +121,7 @@ export function createVoicePlugin(
       stats = new VoiceStats(message.paths.data, setView)
       await stats.read()
       history = new VoiceHistory(message.paths.data, locale, setView)
-      memory = new VoiceMemory(message.paths.data, locale, setView)
+      memory = new VoiceMemory(message.paths.data, locale, setView, synced)
       await history.read()
       await memory.read()
       directory = join(message.paths.data, 'models')

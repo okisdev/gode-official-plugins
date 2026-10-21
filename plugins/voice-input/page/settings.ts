@@ -163,6 +163,12 @@ export default [
         description: 'learnTerms.description',
         default: true,
       },
+      {
+        key: 'syncTerms',
+        kind: 'toggle',
+        title: 'syncTerms.title',
+        default: true,
+      },
     ],
   },
 ] as const satisfies PluginSettings

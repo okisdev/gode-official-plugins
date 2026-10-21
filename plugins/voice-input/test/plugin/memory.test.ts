@@ -4,7 +4,15 @@ import { join } from 'node:path'
 import { pluginManifestSchema, pluginViewDataSchemas, type HostMessage } from '@gode/plugin-sdk'
 import type { PluginContext, SetPluginView } from '@gode/plugin-sdk/plugin'
 import { afterEach, expect, test, vi } from '@gode/plugin-sdk/test'
-import { manifest, model, noise, pcm, settings } from '../fixtures/index.ts'
+import {
+  emptyStores,
+  manifest,
+  model,
+  noise,
+  pcm,
+  settings,
+  testSynced,
+} from '../fixtures/index.ts'
 
 const disk = {
   fail: '',
@@ -90,11 +98,13 @@ async function setup(
     secrets: {},
     locale: options.locale ?? 'en',
     paths: { data: directory, plugin: directory },
+    stores: emptyStores(),
   }
+  const synced = testSynced()
   const launch = async () => {
     const setView = vi.fn<SetPluginView>()
     const log = vi.fn<PluginContext['log']>()
-    const plugin = createVoicePlugin({ setStatus: () => {}, setView, log }, [
+    const plugin = createVoicePlugin({ setStatus: () => {}, setView, log, synced }, [
       { id: 'qwen3-asr-1.7b', files: models },
     ])
     cleanups.push(() => plugin.dispose())
@@ -147,15 +157,20 @@ async function dictate(
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
   expect(parsed.version).toBe('0.0.8')
-  expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual(
-    ['keepHistory', 'learnTerms'].map((key) => ({
+  expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual([
+    ...['keepHistory', 'learnTerms'].map((key) => ({
       key,
       kind: 'toggle',
       title: `${key}.title`,
       description: `${key}.description`,
       default: true,
     })),
-  )
+    { key: 'syncTerms', kind: 'toggle', title: 'syncTerms.title', default: true },
+  ])
+  expect(parsed.stores).toEqual([
+    { id: 'terms', kind: 'map', title: 'sync.terms', sync: 'syncTerms' },
+    { id: 'forgotten', kind: 'set', title: 'sync.forgotten', sync: 'syncTerms' },
+  ])
   expect(parsed.actions).toEqual(
     expect.arrayContaining([
       { id: 'clearHistory', title: 'action.clearHistory', confirm: 'confirm.clearHistory' },

@@ -6,6 +6,7 @@ import type { SetPluginView } from '@gode/plugin-sdk/plugin'
 import { afterEach, expect, test, vi } from '@gode/plugin-sdk/test'
 import { VoiceMemory } from '../../src/data/memory.ts'
 import { extractTerms } from '../../src/data/memory-logic.ts'
+import { testSynced } from '../fixtures/index.ts'
 
 const cleanups: (() => Promise<void>)[] = []
 afterEach(async () => {
@@ -18,14 +19,15 @@ async function setup(locale = 'en', stored?: string) {
   cleanups.push(() => rm(directory, { recursive: true, force: true }))
   if (stored !== undefined) await writeFile(join(directory, 'memory.json'), stored)
   const setView = vi.fn<SetPluginView>()
-  const memory = new VoiceMemory(directory, locale, setView)
+  const synced = testSynced()
+  const memory = new VoiceMemory(directory, locale, setView, synced)
   cleanups.push(() => memory.dispose())
   await memory.read()
   const view = () => {
     const data = setView.mock.calls.at(-1)![1]
     return pluginViewDataSchemas.list.parse(data)
   }
-  return { memory, directory, setView, view }
+  return { memory, directory, setView, view, synced }
 }
 
 test.each([
@@ -57,11 +59,11 @@ test.each([
 })
 
 test('counts separate dictations, retains the most frequent spelling and excludes request vocabulary', async () => {
-  const { memory, view, directory } = await setup()
+  const { memory, view, directory, synced } = await setup()
   memory.record('中文 Gode Gode GODE API', ['API'])
   expect(view().items).toEqual([])
   await memory.dispose()
-  const replacement = new VoiceMemory(directory, 'en', () => {})
+  const replacement = new VoiceMemory(directory, 'en', () => {}, synced)
   cleanups.push(() => replacement.dispose())
   await replacement.read()
   expect(replacement.vocabulary([])).toEqual([])
@@ -87,7 +89,7 @@ test('handles surface forms that are also object property names', async () => {
 test('evicts the least recently heard learned term, regardless of count', async () => {
   let time = 1
   vi.spyOn(Date, 'now').mockImplementation(() => time++)
-  const { memory, view } = await setup()
+  const { memory, view, synced } = await setup()
   for (let index = 0; index < 300; index++) {
     memory.record(`term${index}`, [])
     memory.record(`term${index}`, [])
@@ -102,16 +104,38 @@ test('evicts the least recently heard learned term, regardless of count', async 
   expect(memory.query('', null, 100).items.map((item) => item.text)).toContain('term300')
   expect(memory.query('', null, 100).items.map((item) => item.text)).not.toContain('term1')
   expect(words[0]).toBe('term0')
+  expect(synced('terms').has('term1')).toBe(false)
+  expect(synced('terms').size).toBe(300)
+})
+
+test('migration keeps the newest 1,000 forgotten terms in the store', async () => {
+  const forgotten = Array.from({ length: 1001 }, (_, index) => `term${index}`)
+  const { memory, synced } = await setup('en', JSON.stringify({ terms: [], forgotten }))
+  expect(synced('forgotten').size).toBe(1000)
+  expect(synced('forgotten').has('term0')).toBe(false)
+  expect(synced('forgotten').has('term1000')).toBe(true)
+  await memory.dispose()
+})
+
+test('forgetting a new term evicts the oldest forgotten term before adding it', async () => {
+  const forgotten = Array.from({ length: 1000 }, (_, index) => `term${index}`)
+  const { memory, synced } = await setup('en', JSON.stringify({ terms: [], forgotten }))
+  memory.record('term1000', [])
+  memory.record('term1000', [])
+  memory.forget('term1000')
+  expect(synced('forgotten').size).toBe(1000)
+  expect(synced('forgotten').has('term0')).toBe(false)
+  expect(synced('forgotten').has('term1000')).toBe(true)
 })
 
 test('forgetting survives restart and clear removes candidates and the forgotten set', async () => {
-  const { memory, directory, view } = await setup()
+  const { memory, directory, view, synced } = await setup()
   memory.record('useComposerText API', [])
   memory.record('useComposerText', [])
   memory.forget(view().items[0]!.id)
   expect(view().items).toEqual([])
   await memory.dispose()
-  const replacement = new VoiceMemory(directory, 'en', () => {})
+  const replacement = new VoiceMemory(directory, 'en', () => {}, synced)
   cleanups.push(() => replacement.dispose())
   await replacement.read()
   replacement.record('useComposerText USECOMPOSERTEXT', [])

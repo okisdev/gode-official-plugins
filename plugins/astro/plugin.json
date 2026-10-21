@@ -1,0 +1,29 @@
+{
+  "id": "astro",
+  "publisher": "gode",
+  "version": "0.0.4",
+  "minimumAppVersion": "0.1.19-beta.84",
+  "capabilities": ["language-server"],
+  "languages": ["astro"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "@astrojs/language-server",
+      "version": "2.17.1",
+      "license": "MIT",
+      "url": "https://github.com/withastro/astro"
+    },
+    {
+      "name": "TypeScript",
+      "version": "5.9.3",
+      "license": "Apache-2.0",
+      "url": "https://github.com/microsoft/TypeScript"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

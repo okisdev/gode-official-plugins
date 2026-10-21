@@ -4,9 +4,9 @@ Gode's own plugins, each a workspace package in `plugins/` laid out as the SDK R
 
 ## Commands
 
-- `pnpm test`, `pnpm typecheck` and `pnpm lint`: run all three before calling any change done; `pnpm lint:fix` applies oxlint's and oxfmt's fixes.
-- `pnpm --dir plugins/<id> build [platform...]`: runs `gode-plugin build` for the language plugins, bundling their process and staging their pinned server into archives under `out`; voice-input still downloads pinned programs with `gh release download`, so its build needs the GitHub CLI signed in.
-- In the Codex sandbox run Vitest as `pnpm vitest run --configLoader runner` inside the package, and read tests that fail to listen on `127.0.0.1` as the sandbox, not the change.
+- `pnpm test`, `pnpm typecheck` and `pnpm lint`: run all three before calling any change done; tests run every plugin's `gode-plugin test` and `node --test` for `scripts/`, typecheck runs every plugin's `gode-plugin check` and TypeScript over `scripts/`, and `pnpm lint:fix` applies oxlint's and oxfmt's fixes.
+- `pnpm --dir plugins/<id> build [platform...]`: runs `gode-plugin build`, assembling the archive's manifest from `plugin.json`, `page/`, `i18n/` and `icon.svg`, bundling its process and staging its pinned programs into archives under `out`; voice-input downloads with `gh release download`, so its build needs the GitHub CLI signed in.
+- `pnpm --dir plugins/<id> check` checks the plugin's source files, all ten languages and TypeScript; `pnpm --dir plugins/<id> test` runs its `test/` files through the SDK, and failures to listen on `127.0.0.1` in the sandbox are environment findings.
 
 ## Rules
 

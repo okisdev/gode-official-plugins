@@ -1,0 +1,7 @@
+{
+  "name": "Rust",
+  "description": "Assistance au code pour les projets Rust avec leur propre chaîne d’outils Rust.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Rust. Le serveur démarre quand vous ouvrez un fichier Rust dans un projet et s’arrête quand aucun n’est ouvert. Il utilise la chaîne d’outils Rust du projet et Cargo.",
+  "ready": "Prêt à vous aider avec Rust.",
+  "failed": "Le serveur de langage Rust n’a pas pu démarrer."
+}

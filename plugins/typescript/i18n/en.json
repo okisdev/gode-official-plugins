@@ -1,0 +1,7 @@
+{
+  "name": "TypeScript",
+  "description": "Code intelligence for TypeScript and JavaScript files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in TypeScript and JavaScript files. The language server starts when a matching file opens in a project and stops when none are open. It uses TypeScript 7’s native compiler.",
+  "ready": "Ready to assist with TypeScript and JavaScript.",
+  "failed": "The TypeScript language server could not start."
+}

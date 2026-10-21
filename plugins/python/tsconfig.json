@@ -1,14 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["ES2023"],
-    "types": ["node"],
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "noEmit": true
-  },
-  "include": ["src", "build.ts", "build.test.ts"]
+  "extends": "@gode/plugin-sdk/tsconfig.json",
+  "include": ["page", "src", "test", "build.ts"]
 }

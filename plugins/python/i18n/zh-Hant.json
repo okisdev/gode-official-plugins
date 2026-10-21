@@ -1,0 +1,7 @@
+{
+  "name": "Python",
+  "description": "為 Python 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Python 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Python 檔案時啟動，並在沒有 Python 檔案開啟時停止。它會尋找專案的 Python 環境。",
+  "ready": "已準備好輔助編寫 Python 程式碼。",
+  "failed": "無法啟動 Python 語言伺服器。"
+}

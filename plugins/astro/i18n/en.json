@@ -1,0 +1,7 @@
+{
+  "name": "Astro",
+  "description": "Code intelligence for Astro files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Astro files. The language server starts when an Astro file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with Astro.",
+  "failed": "The Astro language server could not start."
+}

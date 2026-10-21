@@ -37,26 +37,24 @@ Candidates, spelling frequencies, dictation counts and forgotten terms are store
 
 | Path | What it holds |
 | --- | --- |
-| `manifest.json` | Settings, actions, views, statuses and their words in every language. |
-| `resources.json` | The pinned model sets and `llama-server` archives, by URL, size and SHA-256. `setupBytes` in the manifest is the default model set's total size, and the build checks that it matches. |
+| `plugin.json` | Identity, compatibility and software credits. |
+| `page/` | Settings, actions and views. |
+| `i18n/` | Words in every language. |
+| `resources.json` | The pinned model sets and `llama-server` archives, by URL, size and SHA-256. `setupBytes` in `plugin.json` is the default model set's total size, and the build checks that it matches. |
 | `src/main.ts` | The process entry, which hands `createVoicePlugin` to `definePlugin`. |
-| `src/plugin.ts` | Settings, actions, statuses and the `dictation` calls. |
-| `src/engine.ts` | Starts and stops the local `llama-server`. |
-| `src/download.ts` | Model downloads and their checksum checks. |
-| `src/transcription-logic.ts` | The transcription request, and cleanup of what comes back. |
-| `src/speech-logic.ts` | Speech detection from PCM energy, zero crossings and duration. |
-| `src/stats.ts` | Word and audio counts, persistent daily statistics and SDK views. |
-| `src/history.ts` | Saved dictations and the history list. |
-| `src/memory.ts` | Learned terms, forgotten terms and the memory list. |
-| `src/memory-logic.ts` | Candidate term extraction. |
-| `src/atomic-file.ts` | Serialized atomic persistence shared by statistics, history and memory. |
+| `src/plugin.ts` | Settings, secrets, paths and service wiring. |
+| `src/status.ts` | Statuses, setup steps and status publishing. |
+| `src/models/` | Model downloads, removals, checksum checks and the local `llama-server`. |
+| `src/recognition/` | Dictation sessions, previews, local and server recognition, server checks, polish and speech detection. |
+| `src/data/` | History, learned terms, statistics and their shared atomic persistence. |
+| `test/` | Tests mirroring the source areas, with whole-plugin tests grouped by aspect in `plugin/`. |
 | `build.ts` | Fetches the pinned `llama-server` for each platform and stages its runtime files for the SDK build. |
 
 ## Commands
 
 ```sh
 pnpm --dir plugins/voice-input test
-pnpm --dir plugins/voice-input typecheck
+pnpm --dir plugins/voice-input check
 pnpm --dir plugins/voice-input build [platform...]   # archives in out/, llama.cpp downloads cached in out/.cache
 ```
 

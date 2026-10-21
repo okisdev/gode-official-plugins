@@ -1,0 +1,7 @@
+{
+  "name": "Astro",
+  "description": "Codeunterstützung für Astro-Dateien.",
+  "about": "Im Editor von Gode kannst du für Astro-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Astro-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Astro.",
+  "failed": "Der Astro-Sprachserver konnte nicht gestartet werden."
+}

@@ -4,15 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "gode-plugin build",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --configLoader runner"
+    "check": "gode-plugin check",
+    "test": "gode-plugin test"
   },
   "dependencies": {
     "@gode/plugin-sdk": "link:../../../gode/packages/plugin-sdk"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "^5.0.2"
   }
 }

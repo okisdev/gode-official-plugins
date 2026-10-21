@@ -1,0 +1,7 @@
+{
+  "name": "TypeScript",
+  "description": "為 TypeScript 和 JavaScript 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 TypeScript 和 JavaScript 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟相應檔案時啟動，並在沒有相應檔案開啟時停止。它使用 TypeScript 7 的原生編譯器。",
+  "ready": "已準備好輔助編寫 TypeScript 和 JavaScript 程式碼。",
+  "failed": "無法啟動 TypeScript 語言伺服器。"
+}

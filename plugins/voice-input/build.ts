@@ -3,7 +3,7 @@ import { cp, mkdtemp, rm } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { promisify } from 'node:util'
 import type { PluginStage } from '@gode/plugin-sdk/build'
-import manifest from './manifest.json' with { type: 'json' }
+import manifest from './plugin.json' with { type: 'json' }
 import resources from './resources.json' with { type: 'json' }
 
 const exec = promisify(execFile)

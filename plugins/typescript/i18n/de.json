@@ -1,0 +1,7 @@
+{
+  "name": "TypeScript",
+  "description": "Codeunterstützung für TypeScript- und JavaScript-Dateien.",
+  "about": "Im Editor von Gode kannst du für TypeScript- und JavaScript-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine passende Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er verwendet den nativen Compiler von TypeScript 7.",
+  "ready": "Bereit für TypeScript und JavaScript.",
+  "failed": "Der TypeScript-Sprachserver konnte nicht gestartet werden."
+}

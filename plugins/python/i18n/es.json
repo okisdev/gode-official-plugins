@@ -1,0 +1,7 @@
+{
+  "name": "Python",
+  "description": "Asistencia de código para archivos de Python.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos de Python. El servidor se inicia al abrir un archivo de Python en un proyecto y se detiene cuando ya no queda ninguno abierto. Detecta el entorno de Python del proyecto.",
+  "ready": "Listo para trabajar con Python.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Python."
+}

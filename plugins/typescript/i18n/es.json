@@ -1,0 +1,7 @@
+{
+  "name": "TypeScript",
+  "description": "Asistencia de código para archivos de TypeScript y JavaScript.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos de TypeScript y JavaScript. El servidor se inicia al abrir un archivo compatible en un proyecto y se detiene cuando ya no queda ninguno abierto. Usa el compilador nativo de TypeScript 7.",
+  "ready": "Listo para trabajar con TypeScript y JavaScript.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de TypeScript."
+}

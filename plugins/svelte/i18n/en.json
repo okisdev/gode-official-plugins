@@ -1,0 +1,7 @@
+{
+  "name": "Svelte",
+  "description": "Code intelligence for Svelte files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Svelte files. The language server starts when a Svelte file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with Svelte.",
+  "failed": "The Svelte language server could not start."
+}

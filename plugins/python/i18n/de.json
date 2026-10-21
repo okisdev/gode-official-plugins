@@ -1,0 +1,7 @@
+{
+  "name": "Python",
+  "description": "Codeunterstützung für Python-Dateien.",
+  "about": "Im Editor von Gode kannst du für Python-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Python-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er findet die Python-Umgebung des Projekts.",
+  "ready": "Bereit für Python.",
+  "failed": "Der Python-Sprachserver konnte nicht gestartet werden."
+}

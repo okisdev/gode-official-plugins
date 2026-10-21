@@ -1,0 +1,7 @@
+{
+  "name": "Vue",
+  "description": "Codeunterstützung für Vue-Dateien.",
+  "about": "Im Editor von Gode kannst du für Vue-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Vue-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er enthält eine eigene TypeScript-Version und verwendet die in deinem Projekt installierte Vue-Version.",
+  "ready": "Bereit für Vue.",
+  "failed": "Der Vue-Sprachserver konnte nicht gestartet werden."
+}

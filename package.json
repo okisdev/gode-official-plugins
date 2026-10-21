@@ -7,8 +7,8 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm -r --workspace-concurrency=1 test && vitest run --configLoader runner --dir scripts",
-    "typecheck": "pnpm -r typecheck && tsc --noEmit -p scripts",
+    "test": "node --test scripts/*.test.ts && pnpm -r --workspace-concurrency=1 --no-bail test",
+    "typecheck": "pnpm -r check && tsc --noEmit -p scripts",
     "lint": "oxlint && oxfmt --check",
     "lint:fix": "oxlint --fix && oxfmt",
     "index": "node scripts/index.mjs",
@@ -23,7 +23,6 @@
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004",
     "typescript": "catalog:",
-    "vitest": "^5.0.2",
     "wrangler": "4.141.0"
   }
 }

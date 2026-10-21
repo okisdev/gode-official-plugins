@@ -1,0 +1,38 @@
+{
+  "id": "voice-input",
+  "publisher": "gode",
+  "version": "0.0.8",
+  "minimumAppVersion": "0.1.19-beta.92",
+  "setupBytes": 2520744288,
+  "capabilities": ["dictation"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "llama.cpp",
+      "version": "b11724",
+      "license": "MIT",
+      "url": "https://github.com/ggml-org/llama.cpp"
+    },
+    {
+      "name": "Qwen3-ASR-1.7B Q8_0 model",
+      "version": "36a678687ba7d07a74ca70ccb0e36902e005fb80",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/ggml-org/Qwen3-ASR-1.7B-GGUF",
+      "optional": true
+    },
+    {
+      "name": "Qwen3-ASR-0.6B Q8_0 model",
+      "version": "928ab958557df9aa2ef1c93e0e83c7ad0933fae2",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/ggml-org/Qwen3-ASR-0.6B-GGUF",
+      "optional": true
+    },
+    {
+      "name": "Qwen3.5-2B Q4_K_M model",
+      "version": "f6d5376be1edb4d416d56da11e5397a961aca8ae",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/unsloth/Qwen3.5-2B-GGUF",
+      "optional": true
+    }
+  ]
+}

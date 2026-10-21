@@ -1,0 +1,7 @@
+{
+  "name": "Python",
+  "description": "Code intelligence for Python files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Python files. The language server starts when a Python file opens in a project and stops when none are open. It finds the project’s Python environment.",
+  "ready": "Ready to assist with Python.",
+  "failed": "The Python language server could not start."
+}

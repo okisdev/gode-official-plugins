@@ -1,0 +1,7 @@
+{
+  "name": "Vue",
+  "description": "Assistance au code pour les fichiers Vue.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Vue. Le serveur démarre quand vous ouvrez un fichier Vue dans un projet et s’arrête quand aucun n’est ouvert. Il embarque sa propre version de TypeScript et utilise la version de Vue installée dans votre projet.",
+  "ready": "Prêt à vous aider avec Vue.",
+  "failed": "Le serveur de langage Vue n’a pas pu démarrer."
+}

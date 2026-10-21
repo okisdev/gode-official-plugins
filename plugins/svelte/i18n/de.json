@@ -1,0 +1,7 @@
+{
+  "name": "Svelte",
+  "description": "Codeunterstützung für Svelte-Dateien.",
+  "about": "Im Editor von Gode kannst du für Svelte-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Svelte-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Svelte.",
+  "failed": "Der Svelte-Sprachserver konnte nicht gestartet werden."
+}

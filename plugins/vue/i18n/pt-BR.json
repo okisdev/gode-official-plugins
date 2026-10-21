@@ -1,0 +1,7 @@
+{
+  "name": "Vue",
+  "description": "Assistência para programar em arquivos Vue.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos Vue. O servidor inicia quando você abre um arquivo Vue em um projeto e para quando não há mais nenhum aberto. Ele inclui sua própria versão do TypeScript e usa a versão do Vue instalada no projeto.",
+  "ready": "Pronto para ajudar com Vue.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Vue."
+}

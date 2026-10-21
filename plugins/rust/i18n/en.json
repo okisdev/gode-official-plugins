@@ -1,0 +1,7 @@
+{
+  "name": "Rust",
+  "description": "Code intelligence for Rust projects using their own Rust toolchain.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Rust files. The language server starts when a Rust file opens in a project and stops when none are open. It uses the project’s Rust toolchain and Cargo.",
+  "ready": "Ready to assist with Rust.",
+  "failed": "The Rust language server could not start."
+}

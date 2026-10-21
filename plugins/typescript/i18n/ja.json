@@ -1,0 +1,7 @@
+{
+  "name": "TypeScript",
+  "description": "TypeScriptとJavaScriptのファイルでコードの作成を支援します。",
+  "about": "GodeのエディタでTypeScriptとJavaScriptのコード補完、入力中のエラーと警告、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。対応するファイルをプロジェクトで開くと起動し、開いているファイルがなくなると停止します。TypeScript 7のネイティブコンパイラを使用します。",
+  "ready": "TypeScriptとJavaScriptのコードを支援できます。",
+  "failed": "TypeScript言語サーバを起動できませんでした。"
+}

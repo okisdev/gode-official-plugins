@@ -1,0 +1,7 @@
+{
+  "name": "Rust",
+  "description": "Codeunterstützung für Rust-Projekte mit deren eigener Rust-Toolchain.",
+  "about": "Im Editor von Gode kannst du für Rust-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Rust-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er verwendet die Rust-Toolchain und Cargo des Projekts.",
+  "ready": "Bereit für Rust.",
+  "failed": "Der Rust-Sprachserver konnte nicht gestartet werden."
+}

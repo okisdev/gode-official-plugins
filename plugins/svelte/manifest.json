@@ -1,7 +1,7 @@
 {
   "id": "svelte",
   "publisher": "gode",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "minimumAppVersion": "0.1.19-beta.84",
   "capabilities": ["language-server"],
   "languages": ["svelte"],
@@ -12,6 +12,12 @@
       "version": "0.18.4",
       "license": "MIT",
       "url": "https://github.com/sveltejs/language-tools"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
     }
   ],
   "strings": {

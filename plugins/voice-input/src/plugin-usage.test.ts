@@ -71,7 +71,9 @@ async function setup(
     await writeFile(join(directory, 'stats.json'), options.stored)
   }
   const setView = vi.fn<SetPluginView>()
-  const plugin = createVoicePlugin(() => {}, setView, [{ id: 'qwen3-asr-1.7b', files: models }])
+  const plugin = createVoicePlugin({ setStatus: () => {}, setView, log: () => {} }, [
+    { id: 'qwen3-asr-1.7b', files: models },
+  ])
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
     type: 'start',
@@ -156,13 +158,6 @@ type StatsSnapshot = {
 
 test('declares usage views with the SDK schema and sends empty views without creating a file', async () => {
   expect(pluginManifestSchema.parse(manifest).views).toEqual([
-    { id: 'usage', kind: 'figures', title: 'view.usage' },
-    {
-      id: 'activity',
-      kind: 'calendar',
-      title: 'view.activity',
-      description: 'view.activity.description',
-    },
     {
       id: 'history',
       kind: 'list',
@@ -178,6 +173,13 @@ test('declares usage views with the SDK schema and sends empty views without cre
       description: 'view.memory.description',
       itemActions: [{ id: 'forgetTerm', title: 'action.forgetTerm', destructive: true }],
       actions: ['clearMemory'],
+    },
+    { id: 'usage', kind: 'figures', title: 'view.usage' },
+    {
+      id: 'activity',
+      kind: 'calendar',
+      title: 'view.activity',
+      description: 'view.activity.description',
     },
   ])
   const { setView, directory } = await setup()
@@ -204,7 +206,7 @@ test('local sessions warm the engine and clean interim and final text', async ()
   )
   const use = vi
     .spyOn(LocalEngine.prototype, 'use')
-    .mockImplementation(async (work) => work('http://127.0.0.1:12345/v1'))
+    .mockImplementation(async (work) => work('http://127.0.0.1:12345/v1', 'local-test-key'))
   const session = await begin(plugin)
   expect(use).toHaveBeenCalledTimes(1)
   await expect(append(plugin, session, pcm(1.25))).resolves.toEqual({
@@ -214,7 +216,7 @@ test('local sessions warm the engine and clean interim and final text', async ()
   expect(fetch).toHaveBeenCalledTimes(1)
   const [url, init] = vi.mocked(fetch).mock.calls[0]!
   expect(url).toBe('http://127.0.0.1:12345/v1/audio/transcriptions')
-  expect(init?.headers).toEqual({})
+  expect(init?.headers).toEqual({ Authorization: 'Bearer local-test-key' })
   const body = init?.body as FormData
   expect(body.get('model')).toBe('model.gguf')
   expect(body.get('language')).toBe('en')
@@ -275,7 +277,7 @@ test.each([
     )
     const use = vi
       .spyOn(LocalEngine.prototype, 'use')
-      .mockImplementation(async (work) => work('http://127.0.0.1/v1'))
+      .mockImplementation(async (work) => work('http://127.0.0.1/v1', 'local-test-key'))
     const session = await begin(plugin, ['Gode', 'Gode One', 'agentdoc', 'useComposerText'])
     use.mockClear()
     if (kind !== 'empty')
@@ -302,7 +304,7 @@ test.each([true, false])('local=%s sends the correct vocabulary and audio span',
     { local },
   )
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1/v1'),
+    work('http://127.0.0.1/v1', 'local-test-key'),
   )
   const vocabulary = ['Gode', 'Gode One', 'agentdoc', 'useComposerText']
   const session = await begin(plugin, vocabulary)
@@ -338,7 +340,7 @@ test('noise does not consume the preview throttle or borrow speech from another 
     { local: true },
   )
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1/v1'),
+    work('http://127.0.0.1/v1', 'local-test-key'),
   )
   const quiet = await begin(plugin)
   const speaking = await begin(plugin)
@@ -355,10 +357,7 @@ test('noise does not consume the preview throttle or borrow speech from another 
 })
 
 test('start and append return null while not ready, and finish reports not ready', async () => {
-  const plugin = createVoicePlugin(
-    () => {},
-    () => {},
-  )
+  const plugin = createVoicePlugin({ setStatus: () => {}, setView: () => {}, log: () => {} })
   await expect(begin(plugin)).resolves.toBeTypeOf('string')
   await expect(append(plugin, 'missing', pcm(1))).resolves.toBeNull()
   await expect(finish(plugin, 'missing')).rejects.toMatchObject({
@@ -391,7 +390,7 @@ test('overlapping local sessions keep their own audio, vocabulary and settings',
     { local: true },
   )
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1:12345/v1'),
+    work('http://127.0.0.1:12345/v1', 'local-test-key'),
   )
   const first = await begin(plugin)
   const preview = append(plugin, first, pcm(2.5))
@@ -420,23 +419,146 @@ test('overlapping local sessions keep their own audio, vocabulary and settings',
   await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session: first } })
 })
 
-test('local append waits for another second and stops previewing beyond 30 seconds', async () => {
-  const { plugin } = await setup(async () => new Response(JSON.stringify({ text: 'Hello' })), {
-    local: true,
-  })
+test('local append waits for another second and keeps bounded previews growing past a minute', async () => {
+  const parts = Array.from({ length: 13 }, (_, index) => `part${index + 1}`)
+  const audio = Buffer.concat(
+    parts.flatMap((_, index) => [
+      pcm(5, { fundamental: 120 + index * 7 }),
+      ...(index < parts.length - 1 ? [Buffer.alloc(32000)] : []),
+    ]),
+  )
+  const requests: Buffer[] = []
+  const offsets: number[] = []
+  let finishing = false
+  const { plugin } = await setup(
+    async (_url, init) => {
+      const form = init!.body as FormData
+      const sent = Buffer.from(await (form.get('file') as File).arrayBuffer())
+      requests.push(sent)
+      expect(sent.readUInt32LE(4)).toBe(sent.length - 8)
+      expect(sent.readUInt32LE(40)).toBe(sent.length - 44)
+      if (finishing) return new Response(JSON.stringify({ text: 'Final result.' }))
+      expect((sent.length - 44) / 32000).toBeLessThanOrEqual(31)
+      const samples = sent.subarray(44)
+      const anchor = samples.findIndex((byte) => byte !== 0)
+      expect(anchor).toBeGreaterThanOrEqual(0)
+      const offset = audio.indexOf(samples.subarray(anchor, anchor + 2048)) - anchor
+      expect(offset).toBeGreaterThanOrEqual(0)
+      expect(offset % 2).toBe(0)
+      expect(audio.subarray(offset, offset + samples.length).equals(samples)).toBe(true)
+      offsets.push(offset)
+      const start = offset / 32000
+      const end = (offset + sent.length - 44) / 32000
+      const text = parts.filter((_, index) => start < index * 6 + 5 && end > index * 6).join(' ')
+      return new Response(JSON.stringify({ text }))
+    },
+    { local: true },
+  )
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1/v1'),
+    work('http://127.0.0.1/v1', 'local-test-key'),
   )
   const session = await begin(plugin)
-  await expect(append(plugin, session, pcm(0.75))).resolves.toBeNull()
+  await expect(append(plugin, session, audio.subarray(0, 24000))).resolves.toBeNull()
   expect(fetch).not.toHaveBeenCalled()
-  await expect(append(plugin, session, pcm(0.25))).resolves.toEqual({ text: 'Hello' })
-  await expect(append(plugin, session, pcm(0.5))).resolves.toBeNull()
-  await expect(append(plugin, session, pcm(1))).resolves.toEqual({ text: 'Hello' })
-  await expect(append(plugin, session, pcm(29))).resolves.toBeNull()
+  await expect(append(plugin, session, audio.subarray(24000, 32000))).resolves.toEqual({
+    text: 'part1',
+  })
+  await expect(append(plugin, session, audio.subarray(32000, 48000))).resolves.toBeNull()
+  expect(fetch).toHaveBeenCalledTimes(1)
+  await expect(append(plugin, session, audio.subarray(48000, 64000))).resolves.toEqual({
+    text: 'part1',
+  })
   expect(fetch).toHaveBeenCalledTimes(2)
-  await expect(finish(plugin, session)).resolves.toEqual({ text: 'Hello' })
-  expect(fetch).toHaveBeenCalledTimes(3)
+  for (let seconds = 3; seconds <= audio.length / 32000; seconds++)
+    await expect(
+      append(plugin, session, audio.subarray((seconds - 1) * 32000, seconds * 32000)),
+    ).resolves.toEqual({ text: parts.slice(0, Math.ceil(seconds / 6)).join(' ') })
+  expect(offsets.filter((offset) => offset > 0).length).toBeGreaterThan(50)
+  const previews = requests.length
+  finishing = true
+  await expect(finish(plugin, session)).resolves.toEqual({ text: 'Final result.' })
+  expect(requests.length).toBe(previews + 1)
+  expect(requests.at(-1)!.subarray(44).equals(audio)).toBe(true)
+  expect(requests.filter((sent) => sent.length === audio.length + 44).length).toBe(1)
+})
+
+test('local preview commits continuous speech at 30 seconds and keeps text during silence', async () => {
+  const requests: number[] = []
+  const { plugin } = await setup(
+    async (_url, init) => {
+      const form = init!.body as FormData
+      requests.push(((form.get('file') as File).size - 44) / 32000)
+      return new Response(JSON.stringify({ text: 'Hello' }))
+    },
+    { local: true },
+  )
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  const session = await begin(plugin)
+  const audio = pcm(61)
+  for (let seconds = 1; seconds <= 61; seconds++)
+    await expect(
+      append(plugin, session, audio.subarray((seconds - 1) * 32000, seconds * 32000)),
+    ).resolves.toEqual({
+      text: Array(Math.ceil(seconds / 30))
+        .fill('Hello')
+        .join(' '),
+    })
+  expect(requests).toHaveLength(61)
+  expect(Math.max(...requests)).toBeLessThanOrEqual(31)
+  expect(requests[29]).toBe(30)
+  expect(requests[59]).toBe(30)
+  await expect(append(plugin, session, Buffer.alloc(30 * 32000))).resolves.toEqual({
+    text: 'Hello Hello Hello',
+  })
+  const count = requests.length
+  await expect(append(plugin, session, noise(2))).resolves.toEqual({
+    text: 'Hello Hello Hello',
+  })
+  expect(requests).toHaveLength(count)
+  const quiet = await begin(plugin)
+  await expect(append(plugin, quiet, Buffer.alloc(32000))).resolves.toBeNull()
+  await expect(append(plugin, session, pcm(1))).resolves.toEqual({
+    text: 'Hello Hello Hello Hello',
+  })
+  expect(requests).toHaveLength(count + 1)
+})
+
+test('preview throttling across 30 seconds still bounds each request by one append', async () => {
+  const requests: number[] = []
+  const { plugin } = await setup(
+    async (_url, init) => {
+      const form = init!.body as FormData
+      requests.push(((form.get('file') as File).size - 44) / 32000)
+      return new Response(JSON.stringify({ text: 'Hello' }))
+    },
+    { local: true },
+  )
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  const session = await begin(plugin)
+  const audio = pcm(30.5)
+  await expect(append(plugin, session, audio.subarray(0, 29.5 * 32000))).resolves.toEqual({
+    text: 'Hello',
+  })
+  for (let quarter = 0; quarter < 3; quarter++)
+    await expect(
+      append(
+        plugin,
+        session,
+        audio.subarray((29.5 + quarter / 4) * 32000, (29.75 + quarter / 4) * 32000),
+      ),
+    ).resolves.toBeNull()
+  expect(requests).toHaveLength(1)
+  await expect(append(plugin, session, audio.subarray(30.25 * 32000))).resolves.toEqual({
+    text: 'Hello',
+  })
+  expect(requests).toEqual([29.5, 30.25])
+  await expect(append(plugin, session, pcm(1))).resolves.toEqual({ text: 'Hello Hello' })
+  expect(requests).toHaveLength(3)
+  expect(requests[2]).toBeLessThanOrEqual(31)
 })
 
 test('cancel aborts an in-flight request and forgets the session', async () => {
@@ -451,7 +573,7 @@ test('cancel aborts an in-flight request and forgets the session', async () => {
     { local: true },
   )
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1/v1'),
+    work('http://127.0.0.1/v1', 'local-test-key'),
   )
   const session = await begin(plugin)
   const preview = append(plugin, session, pcm(1))
@@ -480,7 +602,7 @@ test('finish aborts an in-flight preview and recognizes the whole recording', as
   })
   const { plugin } = await setup(listener, { local: true })
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-    work('http://127.0.0.1/v1'),
+    work('http://127.0.0.1/v1', 'local-test-key'),
   )
   const session = await begin(plugin)
   const preview = append(plugin, session, pcm(1))
@@ -524,9 +646,10 @@ test('statistics survive restart and publish totals and calendar days using the 
   await plugin.dispose()
   vi.setSystemTime(new Date('2026-01-02T12:30:00Z'))
   const replacementViews = vi.fn<SetPluginView>()
-  const replacement = createVoicePlugin(() => {}, replacementViews, [
-    { id: 'qwen3-asr-1.7b', files: models },
-  ])
+  const replacement = createVoicePlugin(
+    { setStatus: () => {}, setView: replacementViews, log: () => {} },
+    [{ id: 'qwen3-asr-1.7b', files: models }],
+  )
   cleanups.push(() => replacement.dispose())
   await replacement.start(start)
   expect(replacementViews.mock.calls).toEqual([

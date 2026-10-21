@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { detectSpeech } from './speech-logic'
+import { detectSpeech, findSpeechPause } from './speech-logic'
 import { noise, pcm } from './test-fixtures'
 
 function mix(background: Buffer, foreground: Buffer, start: number): Buffer {
@@ -137,4 +137,45 @@ test('reads PCM subarrays and clips padding at recording boundaries', () => {
     hasSpeech: true,
     span: { start: 0, end: 0.5 },
   })
+})
+
+test('finds the latest pause between voiced runs with enough audio before it', () => {
+  const audio = Buffer.concat([
+    pcm(4),
+    Buffer.alloc(32000),
+    pcm(4),
+    Buffer.alloc(32000),
+    pcm(2),
+    Buffer.alloc(3 * 32000),
+  ])
+  const pause = findSpeechPause(audio, 5)!
+  expect(pause).toBeGreaterThanOrEqual(9)
+  expect(pause).toBeLessThanOrEqual(10)
+  expect(findSpeechPause(audio, pause)).toBe(pause)
+  expect(findSpeechPause(audio, pause + 1 / 16000)).toBeNull()
+  expect(detectSpeech(audio.subarray(0, Math.round(pause * 16000) * 2)).hasSpeech).toBe(true)
+  expect(detectSpeech(audio.subarray(Math.round(pause * 16000) * 2)).hasSpeech).toBe(true)
+})
+
+test('does not use leading or trailing silence, continuous speech or noise as pauses', () => {
+  for (const audio of [
+    Buffer.alloc(10 * 32000),
+    noise(10),
+    pcm(10),
+    Buffer.concat([Buffer.alloc(6 * 32000), pcm(2), Buffer.alloc(6 * 32000)]),
+    Buffer.concat([pcm(2), Buffer.alloc(32000), pcm(2)]),
+  ])
+    expect(findSpeechPause(audio, 5)).toBeNull()
+})
+
+test('pause finding uses smoothed runs and reads PCM subarrays', () => {
+  const audio = mix(Buffer.concat([pcm(6), Buffer.alloc(3 * 32000)]), tone(0.06, 800), 7)
+  expect(findSpeechPause(audio, 5)).toBeNull()
+  const speech = Buffer.concat([pcm(6), Buffer.alloc(32000), pcm(2)])
+  const backing = Buffer.concat([Buffer.alloc(7), speech, Buffer.alloc(9)])
+  expect(findSpeechPause(backing.subarray(7, backing.length - 9), 5)).toBe(
+    findSpeechPause(speech, 5),
+  )
+  expect(findSpeechPause(speech, 5)).toBeGreaterThanOrEqual(6)
+  expect(findSpeechPause(speech, 5)).toBeLessThanOrEqual(7)
 })

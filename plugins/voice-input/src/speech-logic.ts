@@ -1,8 +1,4 @@
-export function detectSpeech(pcm: Uint8Array): {
-  hasSpeech: boolean
-  voicedSeconds: number
-  span: { start: number; end: number } | null
-} {
+function speechRuns(pcm: Uint8Array): { start: number; end: number; voiced: number }[] {
   const samples = Math.floor(pcm.byteLength / 2)
   const view = new DataView(pcm.buffer, pcm.byteOffset, pcm.byteLength)
   const frames: { start: number; end: number; energy: number; crossings: number }[] = []
@@ -38,7 +34,25 @@ export function detectSpeech(pcm: Uint8Array): {
       runs.push({ start: frame.start, end: frame.end, voiced: frame.end - frame.start })
     }
   }
-  const smoothed = runs.filter((run) => run.voiced >= 1920)
+  return runs.filter((run) => run.voiced >= 1920)
+}
+
+export function findSpeechPause(pcm: Uint8Array, minimumSeconds: number): number | null {
+  const runs = speechRuns(pcm)
+  for (let index = runs.length - 1; index > 0; index--) {
+    const pause = (runs[index - 1]!.end + runs[index]!.start) / 32000
+    if (pause >= minimumSeconds) return pause
+  }
+  return null
+}
+
+export function detectSpeech(pcm: Uint8Array): {
+  hasSpeech: boolean
+  voicedSeconds: number
+  span: { start: number; end: number } | null
+} {
+  const samples = Math.floor(pcm.byteLength / 2)
+  const smoothed = speechRuns(pcm)
   const voicedSeconds = smoothed.reduce((sum, run) => sum + run.voiced, 0) / 16000
   const first = smoothed[0]
   const last = smoothed.at(-1)

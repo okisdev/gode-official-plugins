@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pluginManifestSchema, pluginViewDataSchemas, type HostMessage } from '@gode/plugin-sdk'
-import type { SetPluginView } from '@gode/plugin-sdk/plugin'
+import type { PluginContext, SetPluginView } from '@gode/plugin-sdk/plugin'
 import { afterEach, expect, test, vi } from 'vitest'
 import manifest from '../manifest.json'
 import { LocalEngine } from './engine'
@@ -67,7 +67,7 @@ async function setup(
     for (const entry of models)
       await writeFile(join(directory, 'models', entry.file), 'model bytes')
     vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
-      work('http://localhost/v1'),
+      work('http://localhost/v1', 'local-test-key'),
     )
   }
   if (options.history !== undefined)
@@ -90,12 +90,15 @@ async function setup(
   }
   const launch = async () => {
     const setView = vi.fn<SetPluginView>()
-    const plugin = createVoicePlugin(() => {}, setView, [{ id: 'qwen3-asr-1.7b', files: models }])
+    const log = vi.fn<PluginContext['log']>()
+    const plugin = createVoicePlugin({ setStatus: () => {}, setView, log }, [
+      { id: 'qwen3-asr-1.7b', files: models },
+    ])
     cleanups.push(() => plugin.dispose())
     await plugin.start(start)
     const view = (id: 'history' | 'memory') =>
       pluginViewDataSchemas.list.parse(setView.mock.calls.findLast(([viewId]) => viewId === id)![1])
-    return { plugin, setView, view }
+    return { plugin, setView, view, log }
   }
   return { ...(await launch()), start, launch, directory, response }
 }
@@ -140,7 +143,7 @@ async function dictate(
 
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
-  expect(parsed.version).toBe('0.0.7')
+  expect(parsed.version).toBe('0.0.8')
   expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual(
     ['keepHistory', 'learnTerms'].map((key) => ({
       key,
@@ -192,6 +195,35 @@ test('saves only finished text with its recording duration, newest first, and re
   expect(entries[0].id).not.toBe(entries[1].id)
   const replacement = await launch()
   expect(replacement.view('history')).toEqual(view('history'))
+})
+
+test('loaded history, learned terms and requested vocabulary never enter the log', async () => {
+  const term = 'PrivateMemoryTerm'
+  const { plugin, log, response, view } = await setup({
+    history: JSON.stringify([
+      { id: 'private-history-id', text: 'Private history entry', time: 1, seconds: 1 },
+    ]),
+    memory: JSON.stringify({
+      terms: [{ key: term.toLowerCase(), count: 2, time: Date.now(), forms: { [term]: 2 } }],
+      forgotten: [],
+    }),
+  })
+  expect(view('memory').items[0]?.text).toBe(term)
+  expect(view('history').items[0]?.text).toBe('Private history entry')
+  expect(log).not.toHaveBeenCalled()
+  response.text = 'Private finished transcript'
+  await expect(dictate(plugin, ['PrivateVocabulary'])).resolves.toEqual({ text: response.text })
+  const body = vi.mocked(fetch).mock.calls[0]![1]!.body as FormData
+  expect(body.get('prompt')).toBe(`PrivateVocabulary, ${term}`)
+  expect(log.mock.calls).toEqual([
+    [
+      'info',
+      expect.stringMatching(
+        /^Dictation finished: 1\.00 s audio, recognition \d+\.\d{2} s, polish skipped$/,
+      ),
+    ],
+  ])
+  expect(JSON.stringify(log.mock.calls).toLowerCase()).not.toContain('private')
 })
 
 test('keeps the newest 10,000 dictations and evicts the oldest', async () => {

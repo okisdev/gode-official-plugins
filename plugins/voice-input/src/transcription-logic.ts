@@ -16,6 +16,21 @@ const leadingJapaneseFillers =
   /(?<=^|[\s\p{P}])(?:えー+と|えっと|ええと|えー+っと|あのー+|うー+ん)/gu
 const repeatedWord = /\b([\p{L}'’]+)(?:\s+\1\b)+/giu
 
+export function joinTranscript(committed: string, window: string): string {
+  const before = committed.trim()
+  const after = window.trim()
+  if (!before || !after) return before || after
+  const cjk = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u
+  const last = Array.from(before).at(-1)!
+  const separator =
+    /^[\p{Pe}\p{Pf},.!?;:，。！？；：、…]/u.test(after) ||
+    /[　-〿＀-￯]/u.test(last) ||
+    (cjk.test(last) && cjk.test(Array.from(after)[0]!))
+      ? ''
+      : ' '
+  return before + separator + after
+}
+
 export function cleanTranscript(text: string, removeFillers: boolean): string {
   const stripped = text.replace(/^\s*language\s+[^<>\r\n]+<asr_text>\s*/i, '').trim()
   if (!removeFillers) return stripped

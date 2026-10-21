@@ -22,8 +22,7 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
   )
   const polish = { id: 'qwen3.5-2b', files: [model('polish.gguf', server.url, 'polish bytes')] }
   const plugin = createVoicePlugin(
-    (status) => statuses.push(status),
-    () => {},
+    { setStatus: (status) => statuses.push(status), setView: () => {}, log: () => {} },
     [{ id: 'qwen3-asr-1.7b', files: models }],
     polish,
   )
@@ -43,9 +42,11 @@ test('missing, downloading, ready and removal use manifest states and localized 
   const { server, statuses, plugin } = await setup((_request, response) =>
     response.end('model bytes'),
   )
-  expect(statuses.at(-1)).toMatchObject({
-    state: 'setup',
-    message: 'status.modelMissing',
+  expect(statuses.at(-1)).toMatchObject({ state: 'setup', message: 'status.setup', actions: [] })
+  expect(statuses.at(-1)?.steps?.[0]).toMatchObject({
+    id: 'model',
+    state: 'todo',
+    message: 'step.modelTodo',
     action: 'downloadModel',
   })
   await expect(
@@ -58,14 +59,16 @@ test('missing, downloading, ready and removal use manifest states and localized 
   ).rejects.toMatchObject({ text: { message: 'error.notReady' } })
   await plugin.action('downloadModel')
   await vi.waitFor(() => expect(statuses.at(-1)?.message).toBe('status.localReady'))
-  expect(statuses.find((status) => status.message === 'status.downloading')).toMatchObject({
+  expect(
+    statuses.find((status) => status.steps?.[0]?.message === 'status.downloading')?.steps?.[0],
+  ).toMatchObject({
     state: 'working',
     progress: 0,
     action: 'stopDownload',
     values: { done: '0 Byte', total: '22 Byte' },
   })
   await plugin.action('removeModel')
-  expect(statuses.at(-1)?.message).toBe('status.modelMissing')
+  expect(statuses.at(-1)?.steps?.[0]?.message).toBe('step.modelTodo')
   expect(await readdir(join(server.directory, 'models'))).toEqual([])
 })
 
@@ -77,7 +80,7 @@ test('download failure offers retry and stopping a retry cleans partials', async
   })
   await plugin.action('downloadModel')
   await vi.waitFor(() =>
-    expect(statuses.at(-1)).toMatchObject({
+    expect(statuses.at(-1)?.steps?.[0]).toMatchObject({
       state: 'failed',
       message: 'status.downloadFailed',
       action: 'downloadModel',
@@ -85,9 +88,9 @@ test('download failure offers retry and stopping a retry cleans partials', async
   )
   slow = true
   await plugin.action('downloadModel')
-  await vi.waitFor(() => expect(statuses.at(-1)?.message).toBe('status.downloading'))
+  await vi.waitFor(() => expect(statuses.at(-1)?.steps?.[0]?.message).toBe('status.downloading'))
   await plugin.action('stopDownload')
-  expect(statuses.at(-1)?.message).toBe('status.modelMissing')
+  expect(statuses.at(-1)?.steps?.[0]?.message).toBe('step.modelTodo')
   expect(await readdir(join(server.directory, 'models'))).toEqual([])
 })
 
@@ -110,7 +113,7 @@ test('server settings, check, transcription and API failures use the contract', 
     )
   })
   await plugin.settings({ type: 'settings', settings: { engine: 'server' }, secrets: {} })
-  expect(statuses.at(-1)?.message).toBe('status.serverMissing')
+  expect(statuses.at(-1)?.steps?.[0]?.message).toBe('step.serverTodo')
   await plugin.settings({
     type: 'settings',
     settings: {
@@ -127,7 +130,7 @@ test('server settings, check, transcription and API failures use the contract', 
     values: { host: new URL(server.url).host },
   })
   await plugin.action('checkServer')
-  expect(statuses.at(-1)?.message).toBe('status.checking')
+  expect(statuses.at(-1)?.steps?.[0]?.message).toBe('status.checking')
   await vi.waitFor(() => expect(statuses.at(-1)?.message).toBe('status.serverReady'))
   const call = {
     type: 'call',
@@ -171,10 +174,11 @@ test('server settings, check, transcription and API failures use the contract', 
   })
   await plugin.action('checkServer')
   await vi.waitFor(() =>
-    expect(statuses.at(-1)).toMatchObject({
+    expect(statuses.at(-1)?.steps?.[0]).toMatchObject({
       state: 'failed',
       message: 'status.serverFailed',
       values: { reason: 'Invalid key' },
+      action: 'checkServer',
     }),
   )
 })
@@ -255,7 +259,7 @@ test.each([
       this: LocalEngine,
       work,
     ) {
-      return work(`${server.url}/v1`)
+      return work(`${server.url}/v1`, 'local-test-key')
     })
     await plugin.settings({
       ...start,
@@ -326,7 +330,7 @@ test('local recognition also tidies only the final transcript', async () => {
     this: LocalEngine,
     work,
   ) {
-    return work(`${server.url}/v1`)
+    return work(`${server.url}/v1`, 'local-test-key')
   })
   await plugin.settings({ ...start, type: 'settings', settings: { engine: 'local', polish: true } })
   await expect(finish(plugin)).resolves.toEqual({ text: 'Please send to agentdoc on Thursday.' })

@@ -1,7 +1,10 @@
 import { spawn, type ChildProcess } from 'node:child_process'
+import { randomBytes } from 'node:crypto'
 import { createServer } from 'node:net'
-import { dirname } from 'node:path'
+import { basename, dirname } from 'node:path'
+import { StringDecoder } from 'node:string_decoder'
 import { setTimeout as delay } from 'node:timers/promises'
+import type { PluginContext } from '@gode/plugin-sdk/plugin'
 
 async function freePort(): Promise<number> {
   const server = createServer()
@@ -18,7 +21,7 @@ async function freePort(): Promise<number> {
 
 export class LocalEngine {
   private child?: ChildProcess
-  private starting?: Promise<string>
+  private starting?: Promise<{ base: string; apiKey: string }>
   private controller?: AbortController
   private idle?: NodeJS.Timeout
   private active = 0
@@ -29,18 +32,21 @@ export class LocalEngine {
       executable: string
       model: string
       projector?: string
+      name: 'recognition' | 'polish'
+      log: PluginContext['log']
       idleMs?: number
       startupMs?: number
     },
   ) {}
 
-  async use<T>(work: (base: string) => Promise<T>): Promise<T> {
+  async use<T>(work: (base: string, apiKey: string) => Promise<T>): Promise<T> {
     await this.stopping
     clearTimeout(this.idle)
     this.active++
     try {
       this.starting ??= this.start()
-      return await work(await this.starting)
+      const { base, apiKey } = await this.starting
+      return await work(base, apiKey)
     } finally {
       this.active--
       if (!this.active) {
@@ -55,13 +61,26 @@ export class LocalEngine {
     }
   }
 
-  private async start(): Promise<string> {
+  private async start(): Promise<{ base: string; apiKey: string }> {
     const controller = new AbortController()
     this.controller = controller
+    const started = performance.now()
+    const label = this.options.name === 'recognition' ? 'Recognition engine' : 'Polish engine'
+    this.options.log(
+      'info',
+      `${label} starting: ${[this.options.model, this.options.projector]
+        .filter((file) => file !== undefined)
+        .map((file) => basename(file))
+        .join(', ')}`,
+    )
+    let exited = false
+    let startupFailure = 'Could not reserve a loopback port'
     try {
       const port = await freePort()
       controller.signal.throwIfAborted()
       const bin = dirname(this.options.executable)
+      const apiKey = randomBytes(32).toString('hex')
+      startupFailure = 'Could not start llama-server'
       const child = spawn(
         this.options.executable,
         [
@@ -69,6 +88,10 @@ export class LocalEngine {
           this.options.model,
           ...(this.options.projector ? ['--mmproj', this.options.projector] : []),
           '--jinja',
+          '--log-verbosity',
+          '2',
+          '--api-key',
+          apiKey,
           '--host',
           '127.0.0.1',
           '--port',
@@ -90,14 +113,36 @@ export class LocalEngine {
       )
       this.child = child
       let stderr = ''
+      let pending = ''
+      const decoder = new StringDecoder('utf8')
       let failure: Error | undefined
+      const forward = (text: string): void => {
+        process.stderr.write(`[${this.options.name}] ${text.replaceAll(apiKey, '[redacted]')}\n`)
+      }
       child.stderr?.on('data', (chunk: Buffer) => {
-        stderr = (stderr + chunk.toString()).slice(-8000)
+        const text = decoder.write(chunk)
+        stderr = (stderr + text).slice(-8000)
+        pending += text
+        const lines = pending.split(/\r?\n/)
+        pending = lines.pop()!
+        for (const line of lines) forward(line)
+      })
+      child.stderr?.once('end', () => {
+        pending += decoder.end()
+        if (pending) forward(pending)
+        pending = ''
       })
       child.once('error', (error) => {
         failure = error
       })
       child.once('exit', (code, signal) => {
+        exited = true
+        this.options.log(
+          controller.signal.aborted ? 'info' : 'error',
+          controller.signal.aborted
+            ? `${label} stopped`
+            : `${label} exited unexpectedly (${signal ? `signal ${signal}` : `code ${code}`})`,
+        )
         failure ??= new Error(stderr.trim() || `Speech engine exited (${signal ?? code})`)
         if (this.child === child) {
           this.child = undefined
@@ -111,12 +156,17 @@ export class LocalEngine {
         if (failure) throw failure
         try {
           const response = await fetch(`http://127.0.0.1:${port}/health`, {
+            headers: { Authorization: `Bearer ${apiKey}` },
             signal: AbortSignal.any([controller.signal, AbortSignal.timeout(1000)]),
           })
           await response.body?.cancel()
           if (response.ok) {
             if (failure) throw failure
-            return base
+            this.options.log(
+              'info',
+              `${label} ready in ${((performance.now() - started) / 1000).toFixed(2)} s`,
+            )
+            return { base, apiKey }
           }
         } catch {
           controller.signal.throwIfAborted()
@@ -124,8 +174,14 @@ export class LocalEngine {
         }
         await delay(100, undefined, { signal: controller.signal })
       }
+      startupFailure = 'Startup timed out'
       throw new Error(stderr.trim() || 'Speech engine startup timed out')
     } catch (error) {
+      if (!controller.signal.aborted && !exited) {
+        const code = (error as NodeJS.ErrnoException).code
+        if (code && /^[A-Z][A-Z0-9_]+$/.test(code)) startupFailure = code
+        this.options.log('error', `${label} failed to start: ${startupFailure}`)
+      }
       if (this.controller === controller) this.kill()
       throw error
     }

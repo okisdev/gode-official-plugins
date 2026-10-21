@@ -4,9 +4,41 @@ import {
   applyVocabulary,
   cleanTranscript,
   formatBytes,
+  joinTranscript,
   responseJSON,
   transcriptionRequest,
 } from './transcription-logic'
+
+test.each([
+  ['', '', ''],
+  ['', ' Hello ', 'Hello'],
+  [' Hello ', '', 'Hello'],
+  [' Hello  ', '  world. ', 'Hello world.'],
+  ['Hello.', 'More words.', 'Hello. More words.'],
+  ['你好', '世界', '你好世界'],
+  ['明日', 'の予定', '明日の予定'],
+  ['カタ', 'カナ', 'カタカナ'],
+  ['𠀀', '中文', '𠀀中文'],
+  ['使用', 'Gode', '使用 Gode'],
+  ['Gode', '很好用', 'Gode 很好用'],
+  ['中文 API', '可以使用', '中文 API 可以使用'],
+  ['Hello', ', world.', 'Hello, world.'],
+  ['你好', '，世界。', '你好，世界。'],
+  ['你好', '。', '你好。'],
+  ['先说一段话。', '这个插件', '先说一段话。这个插件'],
+  ['你好，', 'Gode', '你好，Gode'],
+  ['做完了。', 'Next step', '做完了。Next step'],
+  ['等等', '……', '等等……'],
+  ['Hello', '!', 'Hello!'],
+  ['Hello', '?', 'Hello?'],
+  ['Hello', '; next', 'Hello; next'],
+  ['Hello', ': next', 'Hello: next'],
+  ['「你好', '」', '「你好」'],
+  ['(Hello', ')', '(Hello)'],
+  ['“Hello', '”', '“Hello”'],
+])('joins %s and %s', (committed, window, expected) =>
+  expect(joinTranscript(committed, window)).toBe(expected),
+)
 
 test.each([
   ['language Chinese<asr_text>把 hook 抽出来', true, '把 hook 抽出来'],

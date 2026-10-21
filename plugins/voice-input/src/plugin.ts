@@ -5,14 +5,15 @@ import type {
   DictationSession,
   DictationStart,
   PluginSettingValue,
+  PluginStep,
   PluginStatus,
 } from '@gode/plugin-sdk'
 import {
   DictationRecordings,
   PluginError,
   type DictationRecording,
+  type PluginContext,
   type PluginHandlers,
-  type SetPluginView,
 } from '@gode/plugin-sdk/plugin'
 import resources from '../resources.json'
 import { clearPartials, downloadModels, modelsPresent, type ModelSet } from './download'
@@ -20,13 +21,14 @@ import { LocalEngine } from './engine'
 import { VoiceHistory } from './history'
 import { VoiceMemory } from './memory'
 import { polishedText, polishMessages } from './polish-logic'
-import { detectSpeech } from './speech-logic'
+import { detectSpeech, findSpeechPause } from './speech-logic'
 import { VoiceStats } from './stats'
 import {
   apiURL,
   applyVocabulary,
   cleanTranscript,
   formatBytes,
+  joinTranscript,
   responseJSON,
   transcriptionRequest,
 } from './transcription-logic'
@@ -35,9 +37,44 @@ function reason(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
 }
 
+function logReason(error: unknown): string {
+  if (!(error instanceof Error)) return 'Operation failed'
+  if (error.cause) return logReason(error.cause)
+  if (error.name === 'AbortError') return 'Request aborted'
+  if (error.name === 'TimeoutError') return 'Request timed out'
+  const code = (error as NodeJS.ErrnoException).code
+  if (code && /^[A-Z][A-Z0-9_]+$/.test(code)) return code
+  if (/^HTTP [1-5]\d{2}$/.test(error.message)) return error.message
+  if (error.message.startsWith('Integrity check failed for ')) return 'Model integrity check failed'
+  if (error.message.startsWith('Unexpected size for ')) return 'Unexpected model size'
+  switch (error.message) {
+    case 'fetch failed':
+    case 'Invalid URL':
+    case 'Expected an HTTP or HTTPS API address':
+    case 'The server returned no transcription':
+      return error.message
+    case 'error.notReady':
+      return 'Plugin is not ready'
+    case 'error.session':
+      return 'Dictation session has not started'
+    case 'error.engine':
+      return 'Local engine failed'
+    default:
+      return 'Operation failed'
+  }
+}
+
+async function readResponse(response: Response): Promise<unknown> {
+  try {
+    return await responseJSON(response)
+  } catch (error) {
+    if (response.ok) throw error
+    throw new Error(reason(error), { cause: new Error(`HTTP ${response.status}`) })
+  }
+}
+
 export function createVoicePlugin(
-  setStatus: (status: PluginStatus) => void,
-  setView: SetPluginView,
+  { setStatus, setView, log }: PluginContext,
   models: readonly ModelSet[] = resources.models,
   polish: ModelSet = resources.polish,
 ): Required<Pick<PluginHandlers, 'start' | 'settings' | 'action' | 'query' | 'call' | 'error'>> & {
@@ -58,8 +95,9 @@ export function createVoicePlugin(
   let download: { controller: AbortController; task: Promise<void>; model: ModelSet } | undefined
   let check: AbortController | undefined
   let disposed = false
+  let currentStatus: PluginStatus | undefined
   const recordings = new DictationRecordings()
-  const recognized = new Map<string, number>()
+  const recognized = new Map<string, { seconds: number; start: number; text: string }>()
   const text = (key: string, fallback = ''): string =>
     typeof settings[key] === 'string' ? settings[key] : fallback
   const local = (): boolean => text('engine', 'local') === 'local'
@@ -69,6 +107,8 @@ export function createVoicePlugin(
   const createEngine = (): LocalEngine => {
     const [model, projector] = selected().files
     return new LocalEngine({
+      name: 'recognition',
+      log,
       executable,
       model: join(directory, model!.file),
       projector: join(directory, projector!.file),
@@ -76,45 +116,109 @@ export function createVoicePlugin(
   }
   const polishPresent = (): Promise<boolean> => modelsPresent(directory, polish.files)
   const status = (value: PluginStatus): void => {
-    if (!disposed) setStatus(value)
+    if (!disposed) {
+      currentStatus = value
+      setStatus(value)
+    }
   }
-  async function refresh(): Promise<void> {
-    ready = false
+  const updateStep = (id: string, step: Partial<PluginStep>): void => {
+    if (!currentStatus) return
+    status({
+      ...currentStatus,
+      steps: currentStatus.steps?.map((item) => (item.id === id ? { ...item, ...step } : item)),
+    })
+  }
+  async function refresh(preserveDownload = true): Promise<void> {
+    const steps: PluginStep[] = []
     let next: PluginStatus
     if (local()) {
-      const files = selected().files
+      const model = selected()
+      const files = model.files
       ready = await modelsPresent(directory, files)
-      next = ready
-        ? { state: 'ready', message: 'status.localReady' }
-        : {
-            state: 'setup',
-            message: 'status.modelMissing',
-            values: {
-              size: formatBytes(
-                files.reduce((sum, file) => sum + file.size, 0),
-                locale,
-              ),
-            },
-            action: 'downloadModel',
-          }
+      next = {
+        state: ready ? 'ready' : 'setup',
+        message: ready ? 'status.localReady' : 'status.setup',
+      }
+      const size = formatBytes(
+        files.reduce((sum, file) => sum + file.size, 0),
+        locale,
+      )
+      steps.push({
+        id: 'model',
+        title: 'step.model',
+        message: ready ? 'step.modelDone' : 'step.modelTodo',
+        values: {
+          model: model.id === 'qwen3-asr-1.7b' ? 'Qwen3-ASR 1.7B' : 'Qwen3-ASR 0.6B',
+          size,
+        },
+        state: ready ? 'done' : 'todo',
+        fields: ['engine', 'localModel'],
+        action: ready ? 'removeModel' : 'downloadModel',
+      })
     } else if (!text('serverURL').trim()) {
-      next = { state: 'setup', message: 'status.serverMissing' }
+      ready = false
+      next = { state: 'setup', message: 'status.setup' }
+      steps.push({
+        id: 'server',
+        title: 'step.server',
+        message: 'step.serverTodo',
+        state: 'todo',
+        fields: ['engine', 'serverURL', 'apiKey', 'model'],
+      })
     } else {
       try {
         const url = new URL(apiURL(text('serverURL').trim(), 'audio/transcriptions'))
         ready = true
         next = { state: 'ready', message: 'status.serverReady', values: { host: url.host } }
+        steps.push({
+          id: 'server',
+          title: 'step.server',
+          message: 'step.serverDone',
+          state: 'done',
+          fields: ['engine', 'serverURL', 'apiKey', 'model'],
+          action: 'checkServer',
+        })
       } catch (error) {
-        next = {
-          state: 'failed',
+        ready = false
+        next = { state: 'setup', message: 'status.setup' }
+        steps.push({
+          id: 'server',
+          title: 'step.server',
           message: 'status.serverFailed',
           values: { reason: reason(error) },
-        }
+          state: 'failed',
+          fields: ['engine', 'serverURL', 'apiKey', 'model'],
+          action: 'checkServer',
+        })
       }
     }
-    if (ready && polishOn() && !(await polishPresent()))
-      next = { state: 'ready', message: 'status.polishMissing', action: 'downloadPolishModel' }
-    status(next)
+    if (polishOn()) {
+      const present = await polishPresent()
+      steps.push({
+        id: 'polish',
+        title: 'step.polish',
+        message: present ? 'step.polishDone' : 'step.polishTodo',
+        values: {
+          size: formatBytes(
+            polish.files.reduce((sum, file) => sum + file.size, 0),
+            locale,
+          ),
+        },
+        state: present ? 'done' : 'todo',
+        optional: true,
+        fields: ['polish'],
+        action: present ? 'removePolishModel' : 'downloadPolishModel',
+      })
+    }
+    if (preserveDownload && download) {
+      const id = download.model === polish ? 'polish' : 'model'
+      const active = currentStatus?.steps?.find(
+        (step) => step.id === id && step.state === 'working',
+      )
+      const index = steps.findIndex((step) => step.id === id)
+      if (active && index !== -1) steps.splice(index, 1, active)
+    }
+    status({ ...next, steps, actions: [] })
   }
 
   async function stopDownload(): Promise<void> {
@@ -134,7 +238,7 @@ export function createVoicePlugin(
         ...transcriptionRequest({ audio, vocabulary }, options),
         signal: AbortSignal.any([recording.signal, AbortSignal.timeout(180_000)]),
       })
-      const value = await responseJSON(response)
+      const value = await readResponse(response)
       if (
         !value ||
         typeof value !== 'object' ||
@@ -144,7 +248,12 @@ export function createVoicePlugin(
         throw new Error('The server returned no transcription')
       return { text: cleanTranscript(value.text, options.removeFillers) }
     } catch (error) {
-      throw new PluginError({ message: 'error.recognition', values: { reason: reason(error) } })
+      const failure = new PluginError({
+        message: 'error.recognition',
+        values: { reason: reason(error) },
+      })
+      failure.cause = error
+      throw failure
     }
   }
 
@@ -183,7 +292,9 @@ export function createVoicePlugin(
     header.setUint32(4, 36 + pcm.byteLength, true)
     header.setUint32(40, pcm.byteLength, true)
     try {
-      const result = await engine.use((base) => transcribe(base, recording, trimmed, [], options))
+      const result = await engine.use((base, apiKey) =>
+        transcribe(base, recording, trimmed, [], { ...options, apiKey }),
+      )
       return final ? result : { text: applyVocabulary(result.text, vocabulary) }
     } catch (error) {
       if (error instanceof PluginError) throw error
@@ -191,14 +302,19 @@ export function createVoicePlugin(
     }
   }
 
-  async function tidy(recording: DictationRecording, text: string): Promise<string> {
-    if (!text || !polishOn()) return text
+  async function tidy(
+    recording: DictationRecording,
+    text: string,
+  ): Promise<{ text: string; ran: boolean }> {
+    if (!text || !polishOn()) return { text, ran: false }
+    let ran = false
     try {
-      if (!(await polishPresent())) return text
-      return await polishEngine.use(async (base) => {
+      if (!(await polishPresent())) return { text, ran }
+      return await polishEngine.use(async (base, apiKey) => {
+        ran = true
         const response = await fetch(`${base}/chat/completions`, {
           method: 'POST',
-          headers: { 'content-type': 'application/json' },
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
             messages: polishMessages(text, memory.vocabulary(recording.vocabulary)),
             temperature: 0,
@@ -207,14 +323,15 @@ export function createVoicePlugin(
           }),
           signal: AbortSignal.any([recording.signal, AbortSignal.timeout(5000)]),
         })
-        const value = (await responseJSON(response)) as {
+        const value = (await readResponse(response)) as {
           choices?: { message?: { content?: unknown } }[]
         }
         const reply = value?.choices?.[0]?.message?.content
-        return typeof reply === 'string' ? (polishedText(text, reply) ?? text) : text
+        return { text: typeof reply === 'string' ? (polishedText(text, reply) ?? text) : text, ran }
       })
-    } catch {
-      return text
+    } catch (error) {
+      if (!recording.signal.aborted) log('warning', `Dictation polish failed: ${logReason(error)}`)
+      return { text, ran }
     }
   }
 
@@ -241,7 +358,12 @@ export function createVoicePlugin(
       )
       executable = join(message.paths.plugin, 'bin/llama-server')
       engine = createEngine()
-      polishEngine = new LocalEngine({ executable, model: join(directory, polish.files[0]!.file) })
+      polishEngine = new LocalEngine({
+        name: 'polish',
+        log,
+        executable,
+        model: join(directory, polish.files[0]!.file),
+      })
       await refresh()
     },
     async settings(message) {
@@ -258,8 +380,11 @@ export function createVoicePlugin(
         await engine.stop()
       }
       if (modelChanged) engine = createEngine()
-      if (wasPolish && !polishOn()) await polishEngine.stop()
-      if (!download) await refresh()
+      if (wasPolish && !polishOn()) {
+        if (download?.model === polish) await stopDownload()
+        await polishEngine.stop()
+      }
+      await refresh()
     },
     async action(action, item) {
       if (action === 'deleteEntry' && item) {
@@ -297,13 +422,33 @@ export function createVoicePlugin(
           await engine.stop()
         } else await polishEngine.stop()
         const controller = new AbortController()
+        const files = target.files.map((file) => file.file).join(', ')
+        log(
+          'info',
+          `Model download started: ${files} (${target.files.reduce((sum, file) => sum + file.size, 0)} bytes)`,
+        )
         let lastProgress = 0
+        if (target !== polish && currentStatus)
+          status({ ...currentStatus, state: 'setup', message: 'status.setup' })
+        updateStep(target === polish ? 'polish' : 'model', {
+          state: 'working',
+          message: target === polish ? 'status.polishDownloading' : 'status.downloading',
+          values: {
+            done: formatBytes(0, locale),
+            total: formatBytes(
+              target.files.reduce((sum, file) => sum + file.size, 0),
+              locale,
+            ),
+          },
+          progress: 0,
+          action: 'stopDownload',
+        })
         const task = (async () => {
           try {
             await downloadModels(directory, target.files, controller.signal, (done, bytes) => {
               if (done !== 0 && done !== bytes && Date.now() - lastProgress < 100) return
               lastProgress = Date.now()
-              status({
+              updateStep(target === polish ? 'polish' : 'model', {
                 state: 'working',
                 message: target === polish ? 'status.polishDownloading' : 'status.downloading',
                 progress: done / bytes,
@@ -311,18 +456,20 @@ export function createVoicePlugin(
                 action: 'stopDownload',
               })
             })
-            if (!controller.signal.aborted) await refresh()
+            log('info', `Model download finished: ${files}`)
+            if (!controller.signal.aborted) await refresh(false)
           } catch (error) {
-            if (!controller.signal.aborted) {
-              if (target === polish && !ready) await refresh()
-              else
-                status({
-                  state: target === polish ? 'ready' : 'failed',
-                  message:
-                    target === polish ? 'status.polishDownloadFailed' : 'status.downloadFailed',
-                  values: { reason: reason(error) },
-                  action: target === polish ? 'downloadPolishModel' : 'downloadModel',
-                })
+            if (controller.signal.aborted) log('info', `Model download stopped: ${files}`)
+            else {
+              log('error', `Model download failed: ${files}: ${logReason(error)}`)
+              updateStep(target === polish ? 'polish' : 'model', {
+                state: 'failed',
+                message:
+                  target === polish ? 'status.polishDownloadFailed' : 'status.downloadFailed',
+                values: { reason: reason(error) },
+                progress: undefined,
+                action: target === polish ? 'downloadPolishModel' : 'downloadModel',
+              })
             }
           } finally {
             download = undefined
@@ -331,27 +478,35 @@ export function createVoicePlugin(
         download = { controller, task, model: target }
       } else if (action === 'checkServer' && !local()) {
         check?.abort()
-        if (!text('serverURL').trim()) return refresh()
+        if (!text('serverURL').trim()) {
+          log('warning', 'Server check failed: No server address')
+          return refresh()
+        }
         const controller = new AbortController()
         check = controller
-        ready = false
-        status({ state: 'working', message: 'status.checking' })
+        updateStep('server', { state: 'working', message: 'status.checking', action: undefined })
         void (async () => {
           try {
-            await responseJSON(
+            await readResponse(
               await fetch(apiURL(text('serverURL').trim(), 'models'), {
                 headers: secrets.apiKey ? { Authorization: `Bearer ${secrets.apiKey}` } : {},
                 signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
               }),
             )
-            if (!controller.signal.aborted) await refresh()
+            if (!controller.signal.aborted) {
+              log('info', 'Server check succeeded')
+              await refresh()
+            }
           } catch (error) {
-            if (!controller.signal.aborted)
-              status({
+            if (!controller.signal.aborted) {
+              log('error', `Server check failed: ${logReason(error)}`)
+              updateStep('server', {
                 state: 'failed',
                 message: 'status.serverFailed',
                 values: { reason: reason(error) },
+                action: 'checkServer',
               })
+            }
           }
         })()
       }
@@ -372,7 +527,7 @@ export function createVoicePlugin(
         if (!ready) return null
         const request = message.params as DictationStart
         recordings.start(request)
-        recognized.set(request.session, 0)
+        recognized.set(request.session, { seconds: 0, start: 0, text: '' })
         if (local()) void engine.use(async () => null).catch(() => {})
         if (polishOn())
           void polishPresent()
@@ -386,44 +541,90 @@ export function createVoicePlugin(
       if (message.method === 'dictation.append') {
         if (!ready) return null
         const request = message.params as DictationAudio
-        known(request)
-        return recordings.append(request, async (recording) => {
-          if (!local() || recording.seconds > 30) return null
-          const previous = recognized.get(request.session)!
-          if (recording.seconds - previous < 1) return null
-          const audio = recording.wav()
-          const speech = detectSpeech(audio.subarray(44))
-          if (!speech.hasSpeech || !speech.span) return null
-          recognized.set(request.session, recording.seconds)
-          return recognize(recording, audio, speech.span)
-        })
+        let signal: AbortSignal | undefined
+        try {
+          known(request)
+          return await recordings.append(request, async (recording) => {
+            signal = recording.signal
+            if (!local()) return null
+            const preview = recognized.get(request.session)!
+            if (recording.seconds - preview.seconds < 1) return null
+            const audio = recording.wav()
+            let pcm = audio.subarray(44 + Math.round(preview.start * 16000) * 2)
+            while (pcm.byteLength > 20 * 32000) {
+              const window = pcm.subarray(0, 30 * 32000 + request.audio.byteLength)
+              const pause = findSpeechPause(window, 5)
+              const cut =
+                pause ?? (window.byteLength >= 30 * 32000 ? window.byteLength / 32000 : null)
+              if (cut === null) break
+              const speech = detectSpeech(pcm.subarray(0, Math.round(cut * 16000) * 2))
+              if (speech.hasSpeech && speech.span) {
+                preview.seconds = recording.seconds
+                const result = await recognize(recording, audio, {
+                  start: preview.start + speech.span.start,
+                  end: preview.start + speech.span.end,
+                })
+                preview.text = joinTranscript(preview.text, result.text)
+              }
+              preview.start += cut
+              pcm = audio.subarray(44 + Math.round(preview.start * 16000) * 2)
+            }
+            const speech = detectSpeech(pcm)
+            if (!speech.hasSpeech || !speech.span)
+              return preview.text ? { text: preview.text } : null
+            preview.seconds = recording.seconds
+            const result = await recognize(recording, audio, {
+              start: preview.start + speech.span.start,
+              end: preview.start + speech.span.end,
+            })
+            return { text: joinTranscript(preview.text, result.text) }
+          })
+        } catch (error) {
+          if (!signal?.aborted) log('warning', `Dictation preview failed: ${logReason(error)}`)
+          throw error
+        }
       }
       const request = message.params as DictationSession
-      if (!ready) {
-        recordings.cancel(request)
-        recognized.delete(request.session)
-        throw new PluginError({ message: 'error.notReady' })
-      }
-      known(request)
+      let signal: AbortSignal | undefined
       try {
+        if (!ready) {
+          recordings.cancel(request)
+          throw new PluginError({ message: 'error.notReady' })
+        }
+        known(request)
         return await recordings.finish(request, async (recording) => {
+          signal = recording.signal
           const audio = recording.wav()
           const speech = detectSpeech(audio.subarray(44))
-          if (!speech.hasSpeech || !speech.span) return { text: '' }
+          if (!speech.hasSpeech || !speech.span) {
+            log(
+              'info',
+              `Dictation finished: ${recording.seconds.toFixed(2)} s audio, recognition 0.00 s, polish skipped`,
+            )
+            return { text: '' }
+          }
+          const started = performance.now()
           const raw = await recognize(recording, audio, speech.span, true)
+          const recognitionSeconds = (performance.now() - started) / 1000
+          const polished = await tidy(recording, raw.text)
           const result = {
-            text: applyVocabulary(
-              await tidy(recording, raw.text),
-              memory.vocabulary(recording.vocabulary),
-            ),
+            text: applyVocabulary(polished.text, memory.vocabulary(recording.vocabulary)),
           }
           if (result.text && !recording.signal.aborted) {
             if (settings.keepHistory !== false) history.record(result.text, recording.seconds)
             if (settings.learnTerms !== false) memory.record(result.text, recording.vocabulary)
             stats.record(result.text, recording.seconds)
           }
+          if (!recording.signal.aborted)
+            log(
+              'info',
+              `Dictation finished: ${recording.seconds.toFixed(2)} s audio, recognition ${recognitionSeconds.toFixed(2)} s, polish ${polished.ran ? 'ran' : 'skipped'}`,
+            )
           return result
         })
+      } catch (error) {
+        if (!signal?.aborted) log('error', `Dictation finish failed: ${logReason(error)}`)
+        throw error
       } finally {
         recognized.delete(request.session)
       }

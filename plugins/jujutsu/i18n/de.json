@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "Jujutsu-Repositorys mit Lesezeichen, Arbeitsbereichen, Verlauf und Git-Remotes verwalten.",
+  "about": "Verwalte Jujutsu-Repositorys mit Lesezeichen als Branches und Arbeitsbereichen als Checkouts. Änderungen im Arbeitsverzeichnis gehören zum aktuellen Commit. Ein Commit beschreibt diese Änderungen und beginnt einen neuen leeren Commit.",
+  "ready": "Bereit, Jujutsu-Repositorys zu verwalten.",
+  "failed": "Jujutsu konnte nicht ausgeführt werden."
+}

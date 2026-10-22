@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "Use Jujutsu bookmarks, workspaces, history, and Git remotes for source control.",
+  "about": "Manage a Jujutsu repository with bookmarks for branches and workspaces for checkouts. Changes in the working copy belong to its current commit. Commit describes those changes and starts a new empty commit.",
+  "ready": "Ready to manage Jujutsu repositories.",
+  "failed": "Jujutsu could not run."
+}

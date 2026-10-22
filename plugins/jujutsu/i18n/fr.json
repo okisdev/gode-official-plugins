@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "Utilisez les signets, les espaces de travail, l’historique et les dépôts Git distants de Jujutsu pour le contrôle de version.",
+  "about": "Gérez un dépôt Jujutsu avec des signets pour les branches et des espaces de travail pour les extractions. Les modifications appartiennent au commit actuel. La validation décrit ces modifications et démarre un nouveau commit vide.",
+  "ready": "Prêt à gérer les dépôts Jujutsu.",
+  "failed": "Impossible d’exécuter Jujutsu."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "使用 Jujutsu 书签、工作区、历史记录和 Git 远程仓库管理源代码。",
+  "about": "使用书签作为分支、工作区作为检出目录来管理 Jujutsu 仓库。工作副本中的更改属于当前提交。提交时会描述这些更改，并创建一个新的空提交。",
+  "ready": "已准备好管理 Jujutsu 仓库。",
+  "failed": "无法运行 Jujutsu。"
+}

@@ -48,6 +48,12 @@ importers:
         specifier: link:../../../gode/packages/plugin-sdk
         version: link:../../../gode/packages/plugin-sdk
 
+  plugins/jujutsu:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
   plugins/python:
     dependencies:
       '@gode/plugin-sdk':

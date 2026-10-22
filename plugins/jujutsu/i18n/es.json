@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "Usa marcadores, espacios de trabajo, historial y repositorios remotos de Git de Jujutsu para el control de versiones.",
+  "about": "Administra un repositorio de Jujutsu con marcadores como ramas y espacios de trabajo como directorios de trabajo. Los cambios pertenecen a la confirmación actual. Confirmar los cambios inicia una nueva confirmación vacía.",
+  "ready": "Listo para administrar repositorios de Jujutsu.",
+  "failed": "No se pudo ejecutar Jujutsu."
+}

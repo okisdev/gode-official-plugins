@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "Use marcadores, espaços de trabalho, histórico e repositórios remotos Git do Jujutsu para controlar versões.",
+  "about": "Gerencie um repositório Jujutsu com marcadores como ramificações e espaços de trabalho como cópias de trabalho. As alterações pertencem ao commit atual. Confirmá-las descreve as alterações e inicia um novo commit vazio.",
+  "ready": "Pronto para gerenciar repositórios Jujutsu.",
+  "failed": "Não foi possível executar o Jujutsu."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Jujutsu",
+  "description": "使用 Jujutsu 書籤、工作區、歷史記錄和 Git 遠端存放庫管理原始碼。",
+  "about": "使用書籤作為分支、工作區作為簽出目錄來管理 Jujutsu 存放庫。工作複本中的變更屬於目前的提交。提交時會描述這些變更，並建立新的空提交。",
+  "ready": "已準備好管理 Jujutsu 存放庫。",
+  "failed": "無法執行 Jujutsu。"
+}

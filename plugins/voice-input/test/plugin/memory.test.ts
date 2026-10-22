@@ -110,7 +110,9 @@ async function setup(
     cleanups.push(() => plugin.dispose())
     await plugin.start(start)
     const view = (id: 'history' | 'memory') =>
-      pluginViewDataSchemas.list.parse(setView.mock.calls.findLast(([viewId]) => viewId === id)![1])
+      pluginViewDataSchemas[id === 'history' ? 'list' : 'terms'].parse(
+        setView.mock.calls.findLast(([viewId]) => viewId === id)![1],
+      )
     return { plugin, setView, view, log }
   }
   return { ...(await launch()), start, launch, directory, response }
@@ -156,7 +158,7 @@ async function dictate(
 
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
-  expect(parsed.version).toBe('0.0.8')
+  expect(parsed.version).toBe('0.0.9')
   expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual([
     ...['keepHistory', 'learnTerms'].map((key) => ({
       key,
@@ -168,6 +170,7 @@ test('declares enabled settings and list actions, and publishes valid empty and 
     { key: 'syncTerms', kind: 'toggle', title: 'syncTerms.title', default: true },
   ])
   expect(parsed.stores).toEqual([
+    { id: 'vocabulary', kind: 'map', title: 'sync.vocabulary', sync: 'syncTerms' },
     { id: 'terms', kind: 'map', title: 'sync.terms', sync: 'syncTerms' },
     { id: 'forgotten', kind: 'set', title: 'sync.forgotten', sync: 'syncTerms' },
   ])
@@ -185,13 +188,34 @@ test('declares enabled settings and list actions, and publishes valid empty and 
   await dictate(plugin)
   for (const [id, data] of setView.mock.calls) {
     if (id === 'history' || id === 'memory')
-      expect(pluginViewDataSchemas.list.safeParse(data).success).toBe(true)
+      expect(
+        pluginViewDataSchemas[id === 'history' ? 'list' : 'terms'].safeParse(data).success,
+      ).toBe(true)
   }
   expect(view('memory').items).toEqual([
-    { id: 'usecomposertext', text: 'useComposerText', detail: 'Heard in 2 dictations' },
+    {
+      id: 'usecomposertext',
+      text: 'useComposerText',
+      detail: 'Heard in 2 dictations',
+      automatic: true,
+    },
   ])
   expect(view('history').total).toBe(2)
   expect(view('memory').total).toBe(1)
+})
+
+test('unknown dictation methods fail without finishing a live session', async () => {
+  const { plugin } = await setup()
+  const session = await begin(plugin)
+  await expect(
+    plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.unknown' as 'dictation.finish',
+      params: { session },
+    }),
+  ).rejects.toThrow('Unknown method: dictation.unknown')
+  await expect(finish(plugin, session)).resolves.toEqual({ text: '' })
 })
 
 test('saves only finished text with its recording duration, newest first, and restores it', async () => {
@@ -237,7 +261,7 @@ test('loaded history, learned terms and requested vocabulary never enter the log
     [
       'info',
       expect.stringMatching(
-        /^Dictation finished: 1\.00 s audio, recognition \d+\.\d{2} s, polish skipped$/,
+        /^Dictation finished: 1\.00 s audio, 0 segments before stop, recognition \d+\.\d{2} s, polish skipped$/,
       ),
     ],
   ])
@@ -302,7 +326,7 @@ test('pages history newest first, searches without case, and deletes an entry fr
   expect(() => query('', null, 20, 'unknown')).toThrow('Unknown view: unknown')
 })
 
-test('pages learned terms by count and searches their text without case', async () => {
+test('pages learned terms newest first and searches their text without case', async () => {
   const memory = JSON.stringify({
     terms: Array.from({ length: 25 }, (_, index) => ({
       key: `term${index}`,
@@ -322,15 +346,15 @@ test('pages learned terms by count and searches their text without case', async 
   const last = await query('', second.cursor, 10)
   expect([first.cursor, second.cursor, last.cursor]).toEqual(['10', '20', null])
   expect([...first.items, ...second.items, ...last.items].map((item) => item.id)).toEqual(
-    Array.from({ length: 25 }, (_, index) => `term${index}`),
+    Array.from({ length: 25 }, (_, index) => `term${24 - index}`),
   )
   expect((await query('TERM2', null, 10)).items.map((item) => item.id)).toEqual([
-    'term2',
-    'term20',
-    'term21',
-    'term22',
-    'term23',
     'term24',
+    'term23',
+    'term22',
+    'term21',
+    'term20',
+    'term2',
   ])
   expect(await query('', '999', 10)).toEqual({ items: [], cursor: null })
 })

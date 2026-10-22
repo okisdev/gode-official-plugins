@@ -156,13 +156,15 @@ export function createVoicePlugin(
       }
       await status.refresh()
     },
-    async action(action, item) {
+    async action(action, item, text) {
       if (action === 'deleteEntry' && item) {
         history.delete(item)
       } else if (action === 'clearHistory') {
         history.clear()
       } else if (action === 'forgetTerm' && item) {
         memory.forget(item)
+      } else if (action === 'addTerm' && text !== undefined) {
+        memory.add(text)
       } else if (action === 'clearMemory') {
         memory.clear()
       } else if (action === 'checkServer' && !local()) {

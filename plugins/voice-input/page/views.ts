@@ -17,16 +17,11 @@ export default [
   },
   {
     id: 'memory',
-    kind: 'list',
+    kind: 'terms',
     title: 'view.memory',
     description: 'view.memory.description',
-    itemActions: [
-      {
-        id: 'forgetTerm',
-        title: 'action.forgetTerm',
-        destructive: true,
-      },
-    ],
+    add: { id: 'addTerm', placeholder: 'view.memory.add' },
+    remove: { id: 'forgetTerm', title: 'action.forgetTerm' },
     actions: ['clearMemory'],
   },
   {

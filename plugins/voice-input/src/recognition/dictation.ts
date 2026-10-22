@@ -1,7 +1,13 @@
-import type { DictationAudio, DictationSession, DictationStart } from '@gode/plugin-sdk'
+import type {
+  DictationAudio,
+  DictationSession,
+  DictationStart,
+  DictationVocabulary,
+} from '@gode/plugin-sdk'
 import {
   DictationRecordings,
   PluginError,
+  type DictationRecording,
   type PluginContext,
   type PluginHandlers,
 } from '@gode/plugin-sdk/plugin'
@@ -49,23 +55,87 @@ export function createDictation({
   log: PluginContext<Names>['log']
 }) {
   const recordings = new DictationRecordings()
-  const recognized = new Map<string, { seconds: number; start: number; text: string }>()
-  function known(request: DictationSession): void {
-    if (!recognized.has(request.session)) throw new PluginError({ message: 'error.session' })
+  type Session = {
+    abort: AbortController
+    start: number
+    seconds: number
+    text: string
+    segments: Promise<{ text: string; ran: boolean }>[]
+    committing: Promise<void>
+  }
+  const sessions = new Map<string, Session>()
+  function known(request: DictationSession): Session {
+    const session = sessions.get(request.session)
+    if (!session) throw new PluginError({ message: 'error.session' })
+    return session
+  }
+  function drop(request: DictationSession): void {
+    sessions.get(request.session)?.abort.abort()
+    sessions.delete(request.session)
+  }
+
+  async function commit(session: Session, recording: DictationRecording): Promise<void> {
+    const kept = { ...recording, signal: session.abort.signal }
+    const audio = recording.wav()
+    let pcm = audio.subarray(44 + Math.round(session.start * 16000) * 2)
+    while (pcm.byteLength > 15 * 32000) {
+      const window = pcm.subarray(0, 30 * 32000)
+      const cut = findSpeechPause(window, 10) ?? (window.byteLength >= 30 * 32000 ? 30 : null)
+      if (cut === null) return
+      const speech = detectSpeech(pcm.subarray(0, Math.round(cut * 16000) * 2))
+      if (speech.hasSpeech && speech.span) {
+        const result = await recognize(
+          kept,
+          audio,
+          {
+            start: session.start + speech.span.start,
+            end: session.start + speech.span.end,
+          },
+          true,
+        )
+        session.text = joinTranscript(
+          session.text,
+          applyVocabulary(result.text, vocabulary(recording.vocabulary)),
+        )
+        session.segments.push(tidy(kept, result.text))
+        session.seconds = recording.seconds
+      }
+      session.start += cut
+      pcm = audio.subarray(44 + Math.round(session.start * 16000) * 2)
+    }
   }
 
   const call: NonNullable<PluginHandlers<Names>['call']> = async (message) => {
+    if (
+      !['dictation.start', 'dictation.append', 'dictation.finish', 'dictation.cancel'].includes(
+        message.method,
+      )
+    ) {
+      if (message.method !== 'dictation.adoptVocabulary')
+        throw new Error(`Unknown method: ${message.method}`)
+      const request = message.params as DictationVocabulary
+      for (const word of request.vocabulary) memory().add(word)
+      return null
+    }
     if (message.method === 'dictation.cancel') {
       const request = message.params as DictationSession
       recordings.cancel(request)
-      recognized.delete(request.session)
+      drop(request)
       return null
     }
     if (message.method === 'dictation.start') {
       if (!ready()) return null
       const request = message.params as DictationStart
       recordings.start(request)
-      recognized.set(request.session, { seconds: 0, start: 0, text: '' })
+      drop(request)
+      sessions.set(request.session, {
+        abort: new AbortController(),
+        start: 0,
+        seconds: 0,
+        text: '',
+        segments: [],
+        committing: Promise.resolve(),
+      })
       if (local())
         void engine()
           .use(async () => null)
@@ -73,7 +143,7 @@ export function createDictation({
       if (polishOn())
         void polishPresent()
           .then((present) => {
-            if (present && recognized.has(request.session))
+            if (present && sessions.has(request.session))
               void polishEngine()
                 .use(async () => null)
                 .catch(() => {})
@@ -86,40 +156,26 @@ export function createDictation({
       const request = message.params as DictationAudio
       let signal: AbortSignal | undefined
       try {
-        known(request)
+        const session = known(request)
         return await recordings.append(request, async (recording) => {
           signal = recording.signal
-          if (!local()) return null
-          const preview = recognized.get(request.session)!
-          if (recording.seconds - preview.seconds < 1) return null
+          if (!local() || recording.seconds - session.seconds < 1) return null
+          session.committing = session.committing
+            .then(() => commit(session, recording))
+            .catch((error) => {
+              if (!session.abort.signal.aborted)
+                log('warning', `Dictation segment failed: ${logReason(error)}`)
+            })
+          await session.committing
           const audio = recording.wav()
-          let pcm = audio.subarray(44 + Math.round(preview.start * 16000) * 2)
-          while (pcm.byteLength > 20 * 32000) {
-            const window = pcm.subarray(0, 30 * 32000 + request.audio.byteLength)
-            const pause = findSpeechPause(window, 5)
-            const cut =
-              pause ?? (window.byteLength >= 30 * 32000 ? window.byteLength / 32000 : null)
-            if (cut === null) break
-            const speech = detectSpeech(pcm.subarray(0, Math.round(cut * 16000) * 2))
-            if (speech.hasSpeech && speech.span) {
-              preview.seconds = recording.seconds
-              const result = await recognize(recording, audio, {
-                start: preview.start + speech.span.start,
-                end: preview.start + speech.span.end,
-              })
-              preview.text = joinTranscript(preview.text, result.text)
-            }
-            preview.start += cut
-            pcm = audio.subarray(44 + Math.round(preview.start * 16000) * 2)
-          }
-          const speech = detectSpeech(pcm)
-          if (!speech.hasSpeech || !speech.span) return preview.text ? { text: preview.text } : null
-          preview.seconds = recording.seconds
+          const speech = detectSpeech(audio.subarray(44 + Math.round(session.start * 16000) * 2))
+          if (!speech.hasSpeech || !speech.span) return session.text ? { text: session.text } : null
+          session.seconds = recording.seconds
           const result = await recognize(recording, audio, {
-            start: preview.start + speech.span.start,
-            end: preview.start + speech.span.end,
+            start: session.start + speech.span.start,
+            end: session.start + speech.span.end,
           })
-          return { text: joinTranscript(preview.text, result.text) }
+          return { text: joinTranscript(session.text, result.text) }
         })
       } catch (error) {
         if (!signal?.aborted) log('warning', `Dictation preview failed: ${logReason(error)}`)
@@ -133,50 +189,65 @@ export function createDictation({
         recordings.cancel(request)
         throw new PluginError({ message: 'error.notReady' })
       }
-      known(request)
+      const session = known(request)
       return await recordings.finish(request, async (recording) => {
         signal = recording.signal
+        await session.committing
         const audio = recording.wav()
-        const speech = detectSpeech(audio.subarray(44))
-        if (!speech.hasSpeech || !speech.span) {
+        const speech = detectSpeech(audio.subarray(44 + Math.round(session.start * 16000) * 2))
+        const started = performance.now()
+        const tail =
+          speech.hasSpeech && speech.span
+            ? (
+                await recognize(
+                  recording,
+                  audio,
+                  {
+                    start: session.start + speech.span.start,
+                    end: session.start + speech.span.end,
+                  },
+                  true,
+                )
+              ).text
+            : ''
+        const recognitionSeconds = (performance.now() - started) / 1000
+        const polished = await tidy(recording, tail)
+        const parts = [...(await Promise.all(session.segments)), polished]
+        const text = parts.map((part) => part.text).reduce(joinTranscript, '')
+        if (!text) {
           log(
             'info',
             `Dictation finished: ${recording.seconds.toFixed(2)} s audio, recognition 0.00 s, polish skipped`,
           )
           return { text: '' }
         }
-        const started = performance.now()
-        const raw = await recognize(recording, audio, speech.span, true)
-        const recognitionSeconds = (performance.now() - started) / 1000
-        const polished = await tidy(recording, raw.text)
-        const result = {
-          text: applyVocabulary(polished.text, vocabulary(recording.vocabulary)),
-        }
-        if (result.text && !recording.signal.aborted) {
+        const result = { text: applyVocabulary(text, vocabulary(recording.vocabulary)) }
+        if (!recording.signal.aborted) {
           if (keepHistory()) history().record(result.text, recording.seconds)
           if (learnTerms()) memory().record(result.text, recording.vocabulary)
           stats().record(result.text, recording.seconds)
-        }
-        if (!recording.signal.aborted)
           log(
             'info',
-            `Dictation finished: ${recording.seconds.toFixed(2)} s audio, recognition ${recognitionSeconds.toFixed(2)} s, polish ${polished.ran ? 'ran' : 'skipped'}`,
+            `Dictation finished: ${recording.seconds.toFixed(2)} s audio, ${session.segments.length} segments before stop, recognition ${recognitionSeconds.toFixed(2)} s, polish ${parts.some((part) => part.ran) ? 'ran' : 'skipped'}`,
           )
+        }
         return result
       })
     } catch (error) {
       if (!signal?.aborted) log('error', `Dictation finish failed: ${logReason(error)}`)
       throw error
     } finally {
-      recognized.delete(request.session)
+      drop(request)
     }
   }
 
   return {
     call,
     dispose() {
-      for (const session of recognized.keys()) recordings.cancel({ session })
-      recognized.clear()
+      for (const session of sessions.keys()) {
+        recordings.cancel({ session })
+        drop({ session })
+      }
     },
   }
 }

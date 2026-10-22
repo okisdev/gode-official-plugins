@@ -179,10 +179,11 @@ test('declares usage views with the SDK schema and sends empty views without cre
     },
     {
       id: 'memory',
-      kind: 'list',
+      kind: 'terms',
       title: 'view.memory',
       description: 'view.memory.description',
-      itemActions: [{ id: 'forgetTerm', title: 'action.forgetTerm', destructive: true }],
+      add: { id: 'addTerm', placeholder: 'view.memory.add' },
+      remove: { id: 'forgetTerm', title: 'action.forgetTerm' },
       actions: ['clearMemory'],
     },
     { id: 'usage', kind: 'figures', title: 'view.usage' },
@@ -203,7 +204,13 @@ test('declares usage views with the SDK schema and sends empty views without cre
   for (const [id, data] of setView.mock.calls)
     expect(
       pluginViewDataSchemas[
-        id === 'usage' ? 'figures' : id === 'activity' ? 'calendar' : 'list'
+        id === 'usage'
+          ? 'figures'
+          : id === 'activity'
+            ? 'calendar'
+            : id === 'memory'
+              ? 'terms'
+              : 'list'
       ].safeParse(data).success,
     ).toBe(true)
   await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
@@ -457,8 +464,8 @@ test('local append waits for another second and keeps bounded previews growing p
       requests.push(sent)
       expect(sent.readUInt32LE(4)).toBe(sent.length - 8)
       expect(sent.readUInt32LE(40)).toBe(sent.length - 44)
+      expect((sent.length - 44) / 32000).toBeLessThanOrEqual(30)
       if (finishing) return new Response(JSON.stringify({ text: 'Final result.' }))
-      expect((sent.length - 44) / 32000).toBeLessThanOrEqual(31)
       const samples = sent.subarray(44)
       const anchor = samples.findIndex((byte) => byte !== 0)
       expect(anchor).toBeGreaterThanOrEqual(0)
@@ -496,10 +503,18 @@ test('local append waits for another second and keeps bounded previews growing p
   expect(offsets.filter((offset) => offset > 0).length).toBeGreaterThan(50)
   const previews = requests.length
   finishing = true
-  await expect(finish(plugin, session)).resolves.toEqual({ text: 'Final result.' })
+  await expect(finish(plugin, session)).resolves.toEqual({
+    text: parts.slice(0, -1).join(' ') + ' Final result.',
+  })
   expect(requests.length).toBe(previews + 1)
-  expect(requests.at(-1)!.subarray(44).equals(audio)).toBe(true)
-  expect(requests.filter((sent) => sent.length === audio.length + 44).length).toBe(1)
+  const tail = requests.at(-1)!.subarray(44)
+  expect(tail.length / 32000).toBeLessThan(15)
+  const anchor = tail.findIndex((byte) => byte !== 0)
+  expect(anchor).toBeGreaterThanOrEqual(0)
+  const offset = audio.indexOf(tail.subarray(anchor, anchor + 2048)) - anchor
+  expect(offset / 32000).toBeGreaterThan(60)
+  expect(audio.subarray(offset, offset + tail.length).equals(tail)).toBe(true)
+  expect(requests.some((sent) => sent.length === audio.length + 44)).toBe(false)
 })
 
 test('local preview commits continuous speech at 30 seconds and keeps text during silence', async () => {
@@ -573,12 +588,84 @@ test('preview throttling across 30 seconds still bounds each request by one appe
     ).resolves.toBeNull()
   expect(requests).toHaveLength(1)
   await expect(append(plugin, session, audio.subarray(30.25 * 32000))).resolves.toEqual({
-    text: 'Hello',
+    text: 'Hello Hello',
   })
-  expect(requests).toEqual([29.5, 30.25])
+  expect(requests).toEqual([29.5, 30, 0.5])
   await expect(append(plugin, session, pcm(1))).resolves.toEqual({ text: 'Hello Hello' })
+  expect(requests).toHaveLength(4)
+  expect(Math.max(...requests)).toBeLessThanOrEqual(30)
+})
+
+test('failed segment recognition leaves its audio for finish', async () => {
+  const requests: Buffer[] = []
+  const { plugin } = await setup(
+    async (_url, init) => {
+      const file = (init!.body as FormData).get('file') as File
+      requests.push(Buffer.from(await file.arrayBuffer()))
+      expect((file.size - 44) / 32000).toBeLessThanOrEqual(30)
+      if (requests.length === 1)
+        return new Response(JSON.stringify({ error: { message: 'Unavailable' } }), { status: 503 })
+      return new Response(JSON.stringify({ text: requests.length === 2 ? 'Preview' : 'Recovered' }))
+    },
+    { local: true },
+  )
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  const session = await begin(plugin)
+  const audio = Buffer.concat([pcm(11), Buffer.alloc(2 * 32000), pcm(4)])
+  await expect(append(plugin, session, audio)).resolves.toEqual({ text: 'Preview' })
+  expect(requests).toHaveLength(2)
+  expect((requests[0]!.length - 44) / 32000).toBeLessThan(15)
+  expect(requests[1]!.subarray(44)).toEqual(audio)
+  await expect(finish(plugin, session)).resolves.toEqual({ text: 'Recovered' })
   expect(requests).toHaveLength(3)
-  expect(requests[2]).toBeLessThanOrEqual(31)
+  expect(requests[2]!.subarray(44)).toEqual(audio)
+})
+
+test('cancel aborts segment recognition during commit', async () => {
+  let signal: AbortSignal | undefined
+  const { plugin } = await setup(
+    async (_url, init) => {
+      signal = init?.signal ?? undefined
+      if (signal!.aborted) throw signal!.reason
+      return new Promise<Response>((_resolve, reject) =>
+        signal!.addEventListener('abort', () => reject(signal!.reason), { once: true }),
+      )
+    },
+    { local: true },
+  )
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  const session = await begin(plugin)
+  const pending = append(plugin, session, Buffer.concat([pcm(11), Buffer.alloc(2 * 32000), pcm(4)]))
+  const failed = expect(pending).rejects.toMatchObject({ text: { message: 'error.recognition' } })
+  await vi.waitFor(() => expect(signal).toBeDefined())
+  expect(signal!.aborted).toBe(false)
+  await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session } })
+  expect(signal!.aborted).toBe(true)
+  await failed
+  await expect(finish(plugin, session)).rejects.toMatchObject({
+    text: { message: 'error.session' },
+  })
+})
+
+test('remote dictation sends its whole recording only at finish', async () => {
+  const requests: Buffer[] = []
+  const { plugin } = await setup(async (_url, init) => {
+    const file = (init!.body as FormData).get('file') as File
+    requests.push(Buffer.from(await file.arrayBuffer()))
+    return new Response(JSON.stringify({ text: 'Whole recording' }))
+  })
+  const session = await begin(plugin)
+  const audio = pcm(35)
+  await expect(append(plugin, session, audio.subarray(0, 20 * 32000))).resolves.toBeNull()
+  await expect(append(plugin, session, audio.subarray(20 * 32000))).resolves.toBeNull()
+  expect(requests).toHaveLength(0)
+  await expect(finish(plugin, session)).resolves.toEqual({ text: 'Whole recording' })
+  expect(requests).toHaveLength(1)
+  expect(requests[0]).toEqual(wav(35))
 })
 
 test('cancel aborts an in-flight request and forgets the session', async () => {

@@ -74,9 +74,11 @@ function surface(term: Term): string {
 
 export class VoiceMemory {
   private terms = new Map<string, Term>()
+  private own = new Map<string, string>()
   private forgotten = new Set<string>()
   private readonly file: AtomicFile
   private readonly syncedTerms: SyncedMap
+  private readonly syncedOwn: SyncedMap
   private readonly syncedForgotten: SyncedSet
   private migrated = false
   private unlisten: (() => void)[] = []
@@ -89,12 +91,13 @@ export class VoiceMemory {
   ) {
     this.file = new AtomicFile(join(directory, 'memory.json'))
     this.syncedTerms = synced('terms')
+    this.syncedOwn = synced('vocabulary')
     this.syncedForgotten = synced('forgotten')
   }
 
   async read(): Promise<void> {
     const value = (await this.file.read()) as
-      | { terms?: unknown; forgotten?: unknown; migrated?: unknown }
+      | { terms?: unknown; own?: unknown; forgotten?: unknown; migrated?: unknown }
       | undefined
     if (
       value &&
@@ -130,16 +133,40 @@ export class VoiceMemory {
         this.save()
       }
     }
+    this.own = new Map(
+      this.syncedOwn.entries().filter(([key, spelling]) => validSyncedTerm(key, spelling)),
+    )
     this.reconcile()
-    if (value || this.terms.size || this.forgotten.size) {
+    if (value || this.terms.size || this.own.size || this.forgotten.size) {
       this.migrated = true
       this.save()
     }
     this.unlisten.push(
+      this.syncedOwn.onChange(({ changed, deleted }) => {
+        for (const key of changed) {
+          const spelling = this.syncedOwn.get(key)
+          if (!validSyncedTerm(key, spelling)) {
+            this.own.delete(key)
+            continue
+          }
+          this.own.set(key, spelling)
+          this.terms.delete(key)
+          this.syncedTerms.delete(key)
+          this.forgotten.delete(key)
+          this.syncedForgotten.delete(key)
+        }
+        for (const key of deleted) {
+          if (!this.own.delete(key)) continue
+          this.forgotten.add(key)
+          this.pruneForgotten()
+          this.syncedForgotten.add(key)
+        }
+        this.changed()
+      }),
       this.syncedTerms.onChange(({ changed, deleted }) => {
         for (const key of changed) {
           const spelling = this.syncedTerms.get(key)
-          if (this.forgotten.has(key)) this.syncedTerms.delete(key)
+          if (this.forgotten.has(key) || this.own.has(key)) this.syncedTerms.delete(key)
           else if (validSyncedTerm(key, spelling)) this.learn(key, spelling)
           else if ((this.terms.get(key)?.count ?? 0) >= 2) this.terms.delete(key)
         }
@@ -152,6 +179,10 @@ export class VoiceMemory {
       this.syncedForgotten.onChange(({ added, deleted }) => {
         for (const key of added) {
           if (!validKey(key)) continue
+          if (this.own.has(key)) {
+            this.syncedForgotten.delete(key)
+            continue
+          }
           this.terms.delete(key)
           this.syncedTerms.delete(key)
           this.forgotten.delete(key)
@@ -169,7 +200,7 @@ export class VoiceMemory {
     const seen = new Set<string>()
     for (const form of extractTerms(text, vocabulary)) {
       const key = form.toLowerCase()
-      if (this.forgotten.has(key)) continue
+      if (this.forgotten.has(key) || this.own.has(key)) continue
       const previous = this.terms.get(key)
       this.terms.set(key, {
         key,
@@ -193,18 +224,39 @@ export class VoiceMemory {
   }
 
   vocabulary(request: readonly string[], limit = 300): string[] {
-    const existing = new Set(request.map((word) => word.normalize('NFC').trim().toLowerCase()))
-    return [
-      ...request,
-      ...this.learned()
-        .filter((term) => !existing.has(term.key))
-        .slice(0, limit)
-        .map(surface),
-    ]
+    const existing = new Set<string>()
+    const words: string[] = []
+    let kept = 0
+    const append = (word: string, bounded: boolean): void => {
+      const key = word.normalize('NFC').trim().toLowerCase()
+      if (!key || existing.has(key) || (bounded && kept >= limit)) return
+      existing.add(key)
+      words.push(word)
+      if (bounded) kept++
+    }
+    for (const word of [...this.own.values()].reverse()) append(word, true)
+    for (const word of request) append(word, false)
+    for (const term of this.learned()) append(surface(term), true)
+    return words
+  }
+
+  add(text: string): void {
+    const spelling = text.normalize('NFC').trim()
+    const key = spelling.toLowerCase()
+    if (!validSyncedTerm(key, spelling) || this.own.has(key)) return
+    this.own.set(key, spelling)
+    this.syncedOwn.set(key, spelling)
+    this.terms.delete(key)
+    this.syncedTerms.delete(key)
+    this.forgotten.delete(key)
+    this.syncedForgotten.delete(key)
+    this.changed()
   }
 
   forget(key: string): void {
-    if (!this.terms.has(key)) return
+    if (!this.terms.has(key) && !this.own.has(key)) return
+    this.own.delete(key)
+    this.syncedOwn.delete(key)
     this.terms.delete(key)
     this.syncedTerms.delete(key)
     this.forgotten.add(key)
@@ -214,6 +266,8 @@ export class VoiceMemory {
   }
 
   clear(): void {
+    this.own.clear()
+    this.syncedOwn.clear()
     this.terms.clear()
     this.forgotten.clear()
     this.syncedTerms.clear()
@@ -228,14 +282,14 @@ export class VoiceMemory {
   }
 
   query(search: string, cursor: string | null, limit: number): PluginViewPage {
-    const matches = this.learned().filter((term) =>
-      surface(term).toLowerCase().includes(search.toLowerCase()),
+    const matches = this.items().filter((item) =>
+      item.text.toLowerCase().includes(search.toLowerCase()),
     )
     const offset = cursor === null ? 0 : Number(cursor)
     const page = matches.slice(offset, offset + limit)
     const next = offset + page.length
     return {
-      items: page.map((term) => this.item(term)),
+      items: page,
       cursor: next < matches.length ? String(next) : null,
     }
   }
@@ -263,6 +317,7 @@ export class VoiceMemory {
   }
 
   private learn(key: string, spelling: string): void {
+    if (this.own.has(key)) return
     const previous = this.terms.get(key)
     if (previous && previous.count >= 2 && surface(previous) === spelling) return
     const count = Math.max(2, previous?.count ?? 0)
@@ -279,6 +334,12 @@ export class VoiceMemory {
 
   private reconcile(): void {
     this.forgotten = new Set(this.syncedForgotten.values().filter(validKey))
+    for (const key of this.own.keys()) {
+      this.terms.delete(key)
+      this.syncedTerms.delete(key)
+      this.forgotten.delete(key)
+      this.syncedForgotten.delete(key)
+    }
     this.pruneForgotten()
     for (const [key, term] of this.terms) {
       if (
@@ -288,7 +349,7 @@ export class VoiceMemory {
         this.terms.delete(key)
     }
     for (const [key, spelling] of this.syncedTerms.entries()) {
-      if (this.forgotten.has(key)) this.syncedTerms.delete(key)
+      if (this.forgotten.has(key) || this.own.has(key)) this.syncedTerms.delete(key)
       else if (validSyncedTerm(key, spelling)) this.learn(key, spelling)
     }
     this.prune()
@@ -303,18 +364,28 @@ export class VoiceMemory {
   private save(): void {
     this.file.write({
       terms: [...this.terms.values()],
+      own: [...this.own.values()],
       forgotten: [...this.forgotten],
       migrated: this.migrated,
     })
   }
 
   private publish(): void {
-    const learned = this.learned()
+    const items = this.items()
     this.setView('memory', {
-      items: learned.slice(0, 20).map((term) => this.item(term)),
-      total: learned.length,
+      items: items.slice(0, 20),
+      total: items.length,
       empty: 'view.memory.empty',
     })
+  }
+
+  private items(): PluginViewPage['items'] {
+    return [
+      ...[...this.own].reverse().map(([id, text]) => ({ id, text })),
+      ...this.learned()
+        .sort((a, b) => b.time - a.time || a.key.localeCompare(b.key))
+        .map((term) => this.item(term)),
+    ]
   }
 
   private item(term: Term): PluginViewPage['items'][number] {
@@ -324,6 +395,7 @@ export class VoiceMemory {
     return {
       id: term.key,
       text: surface(term),
+      automatic: true,
       detail: (
         strings[`memory.heard.${plurals.select(term.count)}`] ?? strings['memory.heard.other']!
       ).replace('{count}', numbers.format(term.count)),

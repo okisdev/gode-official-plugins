@@ -166,26 +166,27 @@ export function settings(
 
 export function testSynced(): PluginContext<Names>['synced'] {
   const terms = new Map<string, string>()
+  const vocabulary = new Map<string, string>()
   const forgotten = new Set<string>()
-  const map: SyncedMap = {
+  const map = (entries: Map<string, string>): SyncedMap => ({
     get size() {
-      return terms.size
+      return entries.size
     },
-    has: (key) => terms.has(key),
-    get: (key) => terms.get(key),
-    entries: () => [...terms],
+    has: (key) => entries.has(key),
+    get: (key) => entries.get(key),
+    entries: () => [...entries],
     set: (key, value) => {
-      if (!terms.has(key) && terms.size === 1000) throw new RangeError('Store is full')
-      terms.set(key, value)
+      if (!entries.has(key) && entries.size === 1000) throw new RangeError('Store is full')
+      entries.set(key, value)
     },
     delete: (key) => {
-      terms.delete(key)
+      entries.delete(key)
     },
     clear: () => {
-      terms.clear()
+      entries.clear()
     },
     onChange: () => () => {},
-  }
+  })
   const set: SyncedSet = {
     get size() {
       return forgotten.size
@@ -204,13 +205,16 @@ export function testSynced(): PluginContext<Names>['synced'] {
     },
     onChange: () => () => {},
   }
-  return ((id: 'terms' | 'forgotten') =>
-    id === 'terms' ? map : set) as PluginContext<Names>['synced']
+  return ((id: 'terms' | 'vocabulary' | 'forgotten') =>
+    id === 'forgotten'
+      ? set
+      : map(id === 'terms' ? terms : vocabulary)) as PluginContext<Names>['synced']
 }
 
 export function emptyStores() {
   return {
     terms: { kind: 'map' as const, entries: {} },
+    vocabulary: { kind: 'map' as const, entries: {} },
     forgotten: { kind: 'set' as const, entries: {} },
   }
 }

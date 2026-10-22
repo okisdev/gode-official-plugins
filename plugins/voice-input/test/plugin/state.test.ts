@@ -745,7 +745,7 @@ test.each([false, true])(
         'info',
         expect.stringMatching(
           new RegExp(
-            `^Dictation finished: 1\\.00 s audio, recognition \\d+\\.\\d{2} s, polish ${polishOn ? 'ran' : 'skipped'}$`,
+            `^Dictation finished: 1\\.00 s audio, 0 segments before stop, recognition \\d+\\.\\d{2} s, polish ${polishOn ? 'ran' : 'skipped'}$`,
           ),
         ),
       ],
@@ -754,6 +754,82 @@ test.each([false, true])(
     expect(JSON.stringify(log.mock.calls).toLowerCase()).not.toContain('private')
   },
 )
+
+test('finish joins polished committed speech and polished tail in order', async () => {
+  const { plugin, directory, start, models, polish, log } = await setup()
+  for (const entry of models) await writeFile(join(directory, 'models', entry.file), 'model bytes')
+  await writeFile(join(directory, 'models', polish.files[0]!.file), 'polish bytes')
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  let releaseFirst: (() => void) | undefined
+  const requests: number[] = []
+  const edits: string[] = []
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url, init) => {
+      if (String(url).endsWith('/chat/completions')) {
+        const body = JSON.parse(String(init?.body)) as { messages: { content: string }[] }
+        const input = body.messages.at(-1)!.content
+        edits.push(input)
+        if (input.includes('first part'))
+          await new Promise<void>((resolve) => {
+            releaseFirst = resolve
+          })
+        const content = input.includes('first part') ? 'First part.' : 'Last part.'
+        return new Response(JSON.stringify({ choices: [{ message: { content } }] }))
+      }
+      const form = init!.body as FormData
+      const seconds = ((form.get('file') as File).size - 44) / 32000
+      requests.push(seconds)
+      expect(seconds).toBeLessThanOrEqual(30)
+      return new Response(JSON.stringify({ text: seconds > 15 ? 'first part' : 'last part' }))
+    }),
+  )
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: settings({ engine: 'local', polish: true }),
+  })
+  const session = 'ordered-segments'
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session, vocabulary: [] },
+  })
+  await expect(
+    plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.append',
+      params: { session, audio: pcm(31) },
+    }),
+  ).resolves.toEqual({ text: 'first part last part' })
+  expect(requests).toEqual([30, 1])
+  await vi.waitFor(() => expect(releaseFirst).toBeTypeOf('function'))
+  const finishing = plugin.call({
+    type: 'call',
+    id: 3,
+    method: 'dictation.finish',
+    params: { session },
+  })
+  await vi.waitFor(() =>
+    expect(edits).toEqual([
+      '<transcript>first part</transcript>',
+      '<transcript>last part</transcript>',
+    ]),
+  )
+  expect(requests).toEqual([30, 1, 1])
+  releaseFirst!()
+  await expect(finishing).resolves.toEqual({ text: 'First part. Last part.' })
+  expect(log).toHaveBeenCalledWith(
+    'info',
+    expect.stringMatching(
+      /^Dictation finished: 31\.00 s audio, 1 segments before stop, recognition \d+\.\d{2} s, polish ran$/,
+    ),
+  )
+})
 
 test('preview and finish failures log safe reasons at warning and error level', async () => {
   const { plugin, directory, start, models, log } = await setup()

@@ -24,7 +24,7 @@ test('existing memory migrates once and later store deletions win', async () => 
   const { default: plugin } = await import('../../src/main.ts')
   const settings = { engine: 'server' as const, serverURL: 'http://localhost/v1' }
   const first = await startPlugin(plugin, { settings })
-  expect(first.stores).toEqual({ terms: { gode: 'Gode' }, forgotten: ['oldterm'] })
+  expect(first.stores).toEqual({ vocabulary: {}, terms: { gode: 'Gode' }, forgotten: ['oldterm'] })
   await vi.waitFor(async () => {
     const saved = JSON.parse(await readFile(join(first.paths.data, 'memory.json'), 'utf8'))
     expect(saved.migrated).toBe(true)

@@ -7,6 +7,7 @@ import { pcm } from '../fixtures/index.ts'
 afterEach(() => vi.unstubAllGlobals())
 
 async function start(stores?: {
+  vocabulary?: Readonly<Record<string, string>>
   terms?: Readonly<Record<string, string>>
   forgotten?: readonly string[]
 }) {
@@ -51,7 +52,7 @@ test('learned words move through the stores, while history stays local', async (
   await second.remote('forgotten', first.stores.forgotten)
   expect(second.stores.forgotten).toEqual(['usecomposertext'])
   await first.action('clearMemory')
-  expect(first.stores).toEqual({ terms: {}, forgotten: [] })
+  expect(first.stores).toEqual({ vocabulary: {}, terms: {}, forgotten: [] })
   expect(first.views.history).toMatchObject({ total: 2 })
 })
 
@@ -76,7 +77,7 @@ test('a locally forgotten word stays out when another computer sends it back', a
   await running.action('forgetTerm', 'usecomposertext')
   await running.remote('terms', { usecomposertext: 'useComposerText' })
   expect(running.views.memory).toMatchObject({ total: 0 })
-  expect(running.stores).toEqual({ terms: {}, forgotten: ['usecomposertext'] })
+  expect(running.stores).toEqual({ vocabulary: {}, terms: {}, forgotten: ['usecomposertext'] })
 })
 
 test('remote spelling changes update the vocabulary', async () => {
@@ -109,4 +110,51 @@ test('remote deletions unlearn words and untrusted entries are skipped', async (
     ['x'.repeat(201)]: 'x'.repeat(201),
   })
   expect(running.views.memory).toMatchObject({ total: 0 })
+})
+
+test('person words sync to another computer and remain separate from learned words', async () => {
+  const first = await start()
+  await first.action('addTerm', undefined, '  UseComposerText  ')
+  await first.action('addTerm', undefined, 'usecomposertext')
+  expect(first.stores.vocabulary).toEqual({ usecomposertext: 'UseComposerText' })
+  expect(first.views.memory).toMatchObject({
+    items: [{ id: 'usecomposertext', text: 'UseComposerText' }],
+    total: 1,
+  })
+  const second = await start(first.stores)
+  expect((await second.query('memory')).items).toEqual([
+    { id: 'usecomposertext', text: 'UseComposerText' },
+  ])
+  await second.remote('vocabulary', first.stores.vocabulary)
+  await say(second, 'useComposerText')
+  await say(second, 'useComposerText')
+  expect(second.stores.terms).toEqual({})
+  expect(second.views.memory).toMatchObject({ total: 1 })
+  await first.action('forgetTerm', 'usecomposertext')
+  expect(first.stores.forgotten).toEqual(['usecomposertext'])
+  await second.remote('vocabulary', first.stores.vocabulary)
+  await second.remote('forgotten', first.stores.forgotten)
+  expect(second.views.memory).toMatchObject({ total: 0 })
+  await second.remote('terms', { usecomposertext: 'useComposerText' })
+  expect(second.views.memory).toMatchObject({ total: 0 })
+  await second.action('addTerm', undefined, 'UseComposerText')
+  expect(second.stores.forgotten).toEqual([])
+  expect(second.stores.terms).toEqual({})
+  expect(second.stores.vocabulary).toEqual({ usecomposertext: 'UseComposerText' })
+})
+
+test('adopts earlier Gode vocabulary without needing a ready dictation engine', async () => {
+  const running = await start()
+  expect(
+    await running.call('dictation.adoptVocabulary', {
+      vocabulary: ['  Gode  ', 'gode', 'SwiftUI'],
+    }),
+  ).toBeNull()
+  expect(running.stores.vocabulary).toEqual({ gode: 'Gode', swiftui: 'SwiftUI' })
+  expect((await running.query('memory')).items).toEqual([
+    { id: 'swiftui', text: 'SwiftUI' },
+    { id: 'gode', text: 'Gode' },
+  ])
+  await running.action('clearMemory')
+  expect(running.stores).toEqual({ vocabulary: {}, terms: {}, forgotten: [] })
 })

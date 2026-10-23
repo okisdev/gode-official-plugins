@@ -58,8 +58,8 @@ test('local feed writes a catalog, signed releases, and archives under publisher
   assert.deepEqual(JSON.parse(await readFile(join(feed, 'index.json'), 'utf8')), catalog)
   assert.deepEqual((await readdir(feed)).sort(), ['.dev-key.pem', 'gode', 'index.json'])
   assert.deepEqual((await readdir(join(feed, 'gode/echo'))).sort(), [
-    'echo-1.0.0-darwin-arm64.tar.gz',
-    'echo-1.0.0-linux-x64.tar.gz',
+    'echo-1.0.0-darwin-arm64.tar.br',
+    'echo-1.0.0-linux-x64.tar.br',
     'releases.json',
   ])
   const releases = readSignedPluginReleases(
@@ -67,7 +67,7 @@ test('local feed writes a catalog, signed releases, and archives under publisher
   )
   assert.equal(releases.publicKey, catalog.plugins[0]?.publicKey)
   assert.deepEqual(Object.keys(releases.releases[0]!.builds).sort(), ['darwin-arm64', 'linux-x64'])
-  assert.equal(releases.releases[0]!.builds['linux-x64']?.url, 'echo-1.0.0-linux-x64.tar.gz')
+  assert.equal(releases.releases[0]!.builds['linux-x64']?.url, 'echo-1.0.0-linux-x64.tar.br')
 })
 
 test('catalog rejects inconsistent or repeated builds', async () => {
@@ -80,12 +80,12 @@ test('catalog rejects inconsistent or repeated builds', async () => {
 })
 
 test('release plan uploads archives before the signed file and keeps the catalog separate', () => {
-  const plan = releasePlan('echo', '/tmp/echo', ['echo-1.0.0-linux-x64.tar.gz'])
+  const plan = releasePlan('echo', '/tmp/echo', ['echo-1.0.0-linux-x64.tar.br'])
   assert.deepEqual(
     plan.map((item) => item.file),
-    ['gode/echo/echo-1.0.0-linux-x64.tar.gz', 'gode/echo/releases.json'],
+    ['gode/echo/echo-1.0.0-linux-x64.tar.br', 'gode/echo/releases.json'],
   )
-  assert.ok(plan[0]?.args.includes('gode/updates/plugins/gode/echo/echo-1.0.0-linux-x64.tar.gz'))
+  assert.ok(plan[0]?.args.includes('gode/updates/plugins/gode/echo/echo-1.0.0-linux-x64.tar.br'))
   assert.ok(plan[0]?.args.includes('public, max-age=31536000, immutable'))
   assert.ok(plan[1]?.args.includes('no-cache'))
   assert.ok(catalogPlan('/tmp/catalog.json').args.includes('gode/updates/plugins/index.json'))

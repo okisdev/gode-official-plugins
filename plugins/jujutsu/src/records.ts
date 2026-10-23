@@ -11,7 +11,7 @@ export async function commits(
   log: Log,
   limit?: number,
 ): Promise<Commit[]> {
-  const args = ['log', '-G', '-r', revset, '-T', commitTemplate]
+  const args = ['log', '-G', '-r', `(${revset}) ~ root()`, '-T', commitTemplate]
   if (limit !== undefined) args.push('-n', String(limit))
   const output = await jj(path, args, log)
   return output.split(end).flatMap((record) => {
@@ -35,7 +35,9 @@ export async function commits(
 }
 
 export async function ids(path: string, revset: string, log: Log): Promise<string[]> {
-  return (await jj(path, ['log', '-G', '-r', revset, '-T', 'commit_id ++ "\\n"'], log))
+  return (
+    await jj(path, ['log', '-G', '-r', `(${revset}) ~ root()`, '-T', 'commit_id ++ "\\n"'], log)
+  )
     .trim()
     .split('\n')
     .filter(Boolean)

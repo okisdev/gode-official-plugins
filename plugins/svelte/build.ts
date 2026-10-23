@@ -1,3 +1,5 @@
-import { lockedNpmServer } from '@gode/plugin-sdk/build'
+import { lockedNpmServer, typescriptTools } from '@gode/plugin-sdk/build'
 
-export default lockedNpmServer()
+export default lockedNpmServer({
+  omit: [...typescriptTools, 'prettier/{bin,internal,plugins}/**', 'prettier/standalone.*'],
+})

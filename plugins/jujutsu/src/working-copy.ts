@@ -200,18 +200,29 @@ export function createWorkingCopy(path: string, log: Log) {
         .map((change) => change.path)
         .filter((file) => !options.excluded.includes(file))
       if (!included.length && options.excluded.length) return
-      if (options.amend)
+      if (options.amend) {
         await jj(
           path,
           ['squash', '-m', message, ...(options.excluded.length ? ['--', ...included] : [])],
           log,
         )
-      else
-        await jj(
-          path,
-          ['commit', '-m', message, ...(options.excluded.length ? ['--', ...included] : [])],
-          log,
-        )
+        return
+      }
+      const [items, head, parent] = await Promise.all([
+        bookmarks(path, log),
+        id(path, '@', log),
+        id(path, '@-', log),
+      ])
+      const advancing = items.filter(
+        (item) => !item.remote && (item.target === head || item.target === parent),
+      )
+      await jj(
+        path,
+        ['commit', '-m', message, ...(options.excluded.length ? ['--', ...included] : [])],
+        log,
+      )
+      for (const bookmark of advancing)
+        await jj(path, ['bookmark', 'set', bookmark.name, '-r', '@-'], log)
     },
     async lastCommitMessage() {
       return (await jj(path, ['log', '-G', '-r', '@-', '-T', 'description'], log)).trim()

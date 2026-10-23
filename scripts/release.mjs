@@ -42,7 +42,7 @@ export async function releasePlugin(id) {
   if (entry.publicKey !== pluginPublicKey(privateKey))
     throw new Error('Catalog Gode key differs from the signing key')
   const archives = []
-  for await (const path of glob(join(repository, `plugins/${id}/out/*.tar.gz`))) archives.push(path)
+  for await (const path of glob(join(repository, `plugins/${id}/out/*.tar.br`))) archives.push(path)
   if (!archives.length) throw new Error(`No archives for gode/${id}`)
   const previousUrl = `${remote}/gode/${id}/releases.json`
   const previousResponse = await fetch(previousUrl)

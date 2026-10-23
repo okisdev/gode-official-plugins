@@ -94,7 +94,7 @@ export function createRepository(path: string, log: Log) {
     remotes,
     userName: async () => (await optional(path, ['config', 'get', 'user.name'], log))?.trim() ?? '',
     isAncestor: async (commit: string) =>
-      (await ids(path, `(${JSON.stringify(commit)}) & ::@`, log)).length > 0,
+      !!(await id(path, `(${JSON.stringify(commit)}) & ::@`, log)),
     commitsBetween: async (from: string | null, to: string) =>
       ids(path, from ? `${from}..${to}` : `::${to}`, log),
     checkouts,

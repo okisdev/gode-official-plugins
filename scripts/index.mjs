@@ -13,7 +13,7 @@ const catalogPath = join(repository, 'catalog.json')
 
 export async function buildIndex(paths, directory = feed) {
   const archives = []
-  for await (const path of paths ?? glob(join(repository, 'plugins/*/out/*.tar.gz')))
+  for await (const path of paths ?? glob(join(repository, 'plugins/*/out/*.tar.br')))
     archives.push(await readPluginArchive(resolve(path)))
   pluginCatalogSchema.parse(JSON.parse(await readFile(catalogPath, 'utf8')))
   const key = generatePluginSigningKey()

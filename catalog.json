@@ -41,6 +41,12 @@
       "id": "rust",
       "source": "gode/rust/releases.json",
       "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "jujutsu",
+      "source": "gode/jujutsu/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
     }
   ]
 }

@@ -13,6 +13,7 @@ Each folder in `plugins/` is a workspace package that reaches Gode only through 
 | [`astro`](plugins/astro) | A language server for Astro. |
 | [`python`](plugins/python) | A language server for Python. |
 | [`rust`](plugins/rust) | A language server for Rust. |
+| [`jujutsu`](plugins/jujutsu) | Source control for Jujutsu repositories. |
 
 ## Setting up
 

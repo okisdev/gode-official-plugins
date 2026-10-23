@@ -31,7 +31,7 @@ export function releasePlan(id, directory, archives) {
       upload(
         `${base}/${file}`,
         join(directory, file),
-        'application/gzip',
+        'application/octet-stream',
         'public, max-age=31536000, immutable',
       ),
     ),

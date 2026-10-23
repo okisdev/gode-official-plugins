@@ -27,8 +27,12 @@ async function setup() {
     model(name, 'http://127.0.0.1/small', 'small'),
   )
   const polish = {
-    id: 'qwen3.5-2b',
+    id: 'qwen3.5-4b',
     files: [model('polish.gguf', 'http://127.0.0.1/polish', 'polish bytes')],
+  }
+  const smallPolish = {
+    id: 'qwen3.5-2b',
+    files: [model('small-polish.gguf', 'http://127.0.0.1/small-polish', 'small polish')],
   }
   const plugin = createVoicePlugin(
     { setStatus: (status) => statuses.push(status), setView: () => {}, log, synced: testSynced() },
@@ -36,7 +40,7 @@ async function setup() {
       { id: 'qwen3-asr-1.7b', files: models },
       { id: 'qwen3-asr-0.6b', files: smaller },
     ],
-    polish,
+    [polish, smallPolish],
   )
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
@@ -48,7 +52,7 @@ async function setup() {
     stores: emptyStores(),
   }
   await plugin.start(start)
-  return { plugin, statuses, directory, start, models, smaller, polish, log }
+  return { plugin, statuses, directory, start, models, smaller, polish, smallPolish, log }
 }
 
 test('settings publish one recognition step and an optional tidy step in order', async () => {
@@ -75,7 +79,7 @@ test('settings publish one recognition step and an optional tidy step in order',
       title: 'step.polish',
       state: 'todo',
       optional: true,
-      fields: ['polish'],
+      fields: ['polish', 'polishModel'],
       action: 'downloadPolishModel',
     },
   ])
@@ -121,6 +125,152 @@ test('settings publish one recognition step and an optional tidy step in order',
   })
 })
 
+test('tidy service setup, invalid address, and service checks use the optional step', async () => {
+  const { plugin, statuses, start, directory, models, log } = await setup()
+  for (const file of models) await writeFile(join(directory, 'models', file.file), 'model bytes')
+  const service = settings({
+    engine: 'local',
+    polish: true,
+    polishModel: 'server',
+    polishServerURL: '',
+    polishServerModel: '',
+  })
+  const change = (overrides: Partial<typeof service>) =>
+    plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: { ...service, ...overrides },
+      secrets: { polishApiKey: 'private-key' },
+    })
+  await change({})
+  const step = () => statuses.at(-1)?.steps?.at(-1)
+  const fields = ['polish', 'polishModel', 'polishServerURL', 'polishApiKey', 'polishServerModel']
+  expect(statuses.at(-1)?.state).toBe('ready')
+  expect(step()).toMatchObject({
+    id: 'polish',
+    optional: true,
+    state: 'todo',
+    message: 'step.polishServiceTodo',
+    fields,
+  })
+  await change({ polishServerURL: 'invalid', polishServerModel: 'deepseek-chat' })
+  expect(step()).toMatchObject({
+    state: 'failed',
+    message: 'status.serverFailed',
+    action: 'checkPolishService',
+    fields,
+    values: { reason: expect.any(String) },
+  })
+  await change({ polishServerURL: 'http://127.0.0.1/v1', polishServerModel: 'deepseek-chat' })
+  expect(step()).toMatchObject({
+    state: 'done',
+    message: 'step.polishServiceDone',
+    values: { host: '127.0.0.1' },
+    action: 'checkPolishService',
+    fields,
+  })
+  const fetcher = vi.fn(async () => new Response('{}'))
+  vi.stubGlobal('fetch', fetcher)
+  await plugin.action('checkPolishService')
+  await vi.waitFor(() => expect(log).toHaveBeenCalledWith('info', 'Polish service check succeeded'))
+  expect(fetcher).toHaveBeenCalledWith(
+    'http://127.0.0.1/v1/models',
+    expect.objectContaining({ headers: { Authorization: 'Bearer private-key' } }),
+  )
+  expect(step()?.state).toBe('done')
+  fetcher.mockImplementation(
+    async () => new Response(JSON.stringify({ error: { message: 'Bad key' } }), { status: 401 }),
+  )
+  await plugin.action('checkPolishService')
+  await vi.waitFor(() =>
+    expect(step()).toMatchObject({
+      state: 'failed',
+      message: 'status.serverFailed',
+      values: { reason: 'Bad key' },
+      action: 'checkPolishService',
+    }),
+  )
+  expect(log).toHaveBeenCalledWith('error', 'Polish service check failed: HTTP 401')
+  let respond!: (response: Response) => void
+  fetcher.mockImplementation(
+    () =>
+      new Promise<Response>((resolve) => {
+        respond = resolve
+      }),
+  )
+  await plugin.action('checkPolishService')
+  await change({ polishModel: 'qwen3.5-2b' })
+  respond(new Response('{}'))
+  await Promise.resolve()
+  expect(step()).toMatchObject({ state: 'todo', message: 'step.polishTodo' })
+})
+
+test.each([
+  ['deepseek-chat', 'Please send to agentdoc on Thursday.', 'kept'],
+  ['', 'Please send to agentdoc on Wednesday, I mean Thursday.', 'skipped'],
+])(
+  'a chosen chat service with model %j tidies only when configured',
+  async (modelName, result, outcome) => {
+    const { plugin, start, log } = await setup()
+    const used = vi.spyOn(LocalEngine.prototype, 'use')
+    const fetcher = vi.fn(
+      async (url: string | URL) =>
+        new Response(
+          JSON.stringify(
+            String(url).endsWith('/chat/completions')
+              ? { choices: [{ message: { content: 'Please send to Agent Doc on Thursday.' } }] }
+              : { text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' },
+          ),
+        ),
+    )
+    vi.stubGlobal('fetch', fetcher)
+    await plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: settings({
+        engine: 'server',
+        serverURL: 'http://127.0.0.1/v1',
+        polish: true,
+        polishModel: 'server',
+        polishServerURL: ' http://127.0.0.1/v1 ',
+        polishServerModel: modelName,
+      }),
+      secrets: { polishApiKey: 'chat-secret' },
+    })
+    await plugin.call({
+      type: 'call',
+      id: 1,
+      method: 'dictation.start',
+      params: { session: 'chat', vocabulary: ['agentdoc'] },
+    })
+    await plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.append',
+      params: { session: 'chat', audio: pcm(1) },
+    })
+    await expect(
+      plugin.call({ type: 'call', id: 3, method: 'dictation.finish', params: { session: 'chat' } }),
+    ).resolves.toEqual({ text: result })
+    const chats = fetcher.mock.calls.filter(([url]) => String(url).endsWith('/chat/completions'))
+    expect(chats).toHaveLength(modelName ? 1 : 0)
+    if (modelName) {
+      const [url, options] = vi.mocked(fetch).mock.calls.at(-1)!
+      expect(url).toBe('http://127.0.0.1/v1/chat/completions')
+      expect(new Headers(options?.headers).get('Authorization')).toBe('Bearer chat-secret')
+      const body = JSON.parse(options?.body as string)
+      expect(body.model).toBe(modelName)
+      expect(body).not.toHaveProperty('chat_template_kwargs')
+      expect(body.messages[0].content).toContain('agentdoc')
+    }
+    expect(used).not.toHaveBeenCalled()
+    expect(log).toHaveBeenCalledWith(
+      'info',
+      expect.stringMatching(new RegExp(`polish ${outcome}$`)),
+    )
+  },
+)
+
 test('missing tidy model leaves recognition ready, and download and removal use the same verified files', async () => {
   const { plugin, statuses, directory, start, models, polish } = await setup()
   await plugin.settings({
@@ -155,7 +305,7 @@ test('missing tidy model leaves recognition ready, and download and removal use 
       state: 'todo',
       message: 'step.polishTodo',
       optional: true,
-      fields: ['polish'],
+      fields: ['polish', 'polishModel'],
       action: 'downloadPolishModel',
     },
   ])
@@ -187,6 +337,67 @@ test('missing tidy model leaves recognition ready, and download and removal use 
     settings: settings({ engine: 'local', polish: true }),
   })
   expect(statuses.at(-1)?.steps?.at(-1)?.message).toBe('step.polishTodo')
+})
+
+test('switching tidy presets uses the selected engine and downloads only its files', async () => {
+  const { plugin, statuses, directory, start, polish, smallPolish } = await setup()
+  await writeFile(join(directory, 'models', polish.files[0]!.file), 'polish bytes')
+  const paths: string[] = []
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async function (
+    this: LocalEngine,
+    work,
+  ) {
+    const options = (this as unknown as { options: { model: string } }).options
+    paths.push(options.model)
+    return work('http://127.0.0.1/v1', 'local-test-key')
+  })
+  const stopped = vi.spyOn(LocalEngine.prototype, 'stop')
+  const chosen = (polishModel: string) =>
+    plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: settings({
+        engine: 'server',
+        serverURL: 'http://127.0.0.1/v1',
+        polish: true,
+        polishModel,
+      }),
+    })
+  await chosen('qwen3.5-4b')
+  expect(statuses.at(-1)?.steps?.at(-1)).toMatchObject({
+    state: 'done',
+    values: { model: 'Qwen3.5 4B', size: '12 Byte' },
+  })
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session: 'large', vocabulary: [] },
+  })
+  await vi.waitFor(() => expect(paths).toEqual([join(directory, 'models', polish.files[0]!.file)]))
+  await chosen('qwen3.5-2b')
+  expect(stopped).toHaveBeenCalled()
+  expect(statuses.at(-1)?.steps?.at(-1)).toMatchObject({
+    state: 'todo',
+    values: { model: 'Qwen3.5 2B', size: '12 Byte' },
+  })
+  const fetcher = vi.fn(async () => new Response('small polish'))
+  vi.stubGlobal('fetch', fetcher)
+  await plugin.action('downloadPolishModel')
+  await vi.waitFor(() => expect(statuses.at(-1)?.steps?.at(-1)?.state).toBe('done'))
+  expect(fetcher).toHaveBeenCalledWith('http://127.0.0.1/small-polish', expect.anything())
+  expect((await readdir(join(directory, 'models'))).sort()).toEqual(
+    [polish.files[0]!.file, smallPolish.files[0]!.file].sort(),
+  )
+  await plugin.call({
+    type: 'call',
+    id: 2,
+    method: 'dictation.start',
+    params: { session: 'small', vocabulary: [] },
+  })
+  await vi.waitFor(() =>
+    expect(paths.at(-1)).toBe(join(directory, 'models', smallPolish.files[0]!.file)),
+  )
 })
 
 test('a failed tidy model download leaves dictation ready for a retry', async () => {
@@ -254,6 +465,43 @@ test('turning off tidy up stops its download and removes its step', async () => 
   expect(statuses.at(-1)?.steps?.map((step) => step.id)).toEqual(['model'])
   expect(await readdir(join(directory, 'models'))).toEqual([])
 })
+
+test.each(['qwen3.5-2b', 'server'])(
+  'switching the tidy model to %s stops its old download',
+  async (polishModel) => {
+    const { plugin, statuses, directory, start } = await setup()
+    await plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: settings({ engine: 'local', polish: true }),
+    })
+    const stopped = vi.spyOn(LocalEngine.prototype, 'stop')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(new Error('aborted')), {
+              once: true,
+            })
+          }),
+      ),
+    )
+    await plugin.action('downloadPolishModel')
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalled())
+    await plugin.settings({
+      ...start,
+      type: 'settings',
+      settings: settings({ engine: 'local', polish: true, polishModel }),
+    })
+    expect(stopped).toHaveBeenCalled()
+    expect(statuses.at(-1)?.steps?.at(-1)).toMatchObject({
+      state: 'todo',
+      message: polishModel === 'server' ? 'step.polishServiceTodo' : 'step.polishTodo',
+    })
+    expect(await readdir(join(directory, 'models'))).toEqual([])
+  },
+)
 
 test('selected model controls setup, download and removal while both sets can coexist', async () => {
   const { plugin, statuses, directory, start, models, smaller } = await setup()
@@ -679,7 +927,7 @@ test('server checks log results and safe reasons without addresses, settings or 
 })
 
 test.each([false, true])(
-  'dictation logs duration and whether polish ran (%s) while keeping content private',
+  'dictation logs duration and polish outcome (%s) while keeping content private',
   async (polishOn) => {
     const { plugin, directory, start, models, polish, log } = await setup()
     for (const entry of models)
@@ -745,7 +993,7 @@ test.each([false, true])(
         'info',
         expect.stringMatching(
           new RegExp(
-            `^Dictation finished: 1\\.00 s audio, 0 segments before stop, recognition \\d+\\.\\d{2} s, polish ${polishOn ? 'ran' : 'skipped'}$`,
+            `^Dictation finished: 1\\.00 s audio, 0 segments before stop, recognition \\d+\\.\\d{2} s, polish ${polishOn ? 'kept' : 'skipped'}$`,
           ),
         ),
       ],
@@ -755,14 +1003,13 @@ test.each([false, true])(
   },
 )
 
-test('finish joins polished committed speech and polished tail in order', async () => {
+test('finish joins committed speech and tail for one polish request', async () => {
   const { plugin, directory, start, models, polish, log } = await setup()
   for (const entry of models) await writeFile(join(directory, 'models', entry.file), 'model bytes')
   await writeFile(join(directory, 'models', polish.files[0]!.file), 'polish bytes')
   vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
     work('http://127.0.0.1/v1', 'local-test-key'),
   )
-  let releaseFirst: (() => void) | undefined
   const requests: number[] = []
   const edits: string[] = []
   vi.stubGlobal(
@@ -772,18 +1019,17 @@ test('finish joins polished committed speech and polished tail in order', async 
         const body = JSON.parse(String(init?.body)) as { messages: { content: string }[] }
         const input = body.messages.at(-1)!.content
         edits.push(input)
-        if (input.includes('first part'))
-          await new Promise<void>((resolve) => {
-            releaseFirst = resolve
-          })
-        const content = input.includes('first part') ? 'First part.' : 'Last part.'
-        return new Response(JSON.stringify({ choices: [{ message: { content } }] }))
+        return new Response(
+          JSON.stringify({ choices: [{ message: { content: 'send it on Thursday' } }] }),
+        )
       }
       const form = init!.body as FormData
       const seconds = ((form.get('file') as File).size - 44) / 32000
       requests.push(seconds)
       expect(seconds).toBeLessThanOrEqual(30)
-      return new Response(JSON.stringify({ text: seconds > 15 ? 'first part' : 'last part' }))
+      return new Response(
+        JSON.stringify({ text: seconds > 15 ? 'send it on Wednesday' : 'no, Thursday' }),
+      )
     }),
   )
   await plugin.settings({
@@ -805,30 +1051,118 @@ test('finish joins polished committed speech and polished tail in order', async 
       method: 'dictation.append',
       params: { session, audio: pcm(31) },
     }),
-  ).resolves.toEqual({ text: 'first part last part' })
+  ).resolves.toEqual({ text: 'send it on Wednesday no, Thursday' })
   expect(requests).toEqual([30, 1])
-  await vi.waitFor(() => expect(releaseFirst).toBeTypeOf('function'))
-  const finishing = plugin.call({
-    type: 'call',
-    id: 3,
-    method: 'dictation.finish',
-    params: { session },
-  })
-  await vi.waitFor(() =>
-    expect(edits).toEqual([
-      '<transcript>first part</transcript>',
-      '<transcript>last part</transcript>',
-    ]),
-  )
+  await expect(
+    plugin.call({
+      type: 'call',
+      id: 3,
+      method: 'dictation.finish',
+      params: { session },
+    }),
+  ).resolves.toEqual({ text: 'send it on Thursday' })
+  expect(edits).toEqual(['<transcript>send it on Wednesday no, Thursday</transcript>'])
   expect(requests).toEqual([30, 1, 1])
-  releaseFirst!()
-  await expect(finishing).resolves.toEqual({ text: 'First part. Last part.' })
   expect(log).toHaveBeenCalledWith(
     'info',
     expect.stringMatching(
-      /^Dictation finished: 31\.00 s audio, 1 segments before stop, recognition \d+\.\d{2} s, polish ran$/,
+      /^Dictation finished: 31\.00 s audio, 1 segments before stop, recognition \d+\.\d{2} s, polish kept$/,
     ),
   )
+})
+
+test('a length-limited polish reply types the original text and logs refusal', async () => {
+  const { plugin, directory, start, models, polish, log } = await setup()
+  for (const entry of models) await writeFile(join(directory, 'models', entry.file), 'model bytes')
+  await writeFile(join(directory, 'models', polish.files[0]!.file), 'polish bytes')
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  let chats = 0
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url) => {
+      if (String(url).endsWith('/chat/completions')) {
+        chats++
+        return new Response(
+          JSON.stringify({
+            choices: [{ message: { content: 'Changed text' }, finish_reason: 'length' }],
+          }),
+        )
+      }
+      return new Response(JSON.stringify({ text: 'Original text' }))
+    }),
+  )
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: settings({ engine: 'local', polish: true }),
+  })
+  const session = 'length-limited'
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session, vocabulary: [] },
+  })
+  await plugin.call({
+    type: 'call',
+    id: 2,
+    method: 'dictation.append',
+    params: { session, audio: pcm(1) },
+  })
+  await expect(
+    plugin.call({ type: 'call', id: 3, method: 'dictation.finish', params: { session } }),
+  ).resolves.toEqual({ text: 'Original text' })
+  expect(chats).toBe(1)
+  expect(log).toHaveBeenCalledWith(
+    'info',
+    expect.stringMatching(
+      /^Dictation finished: 1\.00 s audio, 0 segments before stop, recognition \d+\.\d{2} s, polish refused$/,
+    ),
+  )
+})
+
+test('a short segment pause changes its trailing full stop in preview and final text', async () => {
+  const { plugin, directory, start, models } = await setup()
+  for (const entry of models) await writeFile(join(directory, 'models', entry.file), 'model bytes')
+  vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async (work) =>
+    work('http://127.0.0.1/v1', 'local-test-key'),
+  )
+  let requests = 0
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      async () => new Response(JSON.stringify({ text: ++requests === 1 ? '变成。' : 'xhigh' })),
+    ),
+  )
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: settings({ engine: 'local', polish: false }),
+  })
+  const session = 'short-pause'
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session, vocabulary: [] },
+  })
+  await expect(
+    plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.append',
+      params: {
+        session,
+        audio: Buffer.concat([pcm(14), Buffer.alloc(0.4 * 32000), pcm(16.6)]),
+      },
+    }),
+  ).resolves.toEqual({ text: '变成，xhigh' })
+  await expect(
+    plugin.call({ type: 'call', id: 3, method: 'dictation.finish', params: { session } }),
+  ).resolves.toEqual({ text: '变成，xhigh' })
+  expect(requests).toBe(3)
 })
 
 test('preview and finish failures log safe reasons at warning and error level', async () => {

@@ -1,5 +1,10 @@
 import { expect, test } from '@gode/plugin-sdk/test'
-import { detectSpeech, findSpeechPause } from '../../src/recognition/speech-logic.ts'
+import {
+  detectSpeech,
+  segmentCut,
+  sentencePause,
+  speechPauses,
+} from '../../src/recognition/speech-logic.ts'
 import { noise, pcm } from '../fixtures/index.ts'
 
 function mix(background: Buffer, foreground: Buffer, start: number): Buffer {
@@ -139,43 +144,81 @@ test('reads PCM subarrays and clips padding at recording boundaries', () => {
   })
 })
 
-test('finds the latest pause between voiced runs with enough audio before it', () => {
+test('returns every gap between voiced runs with midpoint and length', () => {
   const audio = Buffer.concat([
     pcm(4),
     Buffer.alloc(32000),
     pcm(4),
-    Buffer.alloc(32000),
+    Buffer.alloc(2 * 32000),
     pcm(2),
     Buffer.alloc(3 * 32000),
   ])
-  const pause = findSpeechPause(audio, 5)!
-  expect(pause).toBeGreaterThanOrEqual(9)
-  expect(pause).toBeLessThanOrEqual(10)
-  expect(findSpeechPause(audio, pause)).toBe(pause)
-  expect(findSpeechPause(audio, pause + 1 / 16000)).toBeNull()
-  expect(detectSpeech(audio.subarray(0, Math.round(pause * 16000) * 2)).hasSpeech).toBe(true)
-  expect(detectSpeech(audio.subarray(Math.round(pause * 16000) * 2)).hasSpeech).toBe(true)
+  const pauses = speechPauses(audio)
+  expect(pauses).toHaveLength(2)
+  expect(pauses[0]!.at).toBeGreaterThan(4)
+  expect(pauses[0]!.at).toBeLessThan(5)
+  expect(pauses[0]!.length).toBeCloseTo(1, 1)
+  expect(pauses[1]!.at).toBeGreaterThan(9)
+  expect(pauses[1]!.at).toBeLessThan(11)
+  expect(pauses[1]!.length).toBeCloseTo(2, 1)
 })
 
-test('does not use leading or trailing silence, continuous speech or noise as pauses', () => {
+test('does not count leading or trailing silence, continuous speech or noise as pauses', () => {
   for (const audio of [
     Buffer.alloc(10 * 32000),
     noise(10),
     pcm(10),
     Buffer.concat([Buffer.alloc(6 * 32000), pcm(2), Buffer.alloc(6 * 32000)]),
-    Buffer.concat([pcm(2), Buffer.alloc(32000), pcm(2)]),
   ])
-    expect(findSpeechPause(audio, 5)).toBeNull()
+    expect(speechPauses(audio)).toEqual([])
+  expect(speechPauses(Buffer.concat([pcm(2), Buffer.alloc(32000), pcm(2)]))).toHaveLength(1)
 })
 
 test('pause finding uses smoothed runs and reads PCM subarrays', () => {
   const audio = mix(Buffer.concat([pcm(6), Buffer.alloc(3 * 32000)]), tone(0.06, 800), 7)
-  expect(findSpeechPause(audio, 5)).toBeNull()
+  expect(speechPauses(audio)).toEqual([])
   const speech = Buffer.concat([pcm(6), Buffer.alloc(32000), pcm(2)])
   const backing = Buffer.concat([Buffer.alloc(7), speech, Buffer.alloc(9)])
-  expect(findSpeechPause(backing.subarray(7, backing.length - 9), 5)).toBe(
-    findSpeechPause(speech, 5),
-  )
-  expect(findSpeechPause(speech, 5)).toBeGreaterThanOrEqual(6)
-  expect(findSpeechPause(speech, 5)).toBeLessThanOrEqual(7)
+  expect(speechPauses(backing.subarray(7, backing.length - 9))).toEqual(speechPauses(speech))
+  expect(speechPauses(speech)[0]!.at).toBeGreaterThanOrEqual(6)
+  expect(speechPauses(speech)[0]!.at).toBeLessThanOrEqual(7)
+})
+
+test('sentence pause wins over a later short pause', () => {
+  expect(sentencePause).toBe(0.75)
+  expect(
+    segmentCut(
+      [
+        { at: 9, length: 2 },
+        { at: 12, length: 0.8 },
+        { at: 20, length: 0.3 },
+      ],
+      25,
+    ),
+  ).toEqual({ at: 12, pause: 0.8 })
+})
+
+test('full window uses the longest eligible pause and the latest on a tie', () => {
+  expect(
+    segmentCut(
+      [
+        { at: 8, length: 0.7 },
+        { at: 12, length: 0.4 },
+        { at: 24, length: 0.6 },
+        { at: 18, length: 0.6 },
+        { at: 27, length: 0.2 },
+      ],
+      30,
+    ),
+  ).toEqual({ at: 24, pause: 0.6 })
+})
+
+test('full window without an eligible pause cuts at 30 seconds', () => {
+  expect(segmentCut([], 30)).toEqual({ at: 30, pause: 0 })
+  expect(segmentCut([{ at: 5, length: 2 }], 30)).toEqual({ at: 30, pause: 0 })
+})
+
+test('waits for more audio when no sentence pause and the window is short', () => {
+  expect(segmentCut([], 20)).toBeNull()
+  expect(segmentCut([{ at: 15, length: 0.5 }], 29.99)).toBeNull()
 })

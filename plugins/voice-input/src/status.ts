@@ -11,7 +11,8 @@ export function createVoiceStatus({
   local,
   text,
   selected,
-  polish,
+  selectedPolish,
+  polishService,
   polishOn,
   polishPresent,
   downloading,
@@ -22,7 +23,8 @@ export function createVoiceStatus({
   local: () => boolean
   text: (key: Names['settings'], fallback?: string) => string
   selected: () => ModelSet
-  polish: ModelSet
+  selectedPolish: () => ModelSet
+  polishService: () => boolean
   polishOn: () => boolean
   polishPresent: () => Promise<boolean>
   downloading: () => ModelSet | undefined
@@ -108,26 +110,75 @@ export function createVoiceStatus({
       }
     }
     if (polishOn()) {
-      const present = await polishPresent()
-      steps.push({
-        id: 'polish',
-        title: 'step.polish',
-        message: present ? 'step.polishDone' : 'step.polishTodo',
-        values: {
-          size: formatBytes(
-            polish.files.reduce((sum, file) => sum + file.size, 0),
-            locale(),
-          ),
-        },
-        state: present ? 'done' : 'todo',
-        optional: true,
-        fields: ['polish'],
-        action: present ? 'removePolishModel' : 'downloadPolishModel',
-      })
+      if (polishService()) {
+        const fields = [
+          'polish',
+          'polishModel',
+          'polishServerURL',
+          'polishApiKey',
+          'polishServerModel',
+        ] as const
+        const base = text('polishServerURL').trim()
+        const model = text('polishServerModel').trim()
+        if (!base || !model) {
+          steps.push({
+            id: 'polish',
+            title: 'step.polish',
+            state: 'todo',
+            message: 'step.polishServiceTodo',
+            optional: true,
+            fields: [...fields],
+          })
+        } else {
+          try {
+            const host = new URL(apiURL(base, 'models')).host
+            steps.push({
+              id: 'polish',
+              title: 'step.polish',
+              state: 'done',
+              message: 'step.polishServiceDone',
+              values: { host },
+              optional: true,
+              fields: [...fields],
+              action: 'checkPolishService',
+            })
+          } catch (error) {
+            steps.push({
+              id: 'polish',
+              title: 'step.polish',
+              state: 'failed',
+              message: 'status.serverFailed',
+              values: { reason: reason(error) },
+              optional: true,
+              fields: [...fields],
+              action: 'checkPolishService',
+            })
+          }
+        }
+      } else {
+        const polish = selectedPolish()
+        const present = await polishPresent()
+        steps.push({
+          id: 'polish',
+          title: 'step.polish',
+          message: present ? 'step.polishDone' : 'step.polishTodo',
+          values: {
+            model: polish.id === 'qwen3.5-4b' ? 'Qwen3.5 4B' : 'Qwen3.5 2B',
+            size: formatBytes(
+              polish.files.reduce((sum, file) => sum + file.size, 0),
+              locale(),
+            ),
+          },
+          state: present ? 'done' : 'todo',
+          optional: true,
+          fields: ['polish', 'polishModel'],
+          action: present ? 'removePolishModel' : 'downloadPolishModel',
+        })
+      }
     }
     const download = downloading()
     if (preserveDownload && download) {
-      const id = download === polish ? 'polish' : 'model'
+      const id = download === selectedPolish() ? 'polish' : 'model'
       const active = currentStatus?.steps?.find(
         (step) => step.id === id && step.state === 'working',
       )

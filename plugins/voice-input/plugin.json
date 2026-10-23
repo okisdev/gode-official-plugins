@@ -1,7 +1,7 @@
 {
   "id": "voice-input",
   "publisher": "gode",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "minimumAppVersion": "0.1.19-beta.97",
   "setupBytes": 2520744288,
   "capabilities": ["dictation"],
@@ -25,6 +25,13 @@
       "version": "928ab958557df9aa2ef1c93e0e83c7ad0933fae2",
       "license": "Apache-2.0",
       "url": "https://huggingface.co/ggml-org/Qwen3-ASR-0.6B-GGUF",
+      "optional": true
+    },
+    {
+      "name": "Qwen3.5-4B Q4_K_M model",
+      "version": "e87f176479d0855a907a41277aca2f8ee7a09523",
+      "license": "Apache-2.0",
+      "url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
       "optional": true
     },
     {

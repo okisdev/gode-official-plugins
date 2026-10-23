@@ -26,8 +26,8 @@ export default [
     id: 'downloadPolishModel',
     title: 'action.downloadPolishModel',
     visibleWhen: {
-      key: 'polish',
-      values: ['true'],
+      key: 'polishModel',
+      values: ['qwen3.5-4b', 'qwen3.5-2b'],
     },
   },
   {
@@ -35,8 +35,8 @@ export default [
     title: 'action.removePolishModel',
     confirm: 'confirm.removePolishModel',
     visibleWhen: {
-      key: 'polish',
-      values: ['true'],
+      key: 'polishModel',
+      values: ['qwen3.5-4b', 'qwen3.5-2b'],
     },
   },
   {
@@ -44,6 +44,14 @@ export default [
     title: 'action.checkServer',
     visibleWhen: {
       key: 'engine',
+      values: ['server'],
+    },
+  },
+  {
+    id: 'checkPolishService',
+    title: 'action.checkPolishService',
+    visibleWhen: {
+      key: 'polishModel',
       values: ['server'],
     },
   },

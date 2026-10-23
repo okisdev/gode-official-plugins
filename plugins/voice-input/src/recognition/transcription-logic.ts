@@ -31,6 +31,10 @@ export function joinTranscript(committed: string, window: string): string {
   return before + separator + after
 }
 
+export function continuedText(text: string): string {
+  return text.replace(/。(?=\s*$)/u, '，')
+}
+
 export function cleanTranscript(text: string, removeFillers: boolean): string {
   const stripped = text.replace(/^\s*language\s+[^<>\r\n]+<asr_text>\s*/i, '').trim()
   if (!removeFillers) return stripped

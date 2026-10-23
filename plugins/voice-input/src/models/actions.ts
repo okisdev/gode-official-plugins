@@ -11,8 +11,10 @@ export function createModelActions({
   directory,
   locale,
   models,
-  polish,
+  polishModels,
   selected,
+  selectedPolish,
+  polishService,
   local,
   engine,
   polishEngine,
@@ -22,8 +24,10 @@ export function createModelActions({
   directory: () => string
   locale: () => string
   models: readonly ModelSet[]
-  polish: ModelSet
+  polishModels: readonly ModelSet[]
   selected: () => ModelSet
+  selectedPolish: () => ModelSet
+  polishService: () => boolean
   local: () => boolean
   engine: () => LocalEngine
   polishEngine: () => LocalEngine
@@ -47,19 +51,22 @@ export function createModelActions({
         selected().files.map((file) => rm(join(directory(), file.file), { force: true })),
       )
       await status.refresh()
-    } else if (action === 'removePolishModel') {
-      if (download?.model.id === polish.id) await stopDownload()
+    } else if (action === 'removePolishModel' && !polishService()) {
+      const polish = selectedPolish()
+      if (download?.model === polish) await stopDownload()
       await polishEngine().stop()
       await Promise.all(
         polish.files.map((file) => rm(join(directory(), file.file), { force: true })),
       )
       await status.refresh()
     } else if (
-      ((action === 'downloadModel' && local()) || action === 'downloadPolishModel') &&
+      ((action === 'downloadModel' && local()) ||
+        (action === 'downloadPolishModel' && !polishService())) &&
       !download
     ) {
-      const target = action === 'downloadModel' ? selected() : polish
-      if (target !== polish) {
+      const target = action === 'downloadModel' ? selected() : selectedPolish()
+      const isPolish = action === 'downloadPolishModel'
+      if (!isPolish) {
         status.ready = false
         await engine().stop()
       } else await polishEngine().stop()
@@ -70,11 +77,11 @@ export function createModelActions({
         `Model download started: ${files} (${target.files.reduce((sum, file) => sum + file.size, 0)} bytes)`,
       )
       let lastProgress = 0
-      if (target !== polish && status.current)
+      if (!isPolish && status.current)
         status.status({ ...status.current, state: 'setup', message: 'status.setup' })
-      status.updateStep(target === polish ? 'polish' : 'model', {
+      status.updateStep(isPolish ? 'polish' : 'model', {
         state: 'working',
-        message: target === polish ? 'status.polishDownloading' : 'status.downloading',
+        message: isPolish ? 'status.polishDownloading' : 'status.downloading',
         values: {
           done: formatBytes(0, locale()),
           total: formatBytes(
@@ -90,9 +97,9 @@ export function createModelActions({
           await downloadModels(directory(), target.files, controller.signal, (done, bytes) => {
             if (done !== 0 && done !== bytes && Date.now() - lastProgress < 100) return
             lastProgress = Date.now()
-            status.updateStep(target === polish ? 'polish' : 'model', {
+            status.updateStep(isPolish ? 'polish' : 'model', {
               state: 'working',
-              message: target === polish ? 'status.polishDownloading' : 'status.downloading',
+              message: isPolish ? 'status.polishDownloading' : 'status.downloading',
               progress: done / bytes,
               values: { done: formatBytes(done, locale()), total: formatBytes(bytes, locale()) },
               action: 'stopDownload',
@@ -104,12 +111,12 @@ export function createModelActions({
           if (controller.signal.aborted) log('info', `Model download stopped: ${files}`)
           else {
             log('error', `Model download failed: ${files}: ${logReason(error)}`)
-            status.updateStep(target === polish ? 'polish' : 'model', {
+            status.updateStep(isPolish ? 'polish' : 'model', {
               state: 'failed',
-              message: target === polish ? 'status.polishDownloadFailed' : 'status.downloadFailed',
+              message: isPolish ? 'status.polishDownloadFailed' : 'status.downloadFailed',
               values: { reason: reason(error) },
               progress: undefined,
-              action: target === polish ? 'downloadPolishModel' : 'downloadModel',
+              action: isPolish ? 'downloadPolishModel' : 'downloadModel',
             })
           }
         } finally {
@@ -128,7 +135,7 @@ export function createModelActions({
       await mkdir(directory(), { recursive: true })
       await clearPartials(
         directory(),
-        [...models, polish].flatMap((model) => [...model.files]),
+        [...models, ...polishModels].flatMap((model) => [...model.files]),
       )
     },
     stopDownload,

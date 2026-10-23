@@ -144,6 +144,67 @@ export default [
         description: 'polish.description',
         default: false,
       },
+      {
+        key: 'polishModel',
+        kind: 'choice',
+        title: 'polishModel.title',
+        description: 'polishModel.description',
+        options: [
+          {
+            value: 'qwen3.5-4b',
+            title: 'polishModel.recommended',
+          },
+          {
+            value: 'qwen3.5-2b',
+            title: 'polishModel.smaller',
+          },
+          {
+            value: 'server',
+            title: 'polishModel.server',
+          },
+        ],
+        default: 'qwen3.5-4b',
+        visibleWhen: {
+          key: 'polish',
+          values: ['true'],
+        },
+      },
+      {
+        key: 'polishServerURL',
+        kind: 'text',
+        format: 'url',
+        title: 'polishServerURL.title',
+        description: 'polishServerURL.description',
+        placeholder: 'https://api.deepseek.com/v1',
+        default: '',
+        visibleWhen: {
+          key: 'polishModel',
+          values: ['server'],
+        },
+      },
+      {
+        key: 'polishApiKey',
+        kind: 'secret',
+        title: 'apiKey.title',
+        description: 'apiKey.description',
+        visibleWhen: {
+          key: 'polishModel',
+          values: ['server'],
+        },
+      },
+      {
+        key: 'polishServerModel',
+        kind: 'text',
+        format: 'plain',
+        title: 'model.title',
+        description: 'polishServerModel.description',
+        placeholder: 'deepseek-chat',
+        default: '',
+        visibleWhen: {
+          key: 'polishModel',
+          values: ['server'],
+        },
+      },
     ],
   },
   {

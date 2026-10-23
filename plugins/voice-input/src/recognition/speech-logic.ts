@@ -37,13 +37,41 @@ function speechRuns(pcm: Uint8Array): { start: number; end: number; voiced: numb
   return runs.filter((run) => run.voiced >= 1920)
 }
 
-export function findSpeechPause(pcm: Uint8Array, minimumSeconds: number): number | null {
+export function speechPauses(pcm: Uint8Array): { at: number; length: number }[] {
   const runs = speechRuns(pcm)
-  for (let index = runs.length - 1; index > 0; index--) {
-    const pause = (runs[index - 1]!.end + runs[index]!.start) / 32000
-    if (pause >= minimumSeconds) return pause
+  const pauses: { at: number; length: number }[] = []
+  for (let index = 1; index < runs.length; index++) {
+    const before = runs[index - 1]!
+    const after = runs[index]!
+    pauses.push({
+      at: (before.end + after.start) / 32000,
+      length: (after.start - before.end) / 16000,
+    })
   }
-  return null
+  return pauses
+}
+
+export const sentencePause = 0.75
+
+export function segmentCut(
+  pauses: readonly { at: number; length: number }[],
+  windowSeconds: number,
+): { at: number; pause: number } | null {
+  let sentence: (typeof pauses)[number] | undefined
+  let longest: (typeof pauses)[number] | undefined
+  for (const pause of pauses) {
+    if (pause.at < 10) continue
+    if (pause.length >= sentencePause && (!sentence || pause.at > sentence.at)) sentence = pause
+    if (
+      !longest ||
+      pause.length > longest.length ||
+      (pause.length === longest.length && pause.at > longest.at)
+    )
+      longest = pause
+  }
+  if (sentence) return { at: sentence.at, pause: sentence.length }
+  if (windowSeconds < 30) return null
+  return longest ? { at: longest.at, pause: longest.length } : { at: 30, pause: 0 }
 }
 
 export function detectSpeech(pcm: Uint8Array): {

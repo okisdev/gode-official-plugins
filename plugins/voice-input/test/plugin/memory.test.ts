@@ -158,7 +158,7 @@ async function dictate(
 
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
-  expect(parsed.version).toBe('0.0.10')
+  expect(parsed.version).toBe('0.0.11')
   expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual([
     ...['keepHistory', 'learnTerms'].map((key) => ({
       key,

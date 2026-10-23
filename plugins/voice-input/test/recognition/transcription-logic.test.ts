@@ -3,6 +3,7 @@ import {
   apiURL,
   applyVocabulary,
   cleanTranscript,
+  continuedText,
   formatBytes,
   joinTranscript,
   responseJSON,
@@ -38,6 +39,16 @@ test.each([
   ['“Hello', '”', '“Hello”'],
 ])('joins %s and %s', (committed, window, expected) =>
   expect(joinTranscript(committed, window)).toBe(expected),
+)
+
+test.each([
+  ['变成。', '变成，'],
+  ['变成。 \n', '变成， \n'],
+  ['变成。后面', '变成。后面'],
+  ['变成！', '变成！'],
+  ['', ''],
+])('continues a trailing full stop in %j', (text, expected) =>
+  expect(continuedText(text)).toBe(expected),
 )
 
 test.each([

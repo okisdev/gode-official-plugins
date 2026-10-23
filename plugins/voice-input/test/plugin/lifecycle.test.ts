@@ -17,19 +17,20 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
   const server = await fixture(listener)
   cleanups.push(() => server.close())
   const statuses: PluginStatus[] = []
+  const log = vi.fn()
   const models = ['model.gguf', 'projector.gguf'].map((file) =>
     model(file, server.url, 'model bytes'),
   )
-  const polish = { id: 'qwen3.5-2b', files: [model('polish.gguf', server.url, 'polish bytes')] }
+  const polish = { id: 'qwen3.5-4b', files: [model('polish.gguf', server.url, 'polish bytes')] }
   const plugin = createVoicePlugin(
     {
       setStatus: (status) => statuses.push(status),
       setView: () => {},
-      log: () => {},
+      log,
       synced: testSynced(),
     },
     [{ id: 'qwen3-asr-1.7b', files: models }],
-    polish,
+    [polish],
   )
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
@@ -41,7 +42,7 @@ async function setup(listener: Parameters<typeof fixture>[0]) {
     stores: emptyStores(),
   }
   await plugin.start(start)
-  return { server, statuses, plugin, start, polish }
+  return { server, statuses, plugin, start, polish, log }
 }
 
 test('missing, downloading, ready and removal use manifest states and localized sizes', async () => {
@@ -240,25 +241,41 @@ test.each([
   ['rejected', 'Paris', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
   ['failed', '', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
   ['timeout', '', 'Please send to agentdoc on Wednesday, I mean Thursday.'],
+  [
+    'length',
+    'Please send to Agent Doc on Thursday.',
+    'Please send to agentdoc on Wednesday, I mean Thursday.',
+  ],
 ])(
   'finish uses a tidy edit or falls back when the reply is %s',
   async (caseName, reply, expected) => {
     const requests: { url: string; body: string }[] = []
-    const { server, plugin, start, statuses, polish } = await setup(async (request, response) => {
-      let body = ''
-      for await (const chunk of request) body += chunk
-      requests.push({ url: request.url!, body })
-      if (request.url?.endsWith('/audio/transcriptions')) {
-        response.end(
-          JSON.stringify({ text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' }),
-        )
-      } else if (caseName === 'failed') {
-        response.writeHead(500)
-        response.end('error')
-      } else if (caseName !== 'timeout') {
-        response.end(JSON.stringify({ choices: [{ message: { content: reply } }] }))
-      }
-    })
+    const { server, plugin, start, statuses, polish, log } = await setup(
+      async (request, response) => {
+        let body = ''
+        for await (const chunk of request) body += chunk
+        requests.push({ url: request.url!, body })
+        if (request.url?.endsWith('/audio/transcriptions')) {
+          response.end(
+            JSON.stringify({ text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' }),
+          )
+        } else if (caseName === 'failed') {
+          response.writeHead(500)
+          response.end('error')
+        } else if (caseName !== 'timeout') {
+          response.end(
+            JSON.stringify({
+              choices: [
+                {
+                  message: { content: reply },
+                  ...(caseName === 'length' ? { finish_reason: 'length' } : {}),
+                },
+              ],
+            }),
+          )
+        }
+      },
+    )
     await mkdir(join(server.directory, 'models'), { recursive: true })
     await writeFile(join(server.directory, 'models', polish.files[0]!.file), 'polish bytes')
     const used = vi.spyOn(LocalEngine.prototype, 'use').mockImplementation(async function (
@@ -274,14 +291,24 @@ test.each([
     })
     expect(statuses.at(-1)?.state).toBe('ready')
     await expect(finish(plugin)).resolves.toEqual({ text: expected })
+    expect(log).toHaveBeenCalledWith(
+      'info',
+      expect.stringMatching(
+        new RegExp(
+          `^Dictation finished: 1\\.00 s audio, 0 segments before stop, recognition \\d+\\.\\d{2} s, polish ${caseName === 'accepted' ? 'kept' : caseName === 'failed' || caseName === 'timeout' ? 'failed' : 'refused'}$`,
+        ),
+      ),
+    )
     expect(used).toHaveBeenCalled()
-    const sent = requests.find((request) => request.url === '/v1/chat/completions')
+    const chats = requests.filter((request) => request.url === '/v1/chat/completions')
+    expect(chats).toHaveLength(1)
+    const sent = chats[0]
     expect(sent).toBeDefined()
     expect(JSON.parse(sent!.body)).toMatchObject({
       temperature: 0,
       max_tokens: Math.min(
-        512,
-        2 * 'Please send to Agent Doc on Wednesday, I mean Thursday.'.length + 16,
+        4096,
+        2 * 'Please send to Agent Doc on Wednesday, I mean Thursday.'.length + 64,
       ),
       chat_template_kwargs: { enable_thinking: false },
     })
@@ -290,7 +317,7 @@ test.each([
       content: '<transcript>Please send to Agent Doc on Wednesday, I mean Thursday.</transcript>',
     })
   },
-  8000,
+  16000,
 )
 
 test('polish off never starts the tidy engine or sends a chat request', async () => {
@@ -314,6 +341,79 @@ test('polish off never starts the tidy engine or sends a chat request', async ()
   })
   expect(used).not.toHaveBeenCalled()
   expect(requests).toEqual(['/v1/audio/transcriptions'])
+})
+
+test('a chosen chat service receives one final transcript with its model and key', async () => {
+  const requests: { url: string; auth?: string; body: string }[] = []
+  const { server, plugin, start, log } = await setup(async (request, response) => {
+    let body = ''
+    for await (const chunk of request) body += chunk
+    requests.push({ url: request.url!, auth: request.headers.authorization, body })
+    response.end(
+      JSON.stringify(
+        request.url?.endsWith('/chat/completions')
+          ? { choices: [{ message: { content: 'Please send to Agent Doc on Thursday.' } }] }
+          : { text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' },
+      ),
+    )
+  })
+  const used = vi.spyOn(LocalEngine.prototype, 'use')
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: settings({
+      engine: 'server',
+      serverURL: `${server.url}/v1`,
+      polish: true,
+      polishModel: 'server',
+      polishServerURL: ` ${server.url}/v1 `,
+      polishServerModel: ' deepseek-chat ',
+    }),
+    secrets: { polishApiKey: 'chat-secret' },
+  })
+  await expect(finish(plugin)).resolves.toEqual({ text: 'Please send to agentdoc on Thursday.' })
+  const chats = requests.filter((request) => request.url === '/v1/chat/completions')
+  expect(chats).toHaveLength(1)
+  expect(chats[0]?.auth).toBe('Bearer chat-secret')
+  const body = JSON.parse(chats[0]!.body)
+  expect(body.model).toBe('deepseek-chat')
+  expect(body).not.toHaveProperty('chat_template_kwargs')
+  expect(body.messages[0].content).toContain('agentdoc')
+  expect(body.messages.at(-1)).toEqual({
+    role: 'user',
+    content: '<transcript>Please send to Agent Doc on Wednesday, I mean Thursday.</transcript>',
+  })
+  expect(used).not.toHaveBeenCalled()
+  expect(log).toHaveBeenCalledWith('info', expect.stringMatching(/polish kept$/))
+})
+
+test('a chosen service without a model skips tidy up', async () => {
+  const requests: string[] = []
+  const { server, plugin, start, log } = await setup((request, response) => {
+    requests.push(request.url!)
+    response.end(
+      JSON.stringify({ text: 'Um, please send to Agent Doc on Wednesday, I mean Thursday.' }),
+    )
+  })
+  const used = vi.spyOn(LocalEngine.prototype, 'use')
+  await plugin.settings({
+    ...start,
+    type: 'settings',
+    settings: settings({
+      engine: 'server',
+      serverURL: `${server.url}/v1`,
+      polish: true,
+      polishModel: 'server',
+      polishServerURL: `${server.url}/v1`,
+      polishServerModel: ' ',
+    }),
+  })
+  await expect(finish(plugin)).resolves.toEqual({
+    text: 'Please send to agentdoc on Wednesday, I mean Thursday.',
+  })
+  expect(requests).toEqual(['/v1/audio/transcriptions'])
+  expect(used).not.toHaveBeenCalled()
+  expect(log).toHaveBeenCalledWith('info', expect.stringMatching(/polish skipped$/))
 })
 
 test('local recognition also tidies only the final transcript', async () => {

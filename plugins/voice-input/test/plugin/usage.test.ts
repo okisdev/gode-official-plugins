@@ -61,7 +61,7 @@ afterEach(async () => {
 
 async function setup(
   listener: typeof fetch = async () => new Response('{}'),
-  options: { local?: boolean; stored?: string } = {},
+  options: { local?: boolean; polish?: boolean; stored?: string } = {},
 ) {
   const root = await mkdtemp(join(tmpdir(), 'gode-voice-usage-'))
   cleanups.push(() => rm(root, { recursive: true, force: true }))
@@ -70,10 +70,18 @@ async function setup(
   const models = ['model.gguf', 'projector.gguf'].map((file) =>
     model(file, 'http://127.0.0.1/model', 'model bytes'),
   )
+  const polish = {
+    id: 'qwen3.5-4b',
+    files: [model('polish.gguf', 'http://127.0.0.1/polish', 'polish bytes')],
+  }
   if (options.local) {
     await mkdir(join(directory, 'models'), { recursive: true })
     for (const entry of models)
       await writeFile(join(directory, 'models', entry.file), 'model bytes')
+  }
+  if (options.polish) {
+    await mkdir(join(directory, 'models'), { recursive: true })
+    await writeFile(join(directory, 'models', polish.files[0]!.file), 'polish bytes')
   }
   if (options.stored !== undefined) {
     await mkdir(directory, { recursive: true })
@@ -81,14 +89,17 @@ async function setup(
   }
   const setView = vi.fn<SetPluginView>()
   const synced = testSynced()
-  const plugin = createVoicePlugin({ setStatus: () => {}, setView, log: () => {}, synced }, [
-    { id: 'qwen3-asr-1.7b', files: models },
-  ])
+  const plugin = createVoicePlugin(
+    { setStatus: () => {}, setView, log: () => {}, synced },
+    [{ id: 'qwen3-asr-1.7b', files: models }],
+    options.polish ? [polish] : undefined,
+  )
   cleanups.push(() => plugin.dispose())
   const start: Extract<HostMessage, { type: 'start' }> = {
     type: 'start',
     settings: settings({
       engine: options.local ? 'local' : 'server',
+      polish: options.polish ?? false,
       serverURL: 'http://127.0.0.1/v1',
       language: 'en',
     }),
@@ -261,6 +272,131 @@ test('start replies while the local engine is still warming', async () => {
     .mockImplementation(async () => new Promise<never>(() => {}))
   await expect(begin(plugin)).resolves.toBeTypeOf('string')
   expect(use).toHaveBeenCalledOnce()
+})
+
+test('a failed warm-up does not fail start', async () => {
+  const { plugin } = await setup(undefined, { local: true })
+  const use = vi.spyOn(LocalEngine.prototype, 'use').mockRejectedValue(new Error('warm-up failed'))
+  const session = await begin(plugin)
+  expect(use).toHaveBeenCalledOnce()
+  await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session } })
+})
+
+function trackEngines() {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  const start = vi
+    .spyOn(
+      LocalEngine.prototype as unknown as {
+        start: () => Promise<{ base: string; apiKey: string }>
+      },
+      'start',
+    )
+    .mockResolvedValue({ base: 'http://127.0.0.1/v1', apiKey: 'local-test-key' })
+  const stop = vi.spyOn(LocalEngine.prototype, 'stop')
+  const name = (engine: unknown) =>
+    (engine as { options: { name: string; idleMs: number } }).options
+  const count = (calls: readonly unknown[], kind: string) =>
+    calls.filter((engine) => name(engine).name === kind).length
+  return {
+    started: (kind: string) => count(start.mock.contexts, kind),
+    stopped: (kind: string) => count(stop.mock.contexts, kind),
+    idleMs: (kind: string) =>
+      start.mock.contexts.map(name).find((options) => options.name === kind)?.idleMs,
+  }
+}
+
+test('a recording holds both engines and reuses speech within its idle minute', async () => {
+  const { plugin } = await setup(
+    async (url) =>
+      new Response(
+        JSON.stringify(
+          (typeof url === 'string' ? url : url instanceof URL ? url.href : url.url).endsWith(
+            '/chat/completions',
+          )
+            ? { choices: [{ message: { content: 'Hello.' } }] }
+            : { text: 'Hello.' },
+        ),
+      ),
+    { local: true, polish: true },
+  )
+  const engines = trackEngines()
+  const first = await begin(plugin)
+  await vi.waitFor(() => expect(engines.started('polish')).toBe(1))
+  expect(engines.started('recognition')).toBe(1)
+  expect(engines.idleMs('recognition')).toBe(60_000)
+  expect(engines.idleMs('polish')).toBe(0)
+  await vi.advanceTimersByTimeAsync(5 * 60_000)
+  expect(engines.stopped('recognition')).toBe(0)
+  expect(engines.stopped('polish')).toBe(0)
+  await append(plugin, first, pcm(1))
+  await expect(finish(plugin, first)).resolves.toEqual({ text: 'Hello.' })
+  expect(engines.started('recognition')).toBe(1)
+  expect(engines.started('polish')).toBe(1)
+  await vi.advanceTimersByTimeAsync(0)
+  expect(engines.stopped('polish')).toBe(1)
+  expect(engines.stopped('recognition')).toBe(0)
+  await vi.advanceTimersByTimeAsync(59_999)
+  const second = await begin(plugin)
+  await vi.waitFor(() => expect(engines.started('polish')).toBe(2))
+  expect(engines.started('recognition')).toBe(1)
+  await vi.advanceTimersByTimeAsync(60_001)
+  expect(engines.stopped('recognition')).toBe(0)
+  await expect(finish(plugin, second)).resolves.toEqual({ text: '' })
+  await vi.advanceTimersByTimeAsync(60_000)
+  expect(engines.stopped('recognition')).toBe(1)
+})
+
+test.each(['cancel', 'failed finish'])('%s releases both engine holds', async (ending) => {
+  const { plugin } = await setup(
+    async () =>
+      new Response(JSON.stringify({ error: { message: 'Unavailable' } }), { status: 503 }),
+    { local: true, polish: true },
+  )
+  const engines = trackEngines()
+  const session = await begin(plugin)
+  await vi.waitFor(() => expect(engines.started('polish')).toBe(1))
+  if (ending === 'cancel')
+    await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session } })
+  else {
+    await expect(append(plugin, session, pcm(1))).rejects.toMatchObject({
+      text: { message: 'error.recognition' },
+    })
+    await expect(finish(plugin, session)).rejects.toMatchObject({
+      text: { message: 'error.recognition' },
+    })
+  }
+  await vi.advanceTimersByTimeAsync(0)
+  expect(engines.stopped('polish')).toBe(1)
+  expect(engines.stopped('recognition')).toBe(0)
+  await vi.advanceTimersByTimeAsync(60_000)
+  expect(engines.stopped('recognition')).toBe(1)
+})
+
+test('restarting a session id releases its old hold and dispose releases the replacement', async () => {
+  const { plugin } = await setup(undefined, { local: true, polish: true })
+  const engines = trackEngines()
+  const session = await begin(plugin)
+  await vi.waitFor(() => expect(engines.started('polish')).toBe(1))
+  await plugin.call({
+    type: 'call',
+    id: 1,
+    method: 'dictation.start',
+    params: { session, vocabulary: [] },
+  })
+  await vi.advanceTimersByTimeAsync(60_000)
+  expect(engines.started('recognition')).toBe(1)
+  expect(engines.started('polish')).toBe(1)
+  expect(engines.stopped('recognition')).toBe(0)
+  expect(engines.stopped('polish')).toBe(0)
+  await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session } })
+  await vi.advanceTimersByTimeAsync(60_000)
+  expect(engines.stopped('recognition')).toBe(1)
+  expect(engines.stopped('polish')).toBe(1)
+  await begin(plugin)
+  await vi.waitFor(() => expect(engines.started('polish')).toBe(2))
+  await plugin.dispose()
+  expect(engines.stopped('recognition')).toBe(2)
+  expect(engines.stopped('polish')).toBe(2)
 })
 
 test('server sessions append without a request and finish once', async () => {

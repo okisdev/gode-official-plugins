@@ -67,6 +67,27 @@ test('both model sets have pinned files and the default total matches setupBytes
   expect(() => verifySetupBytes(manifest, resources.models.slice(1))).toThrow('missing')
 })
 
+test('both tidy model presets and their licenses are pinned', () => {
+  expect(resources.polishModels.map((set) => set.id)).toEqual(['qwen3.5-4b', 'qwen3.5-2b'])
+  expect(resources.polishModels.map((set) => set.files.map((file) => file.size))).toEqual([
+    [2740937888],
+    [1280835840],
+  ])
+  expect(resources.polishModels.map((set) => set.files[0]?.sha256)).toEqual([
+    '00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4',
+    'aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223',
+  ])
+  for (const set of resources.polishModels) {
+    const file = set.files[0]!
+    const credit = manifest.includes.find((entry) =>
+      entry.name.includes(set.id === 'qwen3.5-4b' ? '4B' : '2B'),
+    )
+    expect(credit).toMatchObject({ license: 'Apache-2.0', optional: true })
+    expect(file.url).toContain(`/resolve/${credit?.version}/`)
+    expect(file.url).toMatch(new RegExp(`/${file.file}$`))
+  }
+})
+
 test('stage copies only the pinned runtime files and keeps links and executable mode', async () => {
   const root = await mkdtemp(join(tmpdir(), 'gode-voice-build-'))
   try {

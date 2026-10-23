@@ -36,6 +36,7 @@ export class LocalEngine {
       log: PluginContext['log']
       idleMs?: number
       startupMs?: number
+      context?: number
     },
   ) {}
 
@@ -97,7 +98,7 @@ export class LocalEngine {
           '--port',
           String(port),
           '-c',
-          '4096',
+          String(this.options.context ?? 4096),
         ],
         {
           stdio: ['ignore', 'ignore', 'pipe'],

@@ -122,6 +122,7 @@ test('text model starts without a projector', async () => {
     log,
     executable: '/plugin/bin/llama-server',
     model: '/data/models/polish.gguf',
+    context: 8192,
   })
   await engine.use(async () => null)
   expect(harness.spawn.mock.calls[0]?.[1]).toEqual([
@@ -137,7 +138,7 @@ test('text model starts without a projector', async () => {
     '--port',
     '12345',
     '-c',
-    '4096',
+    '8192',
   ])
   child().stderr.emit('data', Buffer.from('warning\n'))
   expect(stderr).toHaveBeenCalledWith('[polish] warning\n')

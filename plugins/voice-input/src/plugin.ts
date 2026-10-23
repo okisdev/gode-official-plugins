@@ -19,7 +19,7 @@ import { createVoiceStatus } from './status'
 export function createVoicePlugin(
   { setStatus, setView, log, synced }: PluginContext<Names>,
   models: readonly ModelSet[] = resources.models,
-  polish: ModelSet = resources.polish,
+  polishModels: readonly ModelSet[] = resources.polishModels,
 ): Required<
   Pick<PluginHandlers<Names>, 'start' | 'settings' | 'action' | 'query' | 'call' | 'error'>
 > & {
@@ -40,8 +40,11 @@ export function createVoicePlugin(
     typeof settings[key] === 'string' ? settings[key] : fallback
   const local = (): boolean => text('engine', 'local') === 'local'
   const polishOn = (): boolean => settings.polish === true
+  const polishService = (): boolean => text('polishModel') === 'server'
   const selected = (): ModelSet =>
     models.find((model) => model.id === text('localModel', 'qwen3-asr-1.7b')) ?? models[0]!
+  const selectedPolish = (): ModelSet =>
+    polishModels.find((model) => model.id === text('polishModel', 'qwen3.5-4b')) ?? polishModels[0]!
   const createEngine = (): LocalEngine => {
     const [model, projector] = selected().files
     return new LocalEngine({
@@ -50,9 +53,20 @@ export function createVoicePlugin(
       executable,
       model: join(directory, model!.file),
       projector: join(directory, projector!.file),
+      idleMs: 60_000,
     })
   }
-  const polishPresent = (): Promise<boolean> => modelsPresent(directory, polish.files)
+  const createPolishEngine = (): LocalEngine =>
+    new LocalEngine({
+      name: 'polish',
+      log,
+      executable,
+      model: join(directory, selectedPolish().files[0]!.file),
+      context: 8192,
+      idleMs: 0,
+    })
+  const polishPresent = (): Promise<boolean> =>
+    polishService() ? Promise.resolve(false) : modelsPresent(directory, selectedPolish().files)
   const vocabulary: VoiceMemory['vocabulary'] = (request, limit) =>
     memory.vocabulary(request, limit)
   const status = createVoiceStatus({
@@ -62,7 +76,8 @@ export function createVoicePlugin(
     local,
     text,
     selected,
-    polish,
+    selectedPolish,
+    polishService,
     polishOn,
     polishPresent,
     downloading: () => modelActions.downloading,
@@ -71,15 +86,30 @@ export function createVoicePlugin(
     directory: () => directory,
     locale: () => locale,
     models,
-    polish,
+    polishModels,
     selected,
+    selectedPolish,
+    polishService,
     local,
     engine: () => engine,
     polishEngine: () => polishEngine,
     status,
     log,
   })
-  const server = createServerCheck({ text, apiKey: () => secrets.apiKey, status, log })
+  const server = createServerCheck({
+    kind: 'speech',
+    base: () => text('serverURL').trim(),
+    apiKey: () => secrets.apiKey,
+    status,
+    log,
+  })
+  const polishServer = createServerCheck({
+    kind: 'polish',
+    base: () => text('polishServerURL').trim(),
+    apiKey: () => secrets.polishApiKey,
+    status,
+    log,
+  })
   const recognize = createRecognition({
     local,
     text,
@@ -91,6 +121,16 @@ export function createVoicePlugin(
   })
   const tidy = createPolish({
     polishOn,
+    service: () =>
+      !polishService()
+        ? undefined
+        : text('polishServerURL').trim() && text('polishServerModel').trim()
+          ? {
+              base: text('polishServerURL').trim(),
+              apiKey: secrets.polishApiKey,
+              model: text('polishServerModel').trim(),
+            }
+          : null,
     polishPresent,
     engine: () => polishEngine,
     vocabulary,
@@ -128,32 +168,33 @@ export function createVoicePlugin(
       await modelActions.initialize()
       executable = join(message.paths.plugin, 'bin/llama-server')
       engine = createEngine()
-      polishEngine = new LocalEngine({
-        name: 'polish',
-        log,
-        executable,
-        model: join(directory, polish.files[0]!.file),
-      })
+      polishEngine = createPolishEngine()
       await status.refresh()
     },
     async settings(message) {
       server.cancel()
+      polishServer.cancel()
       const wasLocal = local()
       const wasPolish = polishOn()
       const previousModel = selected().id
+      const previousPolishModel = polishService() ? 'server' : selectedPolish().id
       settings = message.settings
       secrets = message.secrets
       const modelChanged = previousModel !== selected().id
+      const polishChanged =
+        previousPolishModel !== (polishService() ? 'server' : selectedPolish().id)
       if ((wasLocal && !local()) || modelChanged) {
         status.ready = false
         await modelActions.stopDownload()
         await engine.stop()
       }
       if (modelChanged) engine = createEngine()
-      if (wasPolish && !polishOn()) {
-        if (modelActions.downloading === polish) await modelActions.stopDownload()
+      if ((wasPolish && !polishOn()) || polishChanged) {
+        const downloading = modelActions.downloading
+        if (downloading && polishModels.includes(downloading)) await modelActions.stopDownload()
         await polishEngine.stop()
       }
+      if (polishChanged) polishEngine = createPolishEngine()
       await status.refresh()
     },
     async action(action, item, text) {
@@ -169,6 +210,8 @@ export function createVoicePlugin(
         memory.clear()
       } else if (action === 'checkServer' && !local()) {
         await server.run()
+      } else if (action === 'checkPolishService' && polishService()) {
+        await polishServer.run()
       } else {
         await modelActions.action(action)
       }
@@ -187,6 +230,7 @@ export function createVoicePlugin(
     async dispose() {
       status.dispose()
       server.cancel()
+      polishServer.cancel()
       dictation.dispose()
       await Promise.all([stats?.dispose(), history?.dispose(), memory?.dispose()])
       await modelActions.stopDownload()

@@ -1,0 +1,7 @@
+{
+  "name": "Shell",
+  "description": "为 Shell 脚本提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Shell 脚本时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。语言服务器会在项目中打开 Shell 脚本时启动，并在没有脚本打开时停止。当 PATH 中有 ShellCheck 时，服务器会用它提供更丰富的诊断。",
+  "ready": "已准备好辅助编写 Shell 脚本。",
+  "failed": "无法启动 Shell 语言服务器。"
+}

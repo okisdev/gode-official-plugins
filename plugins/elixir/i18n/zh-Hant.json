@@ -1,0 +1,7 @@
+{
+  "name": "Elixir",
+  "description": "使用已安裝的 Elixir，為 Elixir 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Elixir 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。Expert 會在專案中開啟 Elixir 檔案時啟動，並在沒有 Elixir 檔案開啟時停止。它使用已安裝的 Elixir 和 Erlang 分析專案。",
+  "ready": "已準備好輔助編寫 Elixir 程式碼。",
+  "failed": "無法啟動 Elixir 語言伺服器。"
+}

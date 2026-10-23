@@ -1,0 +1,7 @@
+{
+  "name": "Dockerfile",
+  "description": "為 Dockerfile 提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Dockerfile 時可使用指令補全、查看輸入時的錯誤和警告、游標懸停資訊和前往定義。語言伺服器會在專案中開啟 Dockerfile 時啟動，並在沒有 Dockerfile 開啟時停止。",
+  "ready": "已準備好輔助編寫 Dockerfile。",
+  "failed": "無法啟動 Dockerfile 語言伺服器。"
+}

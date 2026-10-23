@@ -1,0 +1,24 @@
+{
+  "id": "haskell",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["haskell"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "haskell-language-server",
+      "version": "2.15.0.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/haskell/haskell-language-server",
+      "optional": true
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Markdown",
+  "description": "Markdownファイルの作成を支援します。",
+  "about": "GodeのエディタでMarkdownファイルの見出しへの移動、リンクの補完、参照の検索、シンボル名の変更ができます。プロジェクトでMarkdownファイルを開くとサーバが起動し、開いているMarkdownファイルがなくなると停止します。",
+  "ready": "Markdownの作成を支援できます。",
+  "failed": "Markdown言語サーバを起動できませんでした。"
+}

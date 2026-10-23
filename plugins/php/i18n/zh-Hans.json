@@ -1,0 +1,8 @@
+{
+  "name": "PHP",
+  "description": "使用你安装的 PHP，为 PHP 项目提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 PHP 文件时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。语言服务器会在项目中打开 PHP 文件时启动，并在没有 PHP 文件打开时停止。它使用 PATH 中的 PHP 运行 Phpactor。",
+  "ready": "已准备好辅助编写 PHP 代码。",
+  "failed": "无法启动 PHP 语言服务器。",
+  "missing": "请安装 PHP 并将其添加到 PATH，以使用 PHP 语言服务器。"
+}

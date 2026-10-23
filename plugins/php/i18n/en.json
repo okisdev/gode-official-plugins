@@ -1,0 +1,8 @@
+{
+  "name": "PHP",
+  "description": "Code intelligence for PHP projects using your PHP installation.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in PHP files. The language server starts when a PHP file opens in a project and stops when none are open. It runs Phpactor with PHP from your PATH.",
+  "ready": "Ready to assist with PHP.",
+  "failed": "The PHP language server could not start.",
+  "missing": "Install PHP and add it to your PATH to use the PHP language server."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "F#",
+  "description": "Asistencia de código para proyectos F# con tu instalación de .NET.",
+  "about": "En el editor de Gode puedes completar código F#, ver diagnósticos, consultar información al pasar el cursor, ir a definiciones y cambiar nombres. FsAutoComplete se inicia al abrir un archivo F# y usa la versión instalada de .NET.",
+  "ready": "Listo para trabajar con F#.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de F#.",
+  "missing": "Instala el entorno de ejecución de .NET y agrega dotnet a PATH para usar el servidor de F#."
+}

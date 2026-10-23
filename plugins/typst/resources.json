@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.10/tinymist-aarch64-apple-darwin.tar.gz",
+      "file": "tinymist-darwin-arm64-0.15.10.tar.gz",
+      "sha256": "34f5cd17610efca7b5f742a664a9fc31827327f3eebbc886cfcf2c6be69dd27e"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.10/tinymist-x86_64-apple-darwin.tar.gz",
+      "file": "tinymist-darwin-x64-0.15.10.tar.gz",
+      "sha256": "b71ff6e4aee54b2674c225c54a3d6be455c5dd4a991e8544233d6f09d10b555e"
+    },
+    "linux-x64": {
+      "url": "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.10/tinymist-x86_64-unknown-linux-gnu.tar.gz",
+      "file": "tinymist-linux-x64-0.15.10.tar.gz",
+      "sha256": "10df33ec0b6cb380b1354b55bd8a32fdc2f00fec281b7dc0a41086bd0038e0fc"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/Myriad-Dreamin/tinymist/releases/download/v0.15.10/tinymist-aarch64-unknown-linux-gnu.tar.gz",
+      "file": "tinymist-linux-arm64-0.15.10.tar.gz",
+      "sha256": "0a545957d894cec8a4ca9010d05a7fa27beb1e356c2b221b7f7f704538ff0bb0"
+    }
+  }
+}

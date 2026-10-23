@@ -1,0 +1,8 @@
+{
+  "name": "Julia",
+  "description": "お使いのJuliaを使用して、Juliaプロジェクトのコード作成を支援します。",
+  "about": "GodeのエディタでJuliaファイルのコード補完、診断の表示、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。LanguageServer.jlはお使いのJuliaでGodeのデータにインストールされ、Juliaファイルを開くと起動します。",
+  "ready": "Juliaのコードを支援できます。",
+  "failed": "Julia言語サーバを起動できませんでした。",
+  "missing": "Juliaがインストールされていないか、PATHにありません。"
+}

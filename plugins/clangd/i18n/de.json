@@ -1,0 +1,7 @@
+{
+  "name": "C, C++ und Objective-C",
+  "description": "Codeunterstützung für C, C++, Objective-C und Objective-C++.",
+  "about": "Vervollständige Code, sieh Fehlermeldungen und navigiere zu Symbolen in C-, C++-, Objective-C- und Objective-C++-Dateien. clangd liest compile_commands.json aus dem Projekt, um Compileroptionen und Include-Pfade zu ermitteln.",
+  "ready": "Bereit für C, C++ und Objective-C.",
+  "failed": "Der clangd-Sprachserver konnte nicht gestartet werden."
+}

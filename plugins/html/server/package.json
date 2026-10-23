@@ -1,0 +1,8 @@
+{
+  "name": "gode-html-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "vscode-langservers-extracted": "4.10.0"
+  }
+}

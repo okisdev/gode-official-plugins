@@ -1,0 +1,7 @@
+{
+  "name": "Erlang",
+  "description": "Assistência para programar em projetos Erlang com ELP.",
+  "about": "O Gode usa o Erlang Language Platform para completar código, mostrar diagnósticos, navegar e renomear em arquivos Erlang. Esta versão do ELP foi compilada para Erlang/OTP 29.1. Instale o Erlang/OTP 29.1 para o projeto.",
+  "ready": "Pronto para ajudar com Erlang.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Erlang."
+}

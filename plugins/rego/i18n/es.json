@@ -1,0 +1,7 @@
+{
+  "name": "Rego",
+  "description": "Asistencia de código para políticas Rego con Regal.",
+  "about": "En el editor de Gode, Regal ofrece autocompletado, información al pasar el cursor, definiciones y diagnósticos para archivos Rego. El servidor se inicia al abrir un archivo Rego en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+  "ready": "Listo para trabajar con Rego.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Rego."
+}

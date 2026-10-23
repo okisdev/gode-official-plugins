@@ -1,0 +1,7 @@
+{
+  "name": "CMake",
+  "description": "Codeunterstützung für CMake-Dateien.",
+  "about": "Im Editor von Gode kannst du CMake-Code vervollständigen, Diagnosen sehen, Informationen beim Überfahren abrufen und durch CMake-Dateien navigieren. Der Sprachserver startet, sobald du eine CMake-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für CMake.",
+  "failed": "Der CMake-Sprachserver konnte nicht gestartet werden."
+}

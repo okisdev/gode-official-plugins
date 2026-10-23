@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "使用 CUE 語言伺服器輔助編寫 CUE 檔案。",
+  "about": "在 Gode 的編輯器中，CUE 語言伺服器為 CUE 檔案提供支援。在專案中開啟 CUE 檔案時，它會啟動；沒有 CUE 檔案開啟時則會停止。伺服器透過隨附的 CUE 可執行檔運作。",
+  "ready": "已準備好輔助編寫 CUE 程式碼。",
+  "failed": "無法啟動 CUE 語言伺服器。"
+}

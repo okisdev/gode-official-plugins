@@ -1,0 +1,7 @@
+{
+  "name": "ESLint",
+  "description": "Analyse de code pour JavaScript, TypeScript, Vue, Svelte et Astro avec l’installation ESLint du projet.",
+  "about": "Dans l’éditeur de Gode, ESLint ajoute des diagnostics de lint, des corrections rapides et des actions de code associées pendant l’édition des fichiers pris en charge. Il s’exécute aux côtés du serveur principal de chaque langage, démarre à l’ouverture d’un tel fichier dans un projet et s’arrête lorsqu’aucun n’est ouvert. Il utilise le paquet ESLint et la configuration du projet.",
+  "ready": "Prêt à analyser avec ESLint.",
+  "failed": "Le serveur de langage ESLint n’a pas pu démarrer."
+}

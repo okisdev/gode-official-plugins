@@ -1,0 +1,7 @@
+{
+  "name": "Elm",
+  "description": "Code intelligence for Elm projects.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Elm files. The language server starts when an Elm file opens in a project and stops when none are open. It bundles the Elm language server and uses elm, elm-format and elm-test when they are installed on your PATH.",
+  "ready": "Ready to assist with Elm.",
+  "failed": "The Elm language server could not start."
+}

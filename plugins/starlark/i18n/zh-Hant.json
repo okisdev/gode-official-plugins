@@ -1,0 +1,7 @@
+{
+  "name": "Starlark",
+  "description": "使用 starpls 為 Bazel BUILD 和 .bzl 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，starpls 為 Starlark 檔案（包括 Bazel BUILD 和 .bzl 檔案）提供程式碼補全、游標懸停資訊、前往定義和問題診斷。語言伺服器會在專案中開啟 Starlark 檔案時啟動，並在沒有 Starlark 檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 Starlark 程式碼。",
+  "failed": "無法啟動 Starlark 語言伺服器。"
+}

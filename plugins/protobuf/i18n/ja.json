@@ -1,0 +1,7 @@
+{
+  "name": "Protocol Buffers",
+  "description": "Bufを使用してProtocol Buffersファイルのコード作成を支援します。",
+  "about": "Godeのエディタでは、BufがProtocol Buffersファイルの編集を支援します。プロジェクトで「.proto」ファイルを開くと言語サーバが起動し、開いている「.proto」ファイルがなくなると停止します。このプラグインにはBufの実行ファイルが含まれます。",
+  "ready": "Protocol Buffersのコードを支援できます。",
+  "failed": "Protocol Buffers言語サーバを起動できませんでした。"
+}

@@ -1,0 +1,7 @@
+{
+  "phar": {
+    "url": "https://github.com/phpactor/phpactor/releases/download/2026.10.07.0/phpactor.phar",
+    "file": "phpactor-2026.10.07.0.phar",
+    "sha256": "b28bf6166e016d539fc2f2aec18ef918b12590e436a6f1ccbdf30b5bbdbdb16b"
+  }
+}

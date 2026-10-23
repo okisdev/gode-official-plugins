@@ -1,0 +1,8 @@
+{
+  "name": "Java",
+  "description": "Code intelligence for Java projects with Eclipse JDT Language Server.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Java files. The language server starts when a Java file opens in a project and stops when none are open. Java 21 or newer is required.",
+  "ready": "Ready to assist with Java.",
+  "failed": "The Java language server could not start.",
+  "missing": "Install Java 21 or newer and set JAVA_HOME or add java to PATH."
+}

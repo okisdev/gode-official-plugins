@@ -1,0 +1,7 @@
+{
+  "name": "CMake",
+  "description": "為 CMake 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 CMake 檔案時可使用程式碼補全、查看診斷資訊和游標懸停資訊，以及在檔案中導覽。語言伺服器會在專案中開啟 CMake 檔案時啟動，並在沒有 CMake 檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 CMake 程式碼。",
+  "failed": "無法啟動 CMake 語言伺服器。"
+}

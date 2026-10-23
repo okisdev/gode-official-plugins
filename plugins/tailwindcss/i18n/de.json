@@ -1,0 +1,7 @@
+{
+  "name": "Tailwind CSS",
+  "description": "Klassennamen, Sortierung und weitere Hilfe für Tailwind CSS in HTML-, CSS- und Framework-Dateien.",
+  "about": "Im Editor von Gode ergänzt der Tailwind-CSS-Sprachserver unterstützte Dateien um Vervollständigung von Klassennamen, Hover-Informationen, Diagnosen und weitere Hilfe. Er läuft neben dem jeweiligen Hauptsprachserver, startet, wenn eine solche Datei in einem Projekt geöffnet wird, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Tailwind CSS.",
+  "failed": "Der Tailwind-CSS-Sprachserver konnte nicht gestartet werden."
+}

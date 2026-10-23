@@ -1,0 +1,7 @@
+{
+  "name": "CMake",
+  "description": "Assistance au code pour les fichiers CMake.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les diagnostics, consulter les informations au survol et parcourir les fichiers CMake. Le serveur démarre quand vous ouvrez un fichier CMake dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec CMake.",
+  "failed": "Le serveur de langage CMake n’a pas pu démarrer."
+}

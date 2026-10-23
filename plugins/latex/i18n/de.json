@@ -1,0 +1,7 @@
+{
+  "name": "LaTeX",
+  "description": "Codeunterstützung für LaTeX-Dokumente; zum Erstellen wird deine TeX-Distribution verwendet.",
+  "about": "Im Editor von Gode kannst du LaTeX-Befehle vervollständigen, Fehler und Warnungen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine LaTeX-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Zum Erstellen von Dokumenten verwendet er deine installierte TeX-Distribution.",
+  "ready": "Bereit für LaTeX.",
+  "failed": "Der LaTeX-Sprachserver konnte nicht gestartet werden."
+}

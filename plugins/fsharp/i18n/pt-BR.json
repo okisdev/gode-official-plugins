@@ -1,0 +1,8 @@
+{
+  "name": "F#",
+  "description": "Assistência para programar projetos F# com a instalação local do .NET.",
+  "about": "No editor do Gode, você pode completar código F#, ver diagnósticos, consultar informações ao passar o cursor, ir às definições e renomear símbolos. O FsAutoComplete inicia ao abrir um arquivo F# e usa o ambiente de execução .NET instalado.",
+  "ready": "Pronto para ajudar com F#.",
+  "failed": "Não foi possível iniciar o servidor de linguagem F#.",
+  "missing": "Instale o ambiente de execução .NET e disponibilize dotnet no PATH para usar o servidor F#."
+}

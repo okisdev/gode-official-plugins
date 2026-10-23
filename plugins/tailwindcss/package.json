@@ -1,0 +1,13 @@
+{
+  "name": "@gode/plugin-tailwindcss",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "gode-plugin build",
+    "check": "gode-plugin check",
+    "test": "gode-plugin test"
+  },
+  "dependencies": {
+    "@gode/plugin-sdk": "link:../../../gode/packages/plugin-sdk"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Elixir",
+  "description": "Code intelligence for Elixir projects using your Elixir installation.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Elixir files. Expert starts when an Elixir file opens in a project and stops when none are open. It uses your Elixir and Erlang installation to analyze the project.",
+  "ready": "Ready to assist with Elixir.",
+  "failed": "The Elixir language server could not start."
+}

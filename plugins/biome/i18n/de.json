@@ -1,0 +1,7 @@
+{
+  "name": "Biome",
+  "description": "Lint-Diagnosen und Korrekturen für Webprojekte mit Biome.",
+  "about": "Biome ergänzt im Gode-Editor den Sprachserver deines Projekts um Lint-Diagnosen und Korrekturen. Es verwendet die biome.json des Projekts und startet, wenn du eine unterstützte Datei öffnest.",
+  "ready": "Bereit zum Prüfen mit Biome.",
+  "failed": "Der Biome-Sprachserver konnte nicht gestartet werden."
+}

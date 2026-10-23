@@ -1,0 +1,23 @@
+{
+  "id": "lua",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["lua"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "LuaLS",
+      "version": "3.19.2",
+      "license": "MIT",
+      "url": "https://github.com/LuaLS/lua-language-server"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

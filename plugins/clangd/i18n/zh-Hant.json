@@ -1,0 +1,7 @@
+{
+  "name": "C、C++ 和 Objective-C",
+  "description": "為 C、C++、Objective-C 和 Objective-C++ 提供程式碼輔助。",
+  "about": "在 C、C++、Objective-C 和 Objective-C++ 檔案中補齊程式碼、檢視診斷資訊並前往符號。clangd 會讀取專案中的 compile_commands.json，以取得編譯選項和標頭檔路徑。",
+  "ready": "已準備好輔助編寫 C、C++ 和 Objective-C 程式碼。",
+  "failed": "無法啟動 clangd 語言伺服器。"
+}

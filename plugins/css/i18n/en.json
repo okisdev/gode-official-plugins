@@ -1,0 +1,7 @@
+{
+  "name": "CSS",
+  "description": "Code intelligence for CSS, SCSS and Less files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in CSS, SCSS and Less files. The language server starts when one of those files opens in a project and stops when none are open.",
+  "ready": "Ready to assist with CSS.",
+  "failed": "The CSS language server could not start."
+}

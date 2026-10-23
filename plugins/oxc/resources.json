@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/oxc-project/oxc/releases/download/oxlint_v1.89.0/oxlint-aarch64-apple-darwin.tar.gz",
+      "file": "oxlint-darwin-arm64-1.89.0.tar.gz",
+      "sha256": "fa4349f33b24221e2d303ace66de3dac2ff756eab48126b2cb58429ed36bccbc"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/oxc-project/oxc/releases/download/oxlint_v1.89.0/oxlint-x86_64-apple-darwin.tar.gz",
+      "file": "oxlint-darwin-x64-1.89.0.tar.gz",
+      "sha256": "198261cfb91c0f0387c55642ba5c2c4aa2c3cf9593188f86187c759f280bae88"
+    },
+    "linux-x64": {
+      "url": "https://github.com/oxc-project/oxc/releases/download/oxlint_v1.89.0/oxlint-x86_64-unknown-linux-gnu.tar.gz",
+      "file": "oxlint-linux-x64-1.89.0.tar.gz",
+      "sha256": "88492c336807a34062fa540416fe75037c04bcce1ed77824e3db3aaec215949a"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/oxc-project/oxc/releases/download/oxlint_v1.89.0/oxlint-aarch64-unknown-linux-gnu.tar.gz",
+      "file": "oxlint-linux-arm64-1.89.0.tar.gz",
+      "sha256": "69b3680c38b21395d4ea509fbd1019fa011db0cd717dd7be2ede2575cb6f7915"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "SQL (PostgreSQL)",
+  "description": "Syntax checks and formatting for PostgreSQL SQL files.",
+  "about": "In Gode’s editor, you can check PostgreSQL syntax and format SQL files without a database connection. The language server starts when a SQL file opens in a project and stops when none are open. For schema-aware completion, hover information and database checks, configure a PostgreSQL connection in the project’s postgres-language-server.jsonc file. This server supports the PostgreSQL dialect.",
+  "ready": "Ready to assist with PostgreSQL SQL.",
+  "failed": "The PostgreSQL SQL language server could not start."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Gleam",
+  "description": "Code intelligence for Gleam projects using your Gleam compiler.",
+  "about": "Gode runs gleam lsp from your PATH for completion, diagnostics, navigation and rename in Gleam files. Install Gleam for your project. Version 1.19.2 is the tested compiler; the project builds with your installed version.",
+  "ready": "Ready to assist with Gleam.",
+  "failed": "The Gleam language server could not start.",
+  "missing": "Install Gleam and make the gleam command available on PATH."
+}

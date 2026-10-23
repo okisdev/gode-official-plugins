@@ -1,0 +1,7 @@
+{
+  "name": "GraphQL",
+  "description": "Assistência para arquivos de esquema e operações GraphQL.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor e ir às definições em arquivos GraphQL. O servidor inicia quando você abre um arquivo GraphQL em um projeto e para quando não há mais nenhum aberto. Esses recursos precisam de uma configuração do GraphQL no projeto, como .graphqlrc.",
+  "ready": "Pronto para ajudar com GraphQL.",
+  "failed": "Não foi possível iniciar o servidor de linguagem GraphQL."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "C#",
+  "description": "Assistência para programar em projetos C# com o SDK do .NET.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos C#. O servidor inicia quando você abre um arquivo C# em um projeto e para quando não há mais nenhum aberto. Ele requer o SDK do .NET 10 ou posterior.",
+  "ready": "Pronto para ajudar com C#.",
+  "failed": "Não foi possível iniciar o servidor de linguagem C#.",
+  "missing": "Instale o SDK do .NET 10 ou posterior e adicione dotnet ao PATH para usar a assistência de código C#."
+}

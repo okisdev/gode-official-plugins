@@ -1,0 +1,8 @@
+{
+  "name": "F#",
+  "description": "使用已安装的 .NET，为 F# 项目提供代码辅助。",
+  "about": "在 Gode 的编辑器中，你可以补全 F# 代码、查看诊断信息、获取悬停提示、跳转到定义以及重命名。打开 F# 文件时，FsAutoComplete 会启动并使用已安装的 .NET 运行时。",
+  "ready": "已准备好辅助编写 F# 代码。",
+  "failed": "无法启动 F# 语言服务器。",
+  "missing": "请安装 .NET 运行时，并确保可通过 PATH 运行 dotnet，以使用 F# 语言服务器。"
+}

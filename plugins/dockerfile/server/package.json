@@ -1,0 +1,8 @@
+{
+  "name": "gode-dockerfile-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "dockerfile-language-server-nodejs": "0.15.0"
+  }
+}

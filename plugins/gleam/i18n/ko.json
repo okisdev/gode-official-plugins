@@ -1,0 +1,8 @@
+{
+  "name": "Gleam",
+  "description": "설치된 Gleam 컴파일러로 Gleam 프로젝트의 코드 작성을 지원합니다.",
+  "about": "Gode는 PATH의 gleam lsp를 사용해 Gleam 파일에서 코드 완성, 진단, 탐색 및 이름 변경을 제공합니다. 프로젝트에 Gleam을 설치하세요. 검증된 버전은 1.19.2이며 프로젝트는 설치된 버전으로 빌드됩니다.",
+  "ready": "Gleam 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Gleam 언어 서버를 시작할 수 없습니다.",
+  "missing": "Gleam을 설치하고 PATH에서 gleam 명령을 사용할 수 있도록 하세요."
+}

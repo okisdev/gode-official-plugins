@@ -1,0 +1,7 @@
+{
+  "name": "Biome",
+  "description": "使用 Biome 為網頁專案提供程式碼檢查診斷及修正。",
+  "about": "在 Gode 編輯器中，Biome 會與該語言的伺服器同時執行，提供程式碼檢查診斷及修正。它使用專案的 biome.json 設定，並在開啟支援的檔案時啟動。",
+  "ready": "已準備好使用 Biome 檢查程式碼。",
+  "failed": "無法啟動 Biome 語言伺服器。"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "gode-eslint-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "vscode-langservers-extracted": "4.10.0"
+  }
+}

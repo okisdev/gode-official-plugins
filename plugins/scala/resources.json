@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/coursier/coursier/releases/download/v2.1.25-M26/cs-aarch64-apple-darwin.gz",
+      "file": "coursier-darwin-arm64-v2.1.25-M26.gz",
+      "sha256": "4ebc84fa2fd767dffca3b4e63ed1cd7bc0f55870f98f14207e46e00512043bc4"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/coursier/coursier/releases/download/v2.1.25-M26/cs-x86_64-apple-darwin.gz",
+      "file": "coursier-darwin-x64-v2.1.25-M26.gz",
+      "sha256": "e061ec985562e9b21d75975cb6d60cac3c8874df19e3c6e007d935bc68aaf6b0"
+    },
+    "linux-x64": {
+      "url": "https://github.com/coursier/coursier/releases/download/v2.1.25-M26/cs-x86_64-pc-linux.gz",
+      "file": "coursier-linux-x64-v2.1.25-M26.gz",
+      "sha256": "017812b4da91a72fadd3cb0fb97caae4a16cb947a7bd6be2b46e5aa984458cbf"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/coursier/coursier/releases/download/v2.1.25-M26/cs-aarch64-pc-linux.gz",
+      "file": "coursier-linux-arm64-v2.1.25-M26.gz",
+      "sha256": "68288bcd47a81f3a3bcf0392572d40ec0981172bba9055a8b662413691358be9"
+    }
+  }
+}

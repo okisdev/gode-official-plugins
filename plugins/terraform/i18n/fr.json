@@ -1,0 +1,7 @@
+{
+  "name": "Terraform",
+  "description": "Assistance au code pour les fichiers Terraform et les variables Terraform.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Terraform. Le serveur démarre quand vous ouvrez un fichier Terraform dans un projet et s’arrête quand aucun n’est ouvert. Il utilise la CLI Terraform de votre PATH pour la validation si elle est disponible. La complétion et la navigation fonctionnent aussi sans elle.",
+  "ready": "Prêt à vous aider avec Terraform.",
+  "failed": "Le serveur de langage Terraform n’a pas pu démarrer."
+}

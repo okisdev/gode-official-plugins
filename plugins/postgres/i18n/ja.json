@@ -1,0 +1,7 @@
+{
+  "name": "SQL（PostgreSQL）",
+  "description": "PostgreSQLのSQLファイルの構文を検査し、書式を整えます。",
+  "about": "Godeのエディタでは、データベースに接続せずにPostgreSQLの構文検査とSQLファイルの書式設定ができます。プロジェクトでSQLファイルを開くと起動し、開いているSQLファイルがなくなると停止します。スキーマに基づく補完、ホバー情報、データベースの検査を使うには、プロジェクトのpostgres-language-server.jsoncでPostgreSQLへの接続を設定してください。このサーバはPostgreSQLの方言に対応しています。",
+  "ready": "PostgreSQLのSQLを支援できます。",
+  "failed": "PostgreSQLのSQL言語サーバを起動できませんでした。"
+}

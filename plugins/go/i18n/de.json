@@ -1,0 +1,8 @@
+{
+  "name": "Go",
+  "description": "Codeunterstützung für Go-Projekte mit der Go-Toolchain.",
+  "about": "Im Editor von Gode kannst du für Go-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Go-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Go muss in deinem PATH verfügbar sein. Beim ersten Gebrauch wird eine festgelegte gopls-Version installiert.",
+  "ready": "Bereit für Go.",
+  "failed": "Der Go-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere Go und stelle sicher, dass go in deinem PATH verfügbar ist."
+}

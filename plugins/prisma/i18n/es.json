@@ -1,0 +1,7 @@
+{
+  "name": "Prisma",
+  "description": "Asistencia de código para archivos de esquema Prisma.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos de esquema Prisma. El servidor se inicia al abrir un archivo de esquema Prisma en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+  "ready": "Listo para trabajar con Prisma.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Prisma."
+}

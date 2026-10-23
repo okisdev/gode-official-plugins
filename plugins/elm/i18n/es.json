@@ -1,0 +1,7 @@
+{
+  "name": "Elm",
+  "description": "Asistencia de código para proyectos Elm.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos Elm. El servidor se inicia al abrir un archivo Elm en un proyecto y se detiene cuando ya no queda ninguno abierto. Incluye el servidor de lenguaje Elm y usa elm, elm-format y elm-test cuando están instalados en tu PATH.",
+  "ready": "Listo para trabajar con Elm.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Elm."
+}

@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/latex-lsp/texlab/releases/download/v5.26.0/texlab-aarch64-macos.tar.gz",
+      "file": "texlab-darwin-arm64-5.26.0.tar.gz",
+      "sha256": "af7972ffd230711ba04ada9b69cc32ce9111d9196ba69538062872faefdbee56"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/latex-lsp/texlab/releases/download/v5.26.0/texlab-x86_64-macos.tar.gz",
+      "file": "texlab-darwin-x64-5.26.0.tar.gz",
+      "sha256": "6091611f756b28e1a57612b130c196df4b0bb6e22dde5cf5d890578513397daf"
+    },
+    "linux-x64": {
+      "url": "https://github.com/latex-lsp/texlab/releases/download/v5.26.0/texlab-x86_64-linux.tar.gz",
+      "file": "texlab-linux-x64-5.26.0.tar.gz",
+      "sha256": "8697bd5e479d4584b14b7eed5c320c80ec4e1d91ebefbb6801e6bf38e9971300"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/latex-lsp/texlab/releases/download/v5.26.0/texlab-aarch64-linux.tar.gz",
+      "file": "texlab-linux-arm64-5.26.0.tar.gz",
+      "sha256": "a85cdfcd22454b8d8550f4b0f0620c45ab51760f302fac7a12bc18a890f70f8c"
+    }
+  }
+}

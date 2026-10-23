@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "Codeunterstützung für CUE-Dateien mit dem CUE-Sprachserver.",
+  "about": "Im Editor von Gode unterstützt der CUE-Sprachserver die Arbeit mit CUE-Dateien. Er startet, wenn du eine CUE-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Der Server wird über das enthaltene CUE-Programm ausgeführt.",
+  "ready": "Bereit für CUE.",
+  "failed": "Der CUE-Sprachserver konnte nicht gestartet werden."
+}

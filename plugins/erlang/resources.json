@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-macos-aarch64-apple-darwin-otp-29.1.tar.gz",
+      "file": "elp-darwin-arm64-2026-10-14-otp-29.1.tar.gz",
+      "sha256": "3311edc6b4c1d6ed7cb6a8a4e37e3d8d19ffe879d006162d33753d2c72fdcdd4"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-macos-x86_64-apple-darwin-otp-29.1.tar.gz",
+      "file": "elp-darwin-x64-2026-10-14-otp-29.1.tar.gz",
+      "sha256": "2eb4b2a7a17ff96f71ff456175db7c0cc265a1cee1e616ddbfb0c02771b51ed0"
+    },
+    "linux-x64": {
+      "url": "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-x86_64-unknown-linux-gnu-otp-29.1.tar.gz",
+      "file": "elp-linux-x64-2026-10-14-otp-29.1.tar.gz",
+      "sha256": "3251f2d3550adf28f33529686103fabb1fbf0b0e7deb5cd06b93dab06b8647ea"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/WhatsApp/erlang-language-platform/releases/download/2026-10-14/elp-linux-aarch64-unknown-linux-gnu-otp-29.1.tar.gz",
+      "file": "elp-linux-arm64-2026-10-14-otp-29.1.tar.gz",
+      "sha256": "c15b7760222d9fed417b996790cd14aaf949fbe3ef113240bddc2fa7e73aec21"
+    }
+  }
+}

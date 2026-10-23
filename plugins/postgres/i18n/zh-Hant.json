@@ -1,0 +1,7 @@
+{
+  "name": "SQL (PostgreSQL)",
+  "description": "檢查 PostgreSQL SQL 檔案的語法並設定格式。",
+  "about": "在 Gode 的編輯器中，無須連接資料庫即可檢查 PostgreSQL 語法並設定 SQL 檔案的格式。語言伺服器會在專案中開啟 SQL 檔案時啟動，並在沒有 SQL 檔案開啟時停止。如需依據資料庫結構的補全、游標懸停資訊和資料庫檢查，請在專案的 postgres-language-server.jsonc 檔案中設定 PostgreSQL 連線。此伺服器支援 PostgreSQL 方言。",
+  "ready": "已準備好輔助編寫 PostgreSQL SQL。",
+  "failed": "無法啟動 PostgreSQL SQL 語言伺服器。"
+}

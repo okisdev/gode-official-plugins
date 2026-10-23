@@ -1,0 +1,7 @@
+{
+  "name": "C, C++ and Objective-C",
+  "description": "Code intelligence for C, C++, Objective-C and Objective-C++.",
+  "about": "Complete code, see diagnostics and navigate symbols in C, C++, Objective-C and Objective-C++ files. clangd reads compile_commands.json from the project for accurate compile flags and include paths.",
+  "ready": "Ready to assist with C, C++ and Objective-C.",
+  "failed": "The clangd language server could not start."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Just",
+  "description": "Codeunterstützung für Justfiles.",
+  "about": "Im Editor von Gode kannst du Code in Justfiles vervollständigen, Diagnosen sehen, Informationen beim Überfahren abrufen, navigieren und Bezeichner umbenennen. Der Sprachserver startet, sobald du ein Justfile in einem Projekt öffnest, und stoppt, wenn keines mehr offen ist.",
+  "ready": "Bereit für Just.",
+  "failed": "Der Just-Sprachserver konnte nicht gestartet werden."
+}

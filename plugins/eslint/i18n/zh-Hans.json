@@ -1,0 +1,7 @@
+{
+  "name": "ESLint",
+  "description": "使用项目自身的 ESLint，为 JavaScript、TypeScript、Vue、Svelte 和 Astro 提供代码检查。",
+  "about": "在 Gode 的编辑器中，ESLint 会在你编辑受支持文件时补充检查诊断、快速修复和相关代码操作。它与各语言的主语言服务器并行运行，在项目中打开此类文件时启动，并在没有此类文件打开时停止。它使用项目自己的 ESLint 包和配置。",
+  "ready": "已准备好使用 ESLint 进行检查。",
+  "failed": "无法启动 ESLint 语言服务器。"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "Assistance au code pour les fichiers CUE avec le serveur de langage CUE.",
+  "about": "Dans l’éditeur de Gode, le serveur de langage CUE prend en charge les fichiers CUE. Il démarre quand vous ouvrez un fichier CUE dans un projet et s’arrête quand aucun n’est ouvert. Le serveur utilise le programme CUE inclus.",
+  "ready": "Prêt à vous aider avec CUE.",
+  "failed": "Le serveur de langage CUE n’a pas pu démarrer."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "HTML",
+  "description": "Code intelligence for HTML files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in HTML files. The language server starts when an HTML file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with HTML.",
+  "failed": "The HTML language server could not start."
+}

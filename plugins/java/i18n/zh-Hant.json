@@ -1,0 +1,8 @@
+{
+  "name": "Java",
+  "description": "透過 Eclipse JDT Language Server 為 Java 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Java 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Java 檔案時啟動，並在沒有 Java 檔案開啟時停止。需要 Java 21 或更新版本。",
+  "ready": "已準備好輔助編寫 Java 程式碼。",
+  "failed": "無法啟動 Java 語言伺服器。",
+  "missing": "請安裝 Java 21 或更新版本，並設定 JAVA_HOME 或將 java 加入 PATH。"
+}

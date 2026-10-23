@@ -1,0 +1,8 @@
+{
+  "name": "Scala",
+  "description": "Asistencia de código para proyectos Scala con Metals y Java 17 o una versión posterior.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos Scala. Metals se inicia al abrir un archivo Scala en un proyecto y se detiene cuando ya no queda ninguno abierto. Usa Java 17 o una versión posterior de tu computadora.",
+  "ready": "Listo para trabajar con Scala.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Scala.",
+  "missing": "Instala Java 17 o una versión posterior para usar el servidor de lenguaje de Scala."
+}

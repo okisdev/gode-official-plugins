@@ -1,0 +1,7 @@
+{
+  "name": "SQL (PostgreSQL)",
+  "description": "Syntaxprüfung und Formatierung für PostgreSQL-SQL-Dateien.",
+  "about": "Im Editor von Gode kannst du PostgreSQL-Syntax prüfen und SQL-Dateien ohne Datenbankverbindung formatieren. Der Sprachserver startet, sobald du eine SQL-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Für Vervollständigungen anhand des Datenbankschemas, Informationen beim Überfahren und Datenbankprüfungen richte eine PostgreSQL-Verbindung in der Datei postgres-language-server.jsonc des Projekts ein. Dieser Server unterstützt den PostgreSQL-Dialekt.",
+  "ready": "Bereit für PostgreSQL-SQL.",
+  "failed": "Der PostgreSQL-SQL-Sprachserver konnte nicht gestartet werden."
+}

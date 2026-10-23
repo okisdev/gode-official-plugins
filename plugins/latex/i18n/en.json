@@ -1,0 +1,7 @@
+{
+  "name": "LaTeX",
+  "description": "Code intelligence for LaTeX documents using your TeX distribution for builds.",
+  "about": "In Gode’s editor, you can complete commands, see errors and warnings, inspect hover information, go to definitions, find references and rename symbols in LaTeX files. The language server starts when a LaTeX file opens in a project and stops when none are open. Building documents uses your installed TeX distribution.",
+  "ready": "Ready to assist with LaTeX.",
+  "failed": "The LaTeX language server could not start."
+}

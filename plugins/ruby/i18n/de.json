@@ -1,0 +1,9 @@
+{
+  "name": "Ruby",
+  "description": "Codeunterstützung für Ruby-Projekte mit deren eigenem Ruby und Gems.",
+  "about": "Im Editor von Gode kannst du für Ruby-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Ruby-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er verwendet Ruby und die Gems des Projekts. Gode installiert ruby-lsp separat und lässt deine Gems unverändert.",
+  "ready": "Bereit für Ruby.",
+  "failed": "Der Ruby-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere Ruby und RubyGems, um den Ruby-Sprachserver zu verwenden.",
+  "tooOld": "Der Ruby-Sprachserver braucht Ruby 3.0 oder neuer. Installiere eine neuere Ruby-Version und lege sie in deinen PATH."
+}

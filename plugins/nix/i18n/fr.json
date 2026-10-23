@@ -1,0 +1,8 @@
+{
+  "name": "Nix",
+  "description": "Assistance au code pour les fichiers Nix avec nixd de votre installation Nix.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements, consulter les informations au survol, accéder aux définitions et renommer des symboles dans les fichiers Nix. Installez nixd avec Nix et rendez-le accessible dans PATH. Ce plug-in utilise la version de nixd installée sur votre ordinateur. Le serveur démarre quand vous ouvrez un fichier Nix dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Nix.",
+  "failed": "Le serveur de langage Nix n’a pas pu démarrer.",
+  "missing": "Installez nixd avec Nix et rendez-le accessible dans PATH."
+}

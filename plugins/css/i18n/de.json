@@ -1,0 +1,7 @@
+{
+  "name": "CSS",
+  "description": "Codeunterstützung für CSS-, SCSS- und Less-Dateien.",
+  "about": "Im Editor von Gode kannst du für CSS-, SCSS- und Less-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine solche Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für CSS.",
+  "failed": "Der CSS-Sprachserver konnte nicht gestartet werden."
+}

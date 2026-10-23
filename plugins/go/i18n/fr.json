@@ -1,0 +1,8 @@
+{
+  "name": "Go",
+  "description": "Assistance au code pour les projets Go avec la chaîne d’outils Go.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Go. Le serveur démarre quand vous ouvrez un fichier Go dans un projet et s’arrête quand aucun n’est ouvert. Go doit être disponible dans votre PATH. Une version fixe de gopls est installée à la première utilisation.",
+  "ready": "Prêt à vous aider avec Go.",
+  "failed": "Le serveur de langage Go n’a pas pu démarrer.",
+  "missing": "Installez Go et vérifiez que go est disponible dans votre PATH."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "Assistance au code pour les fichiers Swift avec SourceKit-LSP de votre chaîne d’outils Swift.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements, consulter les informations au survol, accéder aux définitions et renommer des symboles dans les fichiers Swift. Sur macOS, installez Xcode ou les outils de ligne de commande. Sur Linux, installez une chaîne d’outils Swift avec sourcekit-lsp dans PATH. Ce plug-in utilise SourceKit-LSP de votre installation. Le serveur démarre quand vous ouvrez un fichier Swift dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Swift.",
+  "failed": "Le serveur de langage Swift n’a pas pu démarrer.",
+  "missing": "Installez Xcode ou les outils de ligne de commande sur macOS, ou une chaîne d’outils Swift avec sourcekit-lsp dans PATH sur Linux."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "설치된 PowerShell을 사용하여 스크립트 코드 작성을 지원합니다.",
+  "about": "Gode 편집기에서 PowerShell 코드 자동 완성, 진단 확인, 마우스를 올렸을 때 정보 확인, 정의로 이동, 이름 변경을 사용할 수 있습니다. PowerShell 파일을 열면 PowerShell Editor Services가 시작되고 설치된 PowerShell을 사용합니다.",
+  "ready": "PowerShell 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "PowerShell 언어 서버를 시작할 수 없습니다.",
+  "missing": "PowerShell 언어 서버를 사용하려면 PowerShell을 설치하고 PATH에서 pwsh를 실행할 수 있게 하세요."
+}

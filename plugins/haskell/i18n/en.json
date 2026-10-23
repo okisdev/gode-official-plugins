@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "Code intelligence for Haskell projects using the language server installed with GHCup.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings, inspect hover information, go to definitions, find references and rename symbols in Haskell files. Install haskell-language-server with GHCup and make haskell-language-server-wrapper available on PATH. This plugin uses the Haskell language server and GHC installed for your project. The server starts when you open a Haskell file in a project and stops when none are open.",
+  "ready": "Ready to assist with Haskell.",
+  "failed": "The Haskell language server could not start.",
+  "missing": "Install haskell-language-server with GHCup and make haskell-language-server-wrapper available on PATH."
+}

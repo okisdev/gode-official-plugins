@@ -1,0 +1,7 @@
+{
+  "name": "GraphQL",
+  "description": "Codeunterstützung für GraphQL-Schema- und Abfragedateien.",
+  "about": "Im Editor von Gode kannst du für GraphQL-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen und zu Definitionen springen. Der Sprachserver startet, sobald du eine GraphQL-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Für die Codeunterstützung braucht das Projekt eine GraphQL-Konfiguration, zum Beispiel .graphqlrc.",
+  "ready": "Bereit für GraphQL.",
+  "failed": "Der GraphQL-Sprachserver konnte nicht gestartet werden."
+}

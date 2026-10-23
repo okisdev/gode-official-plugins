@@ -1,0 +1,7 @@
+{
+  "name": "Rego",
+  "description": "Assistance au code pour les politiques Rego avec Regal.",
+  "about": "Dans l’éditeur de Gode, Regal propose la complétion du code, des informations au survol, l’accès aux définitions et des diagnostics pour les fichiers Rego. Le serveur démarre quand vous ouvrez un fichier Rego dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Rego.",
+  "failed": "Le serveur de langage Rego n’a pas pu démarrer."
+}

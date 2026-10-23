@@ -1,0 +1,7 @@
+{
+  "name": "Solidity",
+  "description": "Asistencia de código para contratos inteligentes en Solidity.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos Solidity. El servidor se inicia al abrir un archivo Solidity en un proyecto y se detiene cuando ya no queda ninguno abierto. Incluye el servidor de lenguaje Solidity de Nomic Foundation.",
+  "ready": "Listo para trabajar con Solidity.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Solidity."
+}

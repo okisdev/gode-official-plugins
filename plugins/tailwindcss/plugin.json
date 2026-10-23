@@ -1,0 +1,35 @@
+{
+  "id": "tailwindcss",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": [
+    "html",
+    "css",
+    "scss",
+    "less",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "svelte",
+    "astro"
+  ],
+  "about": "about",
+  "includes": [
+    {
+      "name": "@tailwindcss/language-server",
+      "version": "0.14.29",
+      "license": "MIT",
+      "url": "https://github.com/tailwindlabs/tailwindcss-intellisense"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

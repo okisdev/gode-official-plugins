@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "Codeunterstützung für Haskell-Projekte mit dem über GHCup installierten Sprachserver.",
+  "about": "Im Editor von Gode kannst du für Haskell-Dateien Code vervollständigen, Fehler und Warnungen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Installiere haskell-language-server mit GHCup und stelle sicher, dass haskell-language-server-wrapper über PATH erreichbar ist. Dieses Plug-in verwendet den Sprachserver und die GHC-Version deines Projekts. Der Server startet, wenn du eine Haskell-Datei im Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Haskell.",
+  "failed": "Der Haskell-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere haskell-language-server mit GHCup und stelle sicher, dass haskell-language-server-wrapper über PATH erreichbar ist."
+}

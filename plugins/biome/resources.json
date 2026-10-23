@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/biomejs/biome/releases/download/%40biomejs/biome%402.6.2/biome-darwin-arm64",
+      "file": "biome-darwin-arm64-2.6.2",
+      "sha256": "be66b76dcb930b1e365bd36c4f5d8557c2dda70b31567f8bd15509e487753a69"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/biomejs/biome/releases/download/%40biomejs/biome%402.6.2/biome-darwin-x64",
+      "file": "biome-darwin-x64-2.6.2",
+      "sha256": "9bba9be8c50bf2a58bc6de8023b599e57613588800bd843273e9ccaa4deba52c"
+    },
+    "linux-x64": {
+      "url": "https://github.com/biomejs/biome/releases/download/%40biomejs/biome%402.6.2/biome-linux-x64",
+      "file": "biome-linux-x64-2.6.2",
+      "sha256": "43c08f3454d375d38c6441939acc8a557702bc8459272dd513f4f7474a4ed352"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/biomejs/biome/releases/download/%40biomejs/biome%402.6.2/biome-linux-arm64",
+      "file": "biome-linux-arm64-2.6.2",
+      "sha256": "08536c586089e603dae610f73adc3ab95c0a0fdb00c029662c09456c42ea3ac8"
+    }
+  }
+}

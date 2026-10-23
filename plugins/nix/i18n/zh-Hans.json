@@ -1,0 +1,8 @@
+{
+  "name": "Nix",
+  "description": "使用通过 Nix 安装的 nixd，为 Nix 文件提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Nix 文件时可以补全代码、查看错误和警告、查看悬停信息、跳转到定义和重命名。请通过 Nix 安装 nixd，并确保可从 PATH 运行。此插件使用你安装的 nixd 版本。在项目中打开 Nix 文件时，语言服务器会启动；没有 Nix 文件打开时会停止。",
+  "ready": "已准备好辅助编写 Nix 代码。",
+  "failed": "无法启动 Nix 语言服务器。",
+  "missing": "请通过 Nix 安装 nixd，并确保可从 PATH 运行。"
+}

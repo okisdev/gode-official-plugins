@@ -1,0 +1,7 @@
+{
+  "name": "Tailwind CSS",
+  "description": "Nomes de classes, ordenação e ajuda relacionada ao Tailwind CSS em arquivos HTML, CSS e de frameworks.",
+  "about": "No editor do Gode, o servidor de linguagem do Tailwind CSS adiciona conclusão de classes, informações ao passar o mouse, diagnósticos e ajuda relacionada enquanto você edita arquivos compatíveis. Ele roda junto com o servidor principal de cada linguagem, inicia quando um desses arquivos é aberto em um projeto e para quando nenhum permanece aberto.",
+  "ready": "Pronto para ajudar com Tailwind CSS.",
+  "failed": "O servidor de linguagem do Tailwind CSS não pôde ser iniciado."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ESLint",
+  "description": "프로젝트의 ESLint로 JavaScript, TypeScript, Vue, Svelte, Astro 파일을 린트합니다.",
+  "about": "Gode 편집기에서 ESLint는 지원되는 파일을 편집할 때 린트 진단, 빠른 수정, 관련 코드 작업을 추가합니다. 각 언어의 기본 언어 서버와 함께 실행되며, 프로젝트에서 해당 파일을 열면 시작하고 열린 파일이 없으면 중지합니다. 프로젝트의 ESLint 패키지와 구성을 사용합니다.",
+  "ready": "ESLint로 린트할 준비가 되었습니다.",
+  "failed": "ESLint 언어 서버를 시작할 수 없습니다."
+}

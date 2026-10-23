@@ -1,0 +1,7 @@
+{
+  "name": "Oxc",
+  "description": "Diagnostics et corrections de lint pour les projets web avec Oxc.",
+  "about": "Oxc ajoute des diagnostics et des corrections de lint aux côtés du serveur de votre langage dans l’éditeur de Gode. Il utilise le fichier .oxlintrc.json du projet et démarre à l’ouverture d’un fichier pris en charge.",
+  "ready": "Prêt à vérifier le code avec Oxc.",
+  "failed": "Le serveur de langage Oxc n’a pas pu démarrer."
+}

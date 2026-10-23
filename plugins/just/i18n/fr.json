@@ -1,0 +1,7 @@
+{
+  "name": "Just",
+  "description": "Assistance au code pour les fichiers justfile.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les diagnostics, consulter les informations au survol, parcourir les fichiers justfile et y renommer des symboles. Le serveur démarre quand vous ouvrez un justfile dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Just.",
+  "failed": "Le serveur de langage Just n’a pas pu démarrer."
+}

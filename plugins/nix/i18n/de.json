@@ -1,0 +1,8 @@
+{
+  "name": "Nix",
+  "description": "Codeunterstützung für Nix-Dateien mit nixd aus deiner Nix-Installation.",
+  "about": "Im Editor von Gode kannst du Nix-Code vervollständigen, Fehler und Warnungen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen und Bezeichner umbenennen. Installiere nixd mit Nix und stelle sicher, dass es über PATH erreichbar ist. Dieses Plug-in verwendet deine installierte nixd-Version. Der Sprachserver startet beim Öffnen einer Nix-Datei in einem Projekt und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Nix.",
+  "failed": "Der Nix-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere nixd mit Nix und stelle sicher, dass es über PATH erreichbar ist."
+}

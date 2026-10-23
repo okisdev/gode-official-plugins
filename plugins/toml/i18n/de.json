@@ -1,0 +1,7 @@
+{
+  "name": "TOML",
+  "description": "Codeunterstützung für TOML-Dateien.",
+  "about": "Im Editor von Gode kannst du TOML-Schlüssel und Werte vervollständigen, Fehler während der Eingabe sehen und bei eingerichtetem Schema dessen Informationen abrufen. Der Sprachserver startet, sobald du eine TOML-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für TOML.",
+  "failed": "Der TOML-Sprachserver konnte nicht gestartet werden."
+}

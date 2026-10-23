@@ -1,0 +1,7 @@
+{
+  "name": "Just",
+  "description": "为 justfile 提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 justfile 时可使用代码补全、查看诊断信息和悬停信息、导航及重命名。语言服务器会在项目中打开 justfile 时启动，并在没有 justfile 打开时停止。",
+  "ready": "已准备好辅助编写 Just 代码。",
+  "failed": "无法启动 Just 语言服务器。"
+}

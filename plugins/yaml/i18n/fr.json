@@ -1,0 +1,7 @@
+{
+  "name": "YAML",
+  "description": "Assistance au code pour les fichiers YAML.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le YAML, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol et valider les fichiers YAML avec des schémas. Le serveur démarre quand vous ouvrez un fichier YAML dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec YAML.",
+  "failed": "Le serveur de langage YAML n’a pas pu démarrer."
+}

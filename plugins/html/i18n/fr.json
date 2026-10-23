@@ -1,0 +1,7 @@
+{
+  "name": "HTML",
+  "description": "Assistance au code pour les fichiers HTML.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers HTML. Le serveur démarre quand vous ouvrez un fichier HTML dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec le HTML.",
+  "failed": "Le serveur de langage HTML n’a pas pu démarrer."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Markdown",
+  "description": "Assistência para escrever arquivos Markdown.",
+  "about": "No editor do Gode, você pode navegar pelos títulos, completar links, buscar referências e renomear símbolos em arquivos Markdown. O servidor inicia quando você abre um arquivo Markdown em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com Markdown.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Markdown."
+}

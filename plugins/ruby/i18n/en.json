@@ -1,0 +1,9 @@
+{
+  "name": "Ruby",
+  "description": "Code intelligence for Ruby projects using their own Ruby and gems.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Ruby files. The language server starts when a Ruby file opens in a project and stops when none are open. It uses the project’s Ruby and gems. Gode installs ruby-lsp separately, leaving your gems untouched.",
+  "ready": "Ready to assist with Ruby.",
+  "failed": "The Ruby language server could not start.",
+  "missing": "Install Ruby and RubyGems to use the Ruby language server.",
+  "tooOld": "The Ruby language server needs Ruby 3.0 or newer. Install a newer Ruby and make it the one on your PATH."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "HTML",
+  "description": "Assistência para programar em arquivos HTML.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos HTML. O servidor inicia quando você abre um arquivo HTML em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com HTML.",
+  "failed": "Não foi possível iniciar o servidor de linguagem HTML."
+}

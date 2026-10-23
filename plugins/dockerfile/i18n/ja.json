@@ -1,0 +1,7 @@
+{
+  "name": "Dockerfile",
+  "description": "Dockerfileのコード作成を支援します。",
+  "about": "GodeのエディタでDockerfileの命令補完、入力中のエラーと警告、ホバー情報、定義への移動ができます。プロジェクトでDockerfileを開くと言語サーバーが起動し、開いているDockerfileがなくなると停止します。",
+  "ready": "Dockerfileのコードを支援できます。",
+  "failed": "Dockerfile言語サーバを起動できませんでした。"
+}

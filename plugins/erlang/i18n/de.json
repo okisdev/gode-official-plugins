@@ -1,0 +1,7 @@
+{
+  "name": "Erlang",
+  "description": "Codeunterstützung für Erlang-Projekte mit ELP.",
+  "about": "Gode verwendet Erlang Language Platform für Vervollständigung, Diagnose, Navigation und Umbenennung in Erlang-Dateien. Dieser ELP-Build ist für Erlang/OTP 29.1 bestimmt. Installiere Erlang/OTP 29.1 für dein Projekt.",
+  "ready": "Bereit für Erlang.",
+  "failed": "Der Erlang-Sprachserver konnte nicht gestartet werden."
+}

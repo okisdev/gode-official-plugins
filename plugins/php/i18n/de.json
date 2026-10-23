@@ -1,0 +1,8 @@
+{
+  "name": "PHP",
+  "description": "Codeunterstützung für PHP-Projekte mit deiner PHP-Installation.",
+  "about": "Im Editor von Gode kannst du für PHP-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine PHP-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er führt Phpactor mit PHP aus deinem PATH aus.",
+  "ready": "Bereit für PHP.",
+  "failed": "Der PHP-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere PHP und füge es deinem PATH hinzu, um den PHP-Sprachserver zu verwenden."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "SwiftツールチェーンのSourceKit-LSPを使い、Swiftファイルのコード作成を支援します。",
+  "about": "GodeのエディタでSwiftファイルのコード補完、エラーと警告の確認、ホバー情報の表示、定義への移動、名前の変更ができます。macOSではXcodeまたはコマンドラインツールをインストールしてください。Linuxではsourcekit-lspをPATHから実行できるSwiftツールチェーンをインストールしてください。このプラグインはツールチェーンのSourceKit-LSPを使用します。Swiftファイルを開くと起動し、開いているSwiftファイルがなくなると停止します。",
+  "ready": "Swiftのコードを支援できます。",
+  "failed": "Swift言語サーバを起動できませんでした。",
+  "missing": "macOSではXcodeまたはコマンドラインツールを、Linuxではsourcekit-lspをPATHから実行できるSwiftツールチェーンをインストールしてください。"
+}

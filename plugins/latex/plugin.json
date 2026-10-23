@@ -1,0 +1,23 @@
+{
+  "id": "latex",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["latex"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "texlab",
+      "version": "5.26.0",
+      "license": "GPL-3.0",
+      "url": "https://github.com/latex-lsp/texlab"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

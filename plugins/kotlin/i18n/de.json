@@ -1,0 +1,7 @@
+{
+  "name": "Kotlin",
+  "description": "Codeunterstützung für Kotlin-Projekte mit JetBrains kotlin-lsp.",
+  "about": "Im Editor von Gode kannst du für Kotlin-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Kotlin-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er bringt seine eigene Java-Laufzeitumgebung mit. Du musst Java nicht installieren, um den Server zu starten.",
+  "ready": "Bereit für Kotlin.",
+  "failed": "Der Kotlin-Sprachserver konnte nicht gestartet werden."
+}

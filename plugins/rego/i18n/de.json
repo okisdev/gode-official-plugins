@@ -1,0 +1,7 @@
+{
+  "name": "Rego",
+  "description": "Codeunterstützung für Rego-Richtlinien mit Regal.",
+  "about": "Im Editor von Gode bietet Regal für Rego-Dateien Codevervollständigung, Informationen beim Überfahren, Definitionen und Fehlermeldungen. Der Sprachserver startet, sobald du eine Rego-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Rego.",
+  "failed": "Der Rego-Sprachserver konnte nicht gestartet werden."
+}

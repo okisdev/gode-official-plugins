@@ -1,0 +1,8 @@
+{
+  "name": "F#",
+  "description": "Codeunterstützung für F#-Projekte mit deiner .NET-Installation.",
+  "about": "Im Editor von Gode kannst du F#-Code vervollständigen, Diagnosen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen und Bezeichner umbenennen. FsAutoComplete startet, wenn du eine F#-Datei öffnest, und verwendet deine installierte .NET-Laufzeit.",
+  "ready": "Bereit für F#.",
+  "failed": "Der F#-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere die .NET-Laufzeit und stelle sicher, dass dotnet über PATH erreichbar ist."
+}

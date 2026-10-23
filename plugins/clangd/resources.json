@@ -1,0 +1,19 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-mac-23.1.0.zip",
+      "file": "clangd-mac-23.1.0.zip",
+      "sha256": "1082e6638223b785ca2daf0939f13afcd0bb95c84ee9a4bbaff4745365159253"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-mac-23.1.0.zip",
+      "file": "clangd-mac-23.1.0.zip",
+      "sha256": "1082e6638223b785ca2daf0939f13afcd0bb95c84ee9a4bbaff4745365159253"
+    },
+    "linux-x64": {
+      "url": "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-linux-23.1.0.zip",
+      "file": "clangd-linux-23.1.0.zip",
+      "sha256": "e53b1a96196095faedb7642cf64964f7fb9ad4a0c1f00dd2c172a3d9dcbafdfd"
+    }
+  }
+}

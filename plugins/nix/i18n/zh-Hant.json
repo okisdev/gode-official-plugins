@@ -1,0 +1,8 @@
+{
+  "name": "Nix",
+  "description": "使用透過 Nix 安裝的 nixd，為 Nix 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Nix 檔案時可以補全程式碼、查看錯誤和警告、查看游標懸停資訊、前往定義和重新命名。請透過 Nix 安裝 nixd，並確保可從 PATH 執行。這個外掛程式使用你安裝的 nixd 版本。在專案中開啟 Nix 檔案時，語言伺服器會啟動；沒有 Nix 檔案開啟時會停止。",
+  "ready": "已準備好輔助編寫 Nix 程式碼。",
+  "failed": "無法啟動 Nix 語言伺服器。",
+  "missing": "請透過 Nix 安裝 nixd，並確保可從 PATH 執行。"
+}

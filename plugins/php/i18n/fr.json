@@ -1,0 +1,8 @@
+{
+  "name": "PHP",
+  "description": "Assistance au code pour les projets PHP avec votre installation de PHP.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers PHP. Le serveur démarre quand vous ouvrez un fichier PHP dans un projet et s’arrête quand aucun n’est ouvert. Il exécute Phpactor avec le PHP de votre PATH.",
+  "ready": "Prêt à vous aider avec PHP.",
+  "failed": "Le serveur de langage PHP n’a pas pu démarrer.",
+  "missing": "Installez PHP et ajoutez-le à votre PATH pour utiliser le serveur de langage PHP."
+}

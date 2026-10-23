@@ -1,0 +1,7 @@
+{
+  "name": "C, C++ и Objective-C",
+  "description": "Помощь при работе с кодом C, C++, Objective-C и Objective-C++.",
+  "about": "Дополняйте код, просматривайте сообщения об ошибках и переходите к символам в файлах C, C++, Objective-C и Objective-C++. clangd читает файл compile_commands.json проекта, чтобы определить параметры компиляции и пути к заголовочным файлам.",
+  "ready": "Готов помогать с C, C++ и Objective-C.",
+  "failed": "Не удалось запустить языковой сервер clangd."
+}

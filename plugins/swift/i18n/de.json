@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "Codeunterstützung für Swift-Dateien mit SourceKit-LSP aus deiner Swift-Toolchain.",
+  "about": "Im Editor von Gode kannst du Swift-Code vervollständigen, Fehler und Warnungen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen und Bezeichner umbenennen. Installiere unter macOS Xcode oder die Command Line Tools. Installiere unter Linux eine Swift-Toolchain mit sourcekit-lsp im PATH. Dieses Plug-in verwendet SourceKit-LSP aus deiner Toolchain. Der Server startet, wenn du eine Swift-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Swift.",
+  "failed": "Der Swift-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere unter macOS Xcode oder die Command Line Tools oder unter Linux eine Swift-Toolchain mit sourcekit-lsp im PATH."
+}

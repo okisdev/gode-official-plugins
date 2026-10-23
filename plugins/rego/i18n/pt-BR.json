@@ -1,0 +1,7 @@
+{
+  "name": "Rego",
+  "description": "Assistência para programar políticas Rego com o Regal.",
+  "about": "No editor do Gode, o Regal oferece preenchimento de código, informações ao passar o cursor, acesso às definições e diagnósticos para arquivos Rego. O servidor inicia quando você abre um arquivo Rego em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com Rego.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Rego."
+}

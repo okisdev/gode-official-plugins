@@ -1,0 +1,7 @@
+{
+  "name": "Prisma",
+  "description": "為 Prisma schema 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Prisma schema 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Prisma schema 檔案時啟動，並在沒有此類檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 Prisma schema。",
+  "failed": "無法啟動 Prisma 語言伺服器。"
+}

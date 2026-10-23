@@ -1,0 +1,8 @@
+{
+  "name": "gode-tailwindcss-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@tailwindcss/language-server": "0.14.29"
+  }
+}

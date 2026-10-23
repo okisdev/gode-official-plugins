@@ -1,0 +1,7 @@
+{
+  "name": "Solidity",
+  "description": "Codeunterstützung für Solidity-Smart-Contracts.",
+  "about": "Im Editor von Gode kannst du für Solidity-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Solidity-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er enthält den Solidity-Sprachserver der Nomic Foundation.",
+  "ready": "Bereit für Solidity.",
+  "failed": "Der Solidity-Sprachserver konnte nicht gestartet werden."
+}

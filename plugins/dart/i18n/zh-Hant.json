@@ -1,0 +1,8 @@
+{
+  "name": "Dart",
+  "description": "使用你的 Dart 或 Flutter SDK，為 Dart 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Dart 檔案時可使用程式碼補全、查看錯誤和警告、游標懸停資訊、前往定義和重新命名。請安裝 Dart 或 Flutter SDK，並確保可從 PATH 執行 dart。此插件使用 SDK 中的語言伺服器。伺服器會在專案中開啟 Dart 檔案時啟動，並在沒有 Dart 檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 Dart 程式碼。",
+  "failed": "無法啟動 Dart 語言伺服器。",
+  "missing": "請安裝 Dart 或 Flutter SDK，並確保可從 PATH 執行 dart。"
+}

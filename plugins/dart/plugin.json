@@ -1,0 +1,23 @@
+{
+  "id": "dart",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["dart"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "Dart language server",
+      "version": "toolchain",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/dart-lang/sdk"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

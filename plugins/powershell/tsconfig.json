@@ -1,0 +1,4 @@
+{
+  "extends": "@gode/plugin-sdk/tsconfig.json",
+  "include": ["page", "src", "test", "build.ts"]
+}

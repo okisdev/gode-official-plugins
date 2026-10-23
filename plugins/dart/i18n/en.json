@@ -1,0 +1,8 @@
+{
+  "name": "Dart",
+  "description": "Code intelligence for Dart files using your Dart or Flutter SDK.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings, inspect hover information, go to definitions and rename symbols in Dart files. Install the Dart or Flutter SDK and make dart available on PATH. This plugin uses the language server from your SDK. The server starts when you open a Dart file in a project and stops when none are open.",
+  "ready": "Ready to assist with Dart.",
+  "failed": "The Dart language server could not start.",
+  "missing": "Install the Dart or Flutter SDK and make dart available on PATH."
+}

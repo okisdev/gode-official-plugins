@@ -1,0 +1,8 @@
+{
+  "name": "C#",
+  "description": "Code intelligence for C# projects using the .NET SDK.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in C# files. The language server starts when a C# file opens in a project and stops when none are open. It requires the .NET 10 SDK or later.",
+  "ready": "Ready to assist with C#.",
+  "failed": "The C# language server could not start.",
+  "missing": "Install the .NET 10 SDK or later and add dotnet to your PATH to use C# code assistance."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "Code intelligence for Swift files using SourceKit-LSP from your Swift toolchain.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings, inspect hover information, go to definitions and rename symbols in Swift files. On macOS, install Xcode or Command Line Tools. On Linux, install a Swift toolchain with sourcekit-lsp on PATH. This plugin uses SourceKit-LSP from your toolchain. The server starts when you open a Swift file in a project and stops when none are open.",
+  "ready": "Ready to assist with Swift.",
+  "failed": "The Swift language server could not start.",
+  "missing": "Install Xcode or Command Line Tools on macOS, or a Swift toolchain with sourcekit-lsp on PATH on Linux."
+}

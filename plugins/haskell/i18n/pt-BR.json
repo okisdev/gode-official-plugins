@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "Assistência para programar em projetos Haskell com o servidor de linguagem instalado pelo GHCup.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos Haskell. Instale o haskell-language-server com o GHCup e disponibilize o haskell-language-server-wrapper no PATH. Este plugin usa o servidor de linguagem e a versão do GHC do seu projeto. O servidor inicia quando você abre um arquivo Haskell em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com Haskell.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Haskell.",
+  "missing": "Instale o haskell-language-server com o GHCup e disponibilize o haskell-language-server-wrapper no PATH."
+}

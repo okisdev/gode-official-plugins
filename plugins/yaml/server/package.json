@@ -1,0 +1,10 @@
+{
+  "name": "gode-yaml-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "jsonc-parser": "3.3.1",
+    "vscode-languageserver-protocol": "3.17.5",
+    "yaml-language-server": "1.23.0"
+  }
+}

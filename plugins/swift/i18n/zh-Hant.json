@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "使用 Swift 工具鏈中的 SourceKit-LSP，為 Swift 檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Swift 檔案時可使用程式碼補全、查看錯誤和警告、游標懸停資訊、前往定義和重新命名。在 macOS 上請安裝 Xcode 或命令列工具。在 Linux 上請安裝 Swift 工具鏈，並確保可從 PATH 執行 sourcekit-lsp。此插件使用工具鏈中的 SourceKit-LSP。伺服器會在專案中開啟 Swift 檔案時啟動，並在沒有 Swift 檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 Swift 程式碼。",
+  "failed": "無法啟動 Swift 語言伺服器。",
+  "missing": "請在 macOS 上安裝 Xcode 或命令列工具，或在 Linux 上安裝可從 PATH 執行 sourcekit-lsp 的 Swift 工具鏈。"
+}

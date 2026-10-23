@@ -1,0 +1,8 @@
+{
+  "name": "R",
+  "description": "Asistencia de código para proyectos R con tu propia instalación de R.",
+  "about": "En el editor de Gode puedes completar código, ver diagnósticos, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos R. El paquete languageserver se instala en los datos de Gode con tu instalación de R y se inicia al abrir un archivo R.",
+  "ready": "Listo para trabajar con R.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de R.",
+  "missing": "R y Rscript deben estar instalados y disponibles en PATH."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "PHP",
+  "description": "使用你安裝的 PHP，為 PHP 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 PHP 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 PHP 檔案時啟動，並在沒有 PHP 檔案開啟時停止。它使用 PATH 中的 PHP 執行 Phpactor。",
+  "ready": "已準備好輔助編寫 PHP 程式碼。",
+  "failed": "無法啟動 PHP 語言伺服器。",
+  "missing": "請安裝 PHP 並將其加入 PATH，以使用 PHP 語言伺服器。"
+}

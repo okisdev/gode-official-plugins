@@ -1,0 +1,7 @@
+{
+  "name": "Lua",
+  "description": "Asistencia de código para proyectos Lua.",
+  "about": "En el editor de Gode puedes completar código Lua, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres. El servidor se inicia al abrir un archivo Lua en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+  "ready": "Listo para trabajar con Lua.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Lua."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "TOML",
+  "description": "Code assistance for TOML files.",
+  "about": "In Gode’s editor, you can complete TOML keys and values, see errors as you type, and inspect schema information when a schema is configured. The language server starts when a TOML file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with TOML.",
+  "failed": "The TOML language server could not start."
+}

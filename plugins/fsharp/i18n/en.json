@@ -1,0 +1,8 @@
+{
+  "name": "F#",
+  "description": "Code intelligence for F# projects using your .NET installation.",
+  "about": "In Gode’s editor, complete code, see diagnostics, inspect hover information, navigate to definitions and rename symbols in F# files. FsAutoComplete starts when you open an F# file and uses your installed .NET runtime.",
+  "ready": "Ready to assist with F#.",
+  "failed": "The F# language server could not start.",
+  "missing": "Install the .NET runtime and make dotnet available on PATH to use the F# language server."
+}

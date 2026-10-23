@@ -1,0 +1,7 @@
+{
+  "name": "GraphQL",
+  "description": "Code intelligence for GraphQL schema and operation files.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information and go to definitions in GraphQL files. The language server starts when a GraphQL file opens in a project and stops when none are open. These features need a GraphQL configuration in the project, such as .graphqlrc.",
+  "ready": "Ready to assist with GraphQL.",
+  "failed": "The GraphQL language server could not start."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Erlang",
+  "description": "Code intelligence for Erlang projects with ELP.",
+  "about": "Gode uses Erlang Language Platform for completion, diagnostics, navigation and rename in Erlang files. This ELP build targets Erlang/OTP 29.1. Install Erlang/OTP 29.1 for your project.",
+  "ready": "Ready to assist with Erlang.",
+  "failed": "The Erlang language server could not start."
+}

@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/supabase-community/postgres-language-server/releases/download/0.28.2/postgres-language-server_aarch64-apple-darwin",
+      "file": "postgres-language-server-darwin-arm64-0.28.2",
+      "sha256": "e6d113284280977265e9d9000a47d9600d0fb58fe6d5d076726328678f5a66ec"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/supabase-community/postgres-language-server/releases/download/0.28.2/postgres-language-server_x86_64-apple-darwin",
+      "file": "postgres-language-server-darwin-x64-0.28.2",
+      "sha256": "8c709d766ea9c6715a150dbca7c9c0e07dc0b6e585ba329449b0a22839921eca"
+    },
+    "linux-x64": {
+      "url": "https://github.com/supabase-community/postgres-language-server/releases/download/0.28.2/postgres-language-server_x86_64-unknown-linux-gnu",
+      "file": "postgres-language-server-linux-x64-0.28.2",
+      "sha256": "82ff82e39be65824378afa5d02626a1b42e8d8e48f97cb4938e4d477c8a9be52"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/supabase-community/postgres-language-server/releases/download/0.28.2/postgres-language-server_aarch64-unknown-linux-gnu",
+      "file": "postgres-language-server-linux-arm64-0.28.2",
+      "sha256": "7be7de3660df047fd712f8fca4d6c42ecf1515daad952715eb02e29053ce256c"
+    }
+  }
+}

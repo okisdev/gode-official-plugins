@@ -1,0 +1,9 @@
+{
+  "name": "Ruby",
+  "description": "프로젝트의 Ruby와 gem을 사용하여 Ruby 코드 작성을 지원합니다.",
+  "about": "Ruby 파일을 편집할 때 Gode 에디터에서 코드 자동 완성, 입력 중 오류와 경고, 커서를 올렸을 때 정보, 정의로 이동, 참조 찾기와 이름 변경을 사용할 수 있습니다. 프로젝트에서 Ruby 파일을 열면 언어 서버가 시작되고, 열린 Ruby 파일이 없어지면 종료됩니다. 프로젝트의 Ruby와 gem을 사용합니다. Gode는 ruby-lsp를 별도로 설치하여 기존 gem을 변경하지 않습니다.",
+  "ready": "Ruby 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Ruby 언어 서버를 시작할 수 없습니다.",
+  "missing": "Ruby 언어 서버를 사용하려면 Ruby와 RubyGems를 설치하세요.",
+  "tooOld": "Ruby 언어 서버에는 Ruby 3.0 이상이 필요합니다. 최신 Ruby를 설치하고 PATH에서 사용되도록 설정하세요."
+}

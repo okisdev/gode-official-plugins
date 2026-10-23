@@ -1,0 +1,7 @@
+{
+  "name": "Terraform",
+  "description": "TerraformファイルとTerraform変数ファイルのコード作成を支援します。",
+  "about": "GodeのエディタでTerraformファイルのコード補完、入力中のエラーと警告、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。プロジェクトでTerraformファイルを開くとサーバが起動し、開いているファイルがなくなると停止します。検証には、PATHにあるTerraform CLIを使用します。CLIがなくてもコード補完とナビゲーションは利用できます。",
+  "ready": "Terraformのコードを支援できます。",
+  "failed": "Terraform言語サーバを起動できませんでした。"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Erlang",
+  "description": "ELPを使ってErlangプロジェクトのコード作成を支援します。",
+  "about": "GodeはErlangファイルの補完、診断、移動、名前変更にErlang Language Platformを使用します。このELPビルドはErlang/OTP 29.1向けです。プロジェクトにErlang/OTP 29.1をインストールしてください。",
+  "ready": "Erlangのコードを支援できます。",
+  "failed": "Erlang言語サーバを起動できませんでした。"
+}

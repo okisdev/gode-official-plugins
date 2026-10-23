@@ -1,0 +1,7 @@
+{
+  "name": "Just",
+  "description": "justfileのコード作成を支援します。",
+  "about": "Godeのエディタでjustfileのコード補完、診断の確認、ホバー情報の表示、移動、シンボル名の変更ができます。プロジェクトでjustfileを開くとサーバが起動し、開いているjustfileがなくなると停止します。",
+  "ready": "Justのコードを支援できます。",
+  "failed": "Just言語サーバを起動できませんでした。"
+}

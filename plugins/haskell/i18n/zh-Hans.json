@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "使用通过 GHCup 安装的语言服务器，为 Haskell 项目提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Haskell 文件时可以补全代码、查看错误和警告、查看悬停信息、跳转到定义、查找引用和重命名。请通过 GHCup 安装 haskell-language-server，并确保可从 PATH 运行 haskell-language-server-wrapper。此插件使用项目的语言服务器和 GHC 版本。在项目中打开 Haskell 文件时，服务器会启动；没有 Haskell 文件打开时会停止。",
+  "ready": "已准备好辅助编写 Haskell 代码。",
+  "failed": "无法启动 Haskell 语言服务器。",
+  "missing": "请通过 GHCup 安装 haskell-language-server，并确保可从 PATH 运行 haskell-language-server-wrapper。"
+}

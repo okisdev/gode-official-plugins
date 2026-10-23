@@ -1,0 +1,7 @@
+{
+  "name": "SQL(PostgreSQL)",
+  "description": "PostgreSQL SQL 파일의 구문을 검사하고 서식을 지정합니다.",
+  "about": "Gode 에디터에서 데이터베이스에 연결하지 않고도 PostgreSQL 구문을 검사하고 SQL 파일의 서식을 지정할 수 있습니다. 프로젝트에서 SQL 파일을 열면 언어 서버가 시작되고, 열린 SQL 파일이 없으면 종료됩니다. 스키마 기반 자동 완성, 커서를 올렸을 때 표시되는 정보와 데이터베이스 검사를 사용하려면 프로젝트의 postgres-language-server.jsonc 파일에서 PostgreSQL 연결을 설정하세요. 이 서버는 PostgreSQL 방언을 지원합니다.",
+  "ready": "PostgreSQL SQL 작성을 지원할 준비가 되었습니다.",
+  "failed": "PostgreSQL SQL 언어 서버를 시작할 수 없습니다."
+}

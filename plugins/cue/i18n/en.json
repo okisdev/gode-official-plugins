@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "Code assistance for CUE files with the CUE language server.",
+  "about": "In Gode’s editor, the CUE language server supports CUE files. It starts when you open a CUE file in a project and stops when none are open. The server runs through the included CUE executable.",
+  "ready": "Ready to assist with CUE.",
+  "failed": "The CUE language server could not start."
+}

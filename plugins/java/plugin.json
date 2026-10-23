@@ -1,0 +1,23 @@
+{
+  "id": "java",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["java"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "Eclipse JDT Language Server",
+      "version": "1.58.0",
+      "license": "EPL-2.0",
+      "url": "https://github.com/eclipse-jdtls/eclipse.jdt.ls"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

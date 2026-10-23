@@ -1,0 +1,7 @@
+{
+  "name": "Just",
+  "description": "Code intelligence for justfiles.",
+  "about": "In Gode’s editor, you can complete code, see diagnostics, inspect hover information, navigate and rename symbols in justfiles. The language server starts when a justfile opens in a project and stops when none are open.",
+  "ready": "Ready to assist with Just.",
+  "failed": "The Just language server could not start."
+}

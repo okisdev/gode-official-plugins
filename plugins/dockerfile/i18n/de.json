@@ -1,0 +1,7 @@
+{
+  "name": "Dockerfile",
+  "description": "Codeunterstützung für Dockerfiles.",
+  "about": "Im Editor von Gode kannst du in Dockerfiles Anweisungen vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen und zu Definitionen springen. Der Sprachserver startet, sobald du ein Dockerfile in einem Projekt öffnest, und stoppt, wenn keines mehr offen ist.",
+  "ready": "Bereit für Dockerfiles.",
+  "failed": "Der Dockerfile-Sprachserver konnte nicht gestartet werden."
+}

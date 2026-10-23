@@ -1,0 +1,7 @@
+{
+  "name": "Markdown",
+  "description": "为 Markdown 文件提供代码辅助。",
+  "about": "在 Gode 的编辑器中，你可以跳转到标题、补全链接、查找引用，以及重命名 Markdown 文件中的符号。语言服务器会在项目中打开 Markdown 文件时启动，并在没有 Markdown 文件打开时停止。",
+  "ready": "已准备好辅助编写 Markdown 文件。",
+  "failed": "无法启动 Markdown 语言服务器。"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Terraform",
+  "description": "Codeunterstützung für Terraform-Dateien und Terraform-Variablendateien.",
+  "about": "Im Editor von Gode kannst du für Terraform-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Terraform-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Für die Validierung verwendet er die Terraform-CLI aus deinem PATH, falls vorhanden. Vervollständigung und Navigation funktionieren auch ohne sie.",
+  "ready": "Bereit für Terraform.",
+  "failed": "Der Terraform-Sprachserver konnte nicht gestartet werden."
+}

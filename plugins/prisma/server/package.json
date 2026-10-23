@@ -1,0 +1,8 @@
+{
+  "name": "gode-prisma-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@prisma/language-server": "31.13.0"
+  }
+}

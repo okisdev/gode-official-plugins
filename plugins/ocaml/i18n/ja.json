@@ -1,0 +1,8 @@
+{
+  "name": "OCaml",
+  "description": "opamのスイッチにあるocamllspを使い、OCamlのコード作成を支援します。",
+  "about": "GodeのエディタでOCamlファイルのコード補完、エラーと警告の表示、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。opamのスイッチにocaml-lsp-serverをインストールし、PATHからocamllspを実行できるようにしてください。このプラグインは選択中のスイッチのサーバとコンパイラを使用します。プロジェクトでOCamlファイルを開くとサーバが起動し、開いているOCamlファイルがなくなると停止します。",
+  "ready": "OCamlのコードを支援できます。",
+  "failed": "OCaml言語サーバを起動できませんでした。",
+  "missing": "opamのスイッチにocaml-lsp-serverをインストールし、PATHからocamllspを実行できるようにしてください。"
+}

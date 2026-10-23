@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/open-policy-agent/regal/releases/download/v0.43.0/regal_Darwin_arm64",
+      "file": "regal-darwin-arm64-0.43.0",
+      "sha256": "23a6e4ef62f288c53e65d770e9325e6d8a9c35ca3f33f6ffb5943c1f381ef540"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/open-policy-agent/regal/releases/download/v0.43.0/regal_Darwin_x86_64",
+      "file": "regal-darwin-x64-0.43.0",
+      "sha256": "f33fc0ac70b6a5783b92c324123c314f7ff127bb970cf1e3dde807925cd821b7"
+    },
+    "linux-x64": {
+      "url": "https://github.com/open-policy-agent/regal/releases/download/v0.43.0/regal_Linux_x86_64",
+      "file": "regal-linux-x64-0.43.0",
+      "sha256": "5e7d030064e307d54e6ffa3d85b8d9052d3d40b7afa10262c86c886f8a76559d"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/open-policy-agent/regal/releases/download/v0.43.0/regal_Linux_arm64",
+      "file": "regal-linux-arm64-0.43.0",
+      "sha256": "d4fd44a191d5b12a5ab980f56d7eddfed0718129c43d1ede5e8dbc9d217fdcb8"
+    }
+  }
+}

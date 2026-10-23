@@ -1,0 +1,7 @@
+{
+  "name": "Shell",
+  "description": "Codeunterstützung für Shell-Skripte.",
+  "about": "Im Editor von Gode kannst du in Shell-Skripten Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du ein Shell-Skript in einem Projekt öffnest, und stoppt, wenn keines mehr offen ist. Ist ShellCheck in deinem PATH, nutzt der Server es für ausführlichere Diagnosen.",
+  "ready": "Bereit für Shell-Skripte.",
+  "failed": "Der Shell-Sprachserver konnte nicht gestartet werden."
+}

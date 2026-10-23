@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "Assistance au code pour les scripts PowerShell avec votre installation de PowerShell.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code PowerShell, voir les diagnostics, consulter les informations au survol, accéder aux définitions et renommer des symboles. PowerShell Editor Services démarre à l’ouverture d’un fichier PowerShell et utilise votre installation de PowerShell.",
+  "ready": "Prêt à vous aider avec PowerShell.",
+  "failed": "Le serveur de langage PowerShell n’a pas pu démarrer.",
+  "missing": "Installez PowerShell et rendez pwsh accessible dans PATH pour utiliser le serveur PowerShell."
+}

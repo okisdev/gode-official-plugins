@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/expert-lsp/expert/releases/download/v0.2.1/expert_darwin_arm64",
+      "file": "expert-darwin-arm64-v0.2.1",
+      "sha256": "234c0f620cef31ec49a10d0838f4a89eb21546fad13d12639ddd0257b629126a"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/expert-lsp/expert/releases/download/v0.2.1/expert_darwin_amd64",
+      "file": "expert-darwin-x64-v0.2.1",
+      "sha256": "8747d648e8c18ebb43fb00786396207710b7e14a7e31ecfb6320403e18075c3c"
+    },
+    "linux-x64": {
+      "url": "https://github.com/expert-lsp/expert/releases/download/v0.2.1/expert_linux_amd64",
+      "file": "expert-linux-x64-v0.2.1",
+      "sha256": "986327d2e0650cd0ae184dd081ec74ca04abafc1c0a256378572105867fd2c8c"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/expert-lsp/expert/releases/download/v0.2.1/expert_linux_arm64",
+      "file": "expert-linux-arm64-v0.2.1",
+      "sha256": "ff498338e065470fac1a2a1272c87a4a10e64f862d2af33a541a04dde73fb525"
+    }
+  }
+}

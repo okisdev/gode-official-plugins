@@ -1,0 +1,7 @@
+{
+  "name": "CSS",
+  "description": "Assistência para programar em arquivos CSS, SCSS e Less.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos CSS, SCSS e Less. O servidor inicia quando você abre um desses arquivos em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com CSS.",
+  "failed": "Não foi possível iniciar o servidor de linguagem CSS."
+}

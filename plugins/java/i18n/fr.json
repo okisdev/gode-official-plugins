@@ -1,0 +1,8 @@
+{
+  "name": "Java",
+  "description": "Assistance au code pour les projets Java avec Eclipse JDT Language Server.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Java. Le serveur démarre quand vous ouvrez un fichier Java dans un projet et s’arrête quand aucun n’est ouvert. Java 21 ou une version ultérieure est nécessaire.",
+  "ready": "Prêt à vous aider avec Java.",
+  "failed": "Le serveur de langage Java n’a pas pu démarrer.",
+  "missing": "Installez Java 21 ou une version ultérieure, puis définissez JAVA_HOME ou ajoutez java à PATH."
+}

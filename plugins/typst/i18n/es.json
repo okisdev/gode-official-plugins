@@ -1,0 +1,7 @@
+{
+  "name": "Typst",
+  "description": "Asistencia de código para documentos Typst con tinymist.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias mientras escribes, consultar información al pasar el cursor, ir a definiciones, buscar referencias y cambiar nombres en archivos Typst. El servidor se inicia al abrir un archivo Typst en un proyecto y se detiene cuando ya no queda ninguno abierto. Tinymist procesa documentos Typst sin instalar Typst por separado.",
+  "ready": "Listo para trabajar con Typst.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Typst."
+}

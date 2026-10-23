@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "Помощь с кодом сценариев PowerShell с использованием установленной среды PowerShell.",
+  "about": "В редакторе Gode для файлов PowerShell доступны автодополнение, диагностика, подсказки при наведении, переход к определениям и переименование. PowerShell Editor Services запускается при открытии файла PowerShell и использует установленную среду PowerShell.",
+  "ready": "Готов помогать с PowerShell.",
+  "failed": "Не удалось запустить языковой сервер PowerShell.",
+  "missing": "Установите PowerShell и добавьте pwsh в PATH, чтобы использовать сервер PowerShell."
+}

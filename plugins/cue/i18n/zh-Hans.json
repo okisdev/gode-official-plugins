@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "使用 CUE 语言服务器辅助编写 CUE 文件。",
+  "about": "在 Gode 的编辑器中，CUE 语言服务器为 CUE 文件提供支持。在项目中打开 CUE 文件时，它会启动；没有 CUE 文件打开时则会停止。服务器通过随附的 CUE 可执行文件运行。",
+  "ready": "已准备好辅助编写 CUE 代码。",
+  "failed": "无法启动 CUE 语言服务器。"
+}

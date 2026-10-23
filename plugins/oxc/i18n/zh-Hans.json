@@ -1,0 +1,7 @@
+{
+  "name": "Oxc",
+  "description": "使用 Oxc 为 Web 项目提供代码检查诊断和修复。",
+  "about": "在 Gode 的编辑器中，Oxc 与语言自身的服务器同时运行，提供代码检查诊断和修复。它使用项目的 .oxlintrc.json 配置，并在打开受支持的文件时启动。",
+  "ready": "已准备好使用 Oxc 检查代码。",
+  "failed": "无法启动 Oxc 语言服务器。"
+}

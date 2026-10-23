@@ -1,0 +1,7 @@
+{
+  "name": "CUE",
+  "description": "Assistência para programar em arquivos CUE com o servidor de linguagem CUE.",
+  "about": "No editor do Gode, o servidor de linguagem CUE oferece suporte a arquivos CUE. Ele inicia quando você abre um arquivo CUE em um projeto e para quando não há mais nenhum aberto. O servidor usa o executável do CUE incluído.",
+  "ready": "Pronto para ajudar com CUE.",
+  "failed": "Não foi possível iniciar o servidor de linguagem CUE."
+}

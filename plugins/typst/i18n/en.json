@@ -1,0 +1,7 @@
+{
+  "name": "Typst",
+  "description": "Code intelligence for Typst documents with tinymist.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Typst files. The language server starts when a Typst file opens in a project and stops when none are open. Tinymist handles Typst documents without a separate Typst installation.",
+  "ready": "Ready to assist with Typst.",
+  "failed": "The Typst language server could not start."
+}

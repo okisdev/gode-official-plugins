@@ -1,0 +1,7 @@
+{
+  "name": "Kotlin",
+  "description": "Assistance au code pour les projets Kotlin avec kotlin-lsp de JetBrains.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements pendant la saisie, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Kotlin. Le serveur démarre quand vous ouvrez un fichier Kotlin dans un projet et s’arrête quand aucun n’est ouvert. Il inclut son propre environnement d’exécution Java. Vous n’avez pas besoin d’installer Java pour démarrer le serveur.",
+  "ready": "Prêt à vous aider avec Kotlin.",
+  "failed": "Le serveur de langage Kotlin n’a pas pu démarrer."
+}

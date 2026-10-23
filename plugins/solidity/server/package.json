@@ -1,0 +1,8 @@
+{
+  "name": "gode-solidity-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "@nomicfoundation/solidity-language-server": "0.9.3"
+  }
+}

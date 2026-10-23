@@ -1,0 +1,23 @@
+{
+  "id": "starlark",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["starlark"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "starpls",
+      "version": "0.1.22",
+      "license": "MIT OR Apache-2.0",
+      "url": "https://github.com/withered-magic/starpls"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

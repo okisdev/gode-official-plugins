@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "GHCup으로 설치한 언어 서버를 사용하여 Haskell 코드 작성을 지원합니다.",
+  "about": "Gode 에디터에서 Haskell 파일의 코드 자동 완성, 오류와 경고 표시, 커서를 올렸을 때 정보, 정의로 이동, 참조 찾기와 이름 변경을 사용할 수 있습니다. GHCup으로 haskell-language-server를 설치하고 PATH에서 haskell-language-server-wrapper를 실행할 수 있도록 설정하십시오. 이 플러그인은 프로젝트의 언어 서버와 GHC를 사용합니다. 프로젝트에서 Haskell 파일을 열면 서버가 시작되고, 열린 파일이 없으면 종료됩니다.",
+  "ready": "Haskell 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Haskell 언어 서버를 시작할 수 없습니다.",
+  "missing": "GHCup으로 haskell-language-server를 설치하고 PATH에서 haskell-language-server-wrapper를 실행할 수 있도록 설정하십시오."
+}

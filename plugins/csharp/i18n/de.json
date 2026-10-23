@@ -1,0 +1,8 @@
+{
+  "name": "C#",
+  "description": "Codeunterstützung für C#-Projekte mit dem .NET SDK.",
+  "about": "Im Editor von Gode kannst du für C#-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine C#-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er benötigt das .NET 10 SDK oder neuer.",
+  "ready": "Bereit für C#.",
+  "failed": "Der C#-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere das .NET 10 SDK oder neuer und füge dotnet zum PATH hinzu, um Codeunterstützung für C# zu verwenden."
+}

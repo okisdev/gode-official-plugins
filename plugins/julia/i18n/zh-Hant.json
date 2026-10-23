@@ -1,0 +1,8 @@
+{
+  "name": "Julia",
+  "description": "使用你安裝的 Julia，為 Julia 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Julia 檔案時可使用程式碼補全、查看診斷、游標懸停資訊、前往定義、尋找參照和重新命名。LanguageServer.jl 會透過你安裝的 Julia 安裝到 Gode 的資料目錄，並在打開 Julia 檔案時啟動。",
+  "ready": "已準備好輔助編寫 Julia 程式碼。",
+  "failed": "無法啟動 Julia 語言伺服器。",
+  "missing": "尚未安裝 Julia，或在 PATH 中找不到 Julia。"
+}

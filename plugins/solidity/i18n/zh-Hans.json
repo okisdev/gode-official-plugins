@@ -1,0 +1,7 @@
+{
+  "name": "Solidity",
+  "description": "为 Solidity 智能合约提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Solidity 文件时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。语言服务器会在项目中打开 Solidity 文件时启动，并在没有 Solidity 文件打开时停止。它内置 Nomic Foundation 的 Solidity 语言服务器。",
+  "ready": "已准备好辅助编写 Solidity 代码。",
+  "failed": "无法启动 Solidity 语言服务器。"
+}

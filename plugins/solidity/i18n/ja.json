@@ -1,0 +1,7 @@
+{
+  "name": "Solidity",
+  "description": "Solidityスマートコントラクト向けのコード支援。",
+  "about": "GodeのエディタでSolidityファイルのコード補完、入力中のエラーと警告、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。Solidityファイルをプロジェクトで開くと起動し、開いているSolidityファイルがなくなると停止します。Nomic FoundationのSolidity言語サーバを同梱しています。",
+  "ready": "Solidityのコードを支援できます。",
+  "failed": "Solidity言語サーバを起動できませんでした。"
+}

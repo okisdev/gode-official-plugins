@@ -1,0 +1,23 @@
+{
+  "id": "php",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["php"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "Phpactor",
+      "version": "2026.10.07.0",
+      "license": "MIT",
+      "url": "https://github.com/phpactor/phpactor"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

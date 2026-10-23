@@ -1,0 +1,9 @@
+{
+  "name": "Ruby",
+  "description": "Assistência para programar em projetos Ruby com o próprio Ruby e suas gems.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos Ruby. O servidor inicia quando você abre um arquivo Ruby em um projeto e para quando não há mais nenhum aberto. Ele usa o Ruby e as gems do projeto. O Gode instala ruby-lsp separadamente, sem alterar suas gems.",
+  "ready": "Pronto para ajudar com Ruby.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Ruby.",
+  "missing": "Instale Ruby e RubyGems para usar o servidor de linguagem Ruby.",
+  "tooOld": "O servidor de linguagem Ruby precisa do Ruby 3.0 ou mais recente. Instale um Ruby mais novo e deixe-o no seu PATH."
+}

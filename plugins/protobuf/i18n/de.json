@@ -1,0 +1,7 @@
+{
+  "name": "Protocol Buffers",
+  "description": "Codeunterstützung für Protocol-Buffers-Dateien mit Buf.",
+  "about": "Im Editor von Gode unterstützt Buf die Arbeit mit Protocol-Buffers-Dateien. Der Sprachserver startet, wenn du eine .proto-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Das Buf-Programm ist in diesem Plug-in enthalten.",
+  "ready": "Bereit für Protocol Buffers.",
+  "failed": "Der Protocol-Buffers-Sprachserver konnte nicht gestartet werden."
+}

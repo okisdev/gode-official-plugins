@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "インストール済みのPowerShellを使ってスクリプトのコード作成を支援します。",
+  "about": "GodeのエディタでPowerShellのコード補完、診断の確認、ホバー情報の表示、定義への移動、名前の変更ができます。PowerShellファイルを開くとPowerShell Editor Servicesが起動し、インストール済みのPowerShellを使用します。",
+  "ready": "PowerShellのコードを支援できます。",
+  "failed": "PowerShell言語サーバを起動できませんでした。",
+  "missing": "PowerShell言語サーバを使うには、PowerShellをインストールし、pwshをPATHから実行できるようにしてください。"
+}

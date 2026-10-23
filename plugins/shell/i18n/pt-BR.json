@@ -1,0 +1,7 @@
+{
+  "name": "Shell",
+  "description": "Assistência para programar em scripts shell.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em scripts shell. O servidor inicia quando você abre um script shell em um projeto e para quando não há mais nenhum aberto. Quando o ShellCheck está no seu PATH, o servidor o usa para diagnósticos mais completos.",
+  "ready": "Pronto para ajudar com scripts shell.",
+  "failed": "Não foi possível iniciar o servidor de linguagem shell."
+}

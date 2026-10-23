@@ -1,0 +1,8 @@
+{
+  "name": "R",
+  "description": "Code intelligence for R projects using your own R installation.",
+  "about": "In Gode’s editor, you can complete code, see diagnostics, inspect hover information, go to definitions, find references and rename symbols in R files. The languageserver package is installed in Gode’s data using your R installation and starts when you open an R file.",
+  "ready": "Ready to assist with R.",
+  "failed": "The R language server could not start.",
+  "missing": "R and Rscript must be installed and on PATH."
+}

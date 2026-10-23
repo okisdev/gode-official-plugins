@@ -1,0 +1,7 @@
+{
+  "name": "YAML",
+  "description": "Code intelligence for YAML files.",
+  "about": "In Gode’s editor, you can complete YAML, see errors and warnings as you type, inspect hover information, and validate against schemas in YAML files. The language server starts when a YAML file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with YAML.",
+  "failed": "The YAML language server could not start."
+}

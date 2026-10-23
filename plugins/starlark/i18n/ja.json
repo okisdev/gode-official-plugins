@@ -1,0 +1,7 @@
+{
+  "name": "Starlark",
+  "description": "starplsを使ってBazelのBUILDファイルと「.bzl」ファイルのコード作成を支援します。",
+  "about": "Godeのエディタで、starplsはBazelのBUILDファイルや「.bzl」ファイルを含むStarlarkファイルのコード補完、ホバー情報、定義への移動、問題の診断を提供します。プロジェクトでStarlarkファイルを開くとサーバが起動し、開いているStarlarkファイルがなくなると停止します。",
+  "ready": "Starlarkのコードを支援できます。",
+  "failed": "Starlark言語サーバを起動できませんでした。"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Ruby",
+  "description": "使用專案自己的 Ruby 和 gem，為 Ruby 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Ruby 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Ruby 檔案時啟動，並在沒有 Ruby 檔案開啟時停止。它使用專案的 Ruby 和 gem。Gode 會另外安裝 ruby-lsp，不會修改原有的 gem。",
+  "ready": "已準備好輔助編寫 Ruby 程式碼。",
+  "failed": "無法啟動 Ruby 語言伺服器。",
+  "missing": "請安裝 Ruby 和 RubyGems，以使用 Ruby 語言伺服器。",
+  "tooOld": "Ruby 語言伺服器需要 Ruby 3.0 或更新版本。請安裝較新的 Ruby，並讓 PATH 使用它。"
+}

@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v4.7.0/PowerShellEditorServices.zip",
+      "file": "PowerShellEditorServices-4.7.0.zip",
+      "sha256": "5084f0326cc88539e9d880b08f6c52ce5be4672bb8ecee8921e35f8895a6b9d7"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v4.7.0/PowerShellEditorServices.zip",
+      "file": "PowerShellEditorServices-4.7.0.zip",
+      "sha256": "5084f0326cc88539e9d880b08f6c52ce5be4672bb8ecee8921e35f8895a6b9d7"
+    },
+    "linux-x64": {
+      "url": "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v4.7.0/PowerShellEditorServices.zip",
+      "file": "PowerShellEditorServices-4.7.0.zip",
+      "sha256": "5084f0326cc88539e9d880b08f6c52ce5be4672bb8ecee8921e35f8895a6b9d7"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v4.7.0/PowerShellEditorServices.zip",
+      "file": "PowerShellEditorServices-4.7.0.zip",
+      "sha256": "5084f0326cc88539e9d880b08f6c52ce5be4672bb8ecee8921e35f8895a6b9d7"
+    }
+  }
+}

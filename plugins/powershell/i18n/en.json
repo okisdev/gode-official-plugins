@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "Code intelligence for PowerShell scripts using your PowerShell installation.",
+  "about": "In Gode’s editor, complete code, see diagnostics, inspect hover information, navigate to definitions and rename symbols in PowerShell scripts. PowerShell Editor Services starts when you open a PowerShell file and uses your installed PowerShell.",
+  "ready": "Ready to assist with PowerShell.",
+  "failed": "The PowerShell language server could not start.",
+  "missing": "Install PowerShell and make pwsh available on PATH to use the PowerShell language server."
+}

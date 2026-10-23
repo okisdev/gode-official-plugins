@@ -1,0 +1,7 @@
+{
+  "name": "Prisma",
+  "description": "Codeunterstützung für Prisma-Schema-Dateien.",
+  "about": "Im Editor von Gode kannst du für Prisma-Schema-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Prisma-Schema-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Prisma.",
+  "failed": "Der Prisma-Sprachserver konnte nicht gestartet werden."
+}

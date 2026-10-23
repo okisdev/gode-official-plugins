@@ -1,0 +1,8 @@
+{
+  "name": "gode-shell-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "bash-language-server": "5.8.1"
+  }
+}

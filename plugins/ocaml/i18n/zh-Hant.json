@@ -1,0 +1,8 @@
+{
+  "name": "OCaml",
+  "description": "使用目前 opam 環境中的 ocamllsp，為 OCaml 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 OCaml 檔案時可以補全程式碼、查看錯誤和警告、查看游標懸停資訊、前往定義、尋找參照和重新命名。請在 opam 環境中安裝 ocaml-lsp-server，並確保可從 PATH 執行 ocamllsp。這個外掛程式使用所選環境的伺服器和編譯器。在專案中開啟 OCaml 檔案時，伺服器會啟動；沒有 OCaml 檔案開啟時會停止。",
+  "ready": "已準備好輔助編寫 OCaml 程式碼。",
+  "failed": "無法啟動 OCaml 語言伺服器。",
+  "missing": "請在 opam 環境中安裝 ocaml-lsp-server，並確保可從 PATH 執行 ocamllsp。"
+}

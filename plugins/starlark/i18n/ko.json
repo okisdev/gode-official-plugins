@@ -1,0 +1,7 @@
+{
+  "name": "Starlark",
+  "description": "starpls를 사용하여 Bazel BUILD 및 .bzl 파일의 코드 작성을 지원합니다.",
+  "about": "Gode 에디터에서 starpls는 Bazel BUILD 및 .bzl 파일을 포함한 Starlark 파일의 코드 자동 완성, 커서를 올렸을 때 정보, 정의로 이동, 문제 진단을 제공합니다. 프로젝트에서 Starlark 파일을 열면 언어 서버가 시작되고, 열린 Starlark 파일이 없어지면 종료됩니다.",
+  "ready": "Starlark 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Starlark 언어 서버를 시작할 수 없습니다."
+}

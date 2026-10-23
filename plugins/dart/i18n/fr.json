@@ -1,0 +1,8 @@
+{
+  "name": "Dart",
+  "description": "Assistance au code pour les fichiers Dart avec votre SDK Dart ou Flutter.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements, consulter les informations au survol, accéder aux définitions et renommer des symboles dans les fichiers Dart. Installez le SDK Dart ou Flutter et rendez dart accessible dans PATH. Ce plug-in utilise le serveur de langage de votre SDK. Le serveur démarre quand vous ouvrez un fichier Dart dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Dart.",
+  "failed": "Le serveur de langage Dart n’a pas pu démarrer.",
+  "missing": "Installez le SDK Dart ou Flutter et rendez dart accessible dans PATH."
+}

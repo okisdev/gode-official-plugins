@@ -1,0 +1,7 @@
+{
+  "name": "ESLint",
+  "description": "Linting für JavaScript, TypeScript, Vue, Svelte und Astro mit der ESLint-Installation des Projekts.",
+  "about": "Im Editor von Gode ergänzt ESLint unterstützte Dateien um Lint-Diagnosen, Schnellkorrekturen und zugehörige Codeaktionen. Es läuft neben dem jeweiligen Hauptsprachserver, startet, wenn eine solche Datei in einem Projekt geöffnet wird, und stoppt, wenn keine mehr offen ist. Es verwendet das eigene ESLint-Paket und die Konfiguration des Projekts.",
+  "ready": "Bereit zum Linten mit ESLint.",
+  "failed": "Der ESLint-Sprachserver konnte nicht gestartet werden."
+}

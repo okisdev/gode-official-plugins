@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "Asistencia de código para archivos Swift con SourceKit-LSP de tu cadena de herramientas de Swift.",
+  "about": "En el editor de Gode puedes completar código, ver errores y advertencias, consultar información al pasar el cursor, ir a definiciones y cambiar nombres en archivos Swift. En macOS, instala Xcode o Command Line Tools. En Linux, instala una cadena de herramientas de Swift con sourcekit-lsp en PATH. Este plugin usa SourceKit-LSP de tu instalación. El servidor se inicia al abrir un archivo Swift en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+  "ready": "Listo para trabajar con Swift.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de Swift.",
+  "missing": "Instala Xcode o Command Line Tools en macOS, o una cadena de herramientas de Swift con sourcekit-lsp en PATH en Linux."
+}

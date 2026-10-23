@@ -1,0 +1,8 @@
+{
+  "name": "Scala",
+  "description": "使用 Metals 和 Java 17 或更新版本，为 Scala 项目提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Scala 文件时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。Metals 会在项目中打开 Scala 文件时启动，并在没有 Scala 文件打开时停止。它使用电脑上安装的 Java 17 或更新版本。",
+  "ready": "已准备好辅助编写 Scala 代码。",
+  "failed": "无法启动 Scala 语言服务器。",
+  "missing": "请安装 Java 17 或更新版本，以使用 Scala 语言服务器。"
+}

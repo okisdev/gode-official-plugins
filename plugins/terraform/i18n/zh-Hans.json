@@ -1,0 +1,7 @@
+{
+  "name": "Terraform",
+  "description": "为 Terraform 文件和 Terraform 变量文件提供代码辅助。",
+  "about": "在 Gode 的编辑器中，编辑 Terraform 文件时可使用代码补全、查看输入时的错误和警告、悬停信息、跳转到定义、查找引用和重命名。语言服务器会在项目中打开 Terraform 文件时启动，并在没有此类文件打开时停止。如果 PATH 中有 Terraform CLI，服务器会使用它进行验证。没有 CLI 也能使用代码补全和导航。",
+  "ready": "已准备好辅助编写 Terraform 代码。",
+  "failed": "无法启动 Terraform 语言服务器。"
+}

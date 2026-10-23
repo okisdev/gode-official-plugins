@@ -1,0 +1,7 @@
+{
+  "name": "C、C++、Objective-C",
+  "description": "C、C++、Objective-C、Objective-C++のコード作成を支援します。",
+  "about": "C、C++、Objective-C、Objective-C++ファイルでコード補完、診断結果の確認、シンボルへの移動ができます。clangdはプロジェクトのcompile_commands.jsonを読み取り、コンパイルオプションとインクルードパスを取得します。",
+  "ready": "C、C++、Objective-Cのコードを支援できます。",
+  "failed": "clangd言語サーバを起動できませんでした。"
+}

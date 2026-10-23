@@ -1,0 +1,7 @@
+{
+  "name": "Lua",
+  "description": "Codeunterstützung für Lua-Projekte.",
+  "about": "Im Editor von Gode kannst du Lua-Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet beim Öffnen einer Lua-Datei in einem Projekt und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Lua.",
+  "failed": "Der Lua-Sprachserver konnte nicht gestartet werden."
+}

@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://download.jetbrains.com/language-server/kotlin-server/263.7084.0/kotlin-server-263.7084.0-aarch64.sit",
+      "file": "kotlin-server-263.7084.0-aarch64.sit",
+      "sha256": "b403bf8a54bd458e3ba6731cf8abb3340be08b439c03576dfc02b13faf3694b8"
+    },
+    "darwin-x64": {
+      "url": "https://download.jetbrains.com/language-server/kotlin-server/263.7084.0/kotlin-server-263.7084.0.sit",
+      "file": "kotlin-server-263.7084.0.sit",
+      "sha256": "b29c393a5e541153d03d626e7946268437e358a667a5f914a126dbb4007664b1"
+    },
+    "linux-x64": {
+      "url": "https://download.jetbrains.com/language-server/kotlin-server/263.7084.0/kotlin-server-263.7084.0.tar.gz",
+      "file": "kotlin-server-263.7084.0.tar.gz",
+      "sha256": "ae0c4b01e17ab73a4a5227a78ea99e6dcbe3e499600315b22759a4e4cddd11df"
+    },
+    "linux-arm64": {
+      "url": "https://download.jetbrains.com/language-server/kotlin-server/263.7084.0/kotlin-server-263.7084.0-aarch64.tar.gz",
+      "file": "kotlin-server-263.7084.0-aarch64.tar.gz",
+      "sha256": "450ab7c1d80e48106aa429b48cb4226d82ca12a8a2400447ae02386794780cac"
+    }
+  }
+}

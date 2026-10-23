@@ -1,0 +1,7 @@
+{
+  "name": "Solidity",
+  "description": "為 Solidity 智慧型合約提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Solidity 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Solidity 檔案時啟動，並在沒有 Solidity 檔案開啟時停止。它內建 Nomic Foundation 的 Solidity 語言伺服器。",
+  "ready": "已準備好輔助編寫 Solidity 程式碼。",
+  "failed": "無法啟動 Solidity 語言伺服器。"
+}

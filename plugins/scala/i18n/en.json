@@ -1,0 +1,8 @@
+{
+  "name": "Scala",
+  "description": "Code intelligence for Scala projects with Metals and Java 17 or newer.",
+  "about": "In Gode’s editor, you can complete code, see errors and warnings as you type, inspect hover information, go to definitions, find references and rename symbols in Scala files. Metals starts when a Scala file opens in a project and stops when none are open. It uses Java 17 or newer from your computer.",
+  "ready": "Ready to assist with Scala.",
+  "failed": "The Scala language server could not start.",
+  "missing": "Install Java 17 or newer to use the Scala language server."
+}

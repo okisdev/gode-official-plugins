@@ -1,0 +1,7 @@
+{
+  "name": "Zig",
+  "description": "Assistência para programar em projetos Zig com Zig no seu PATH.",
+  "about": "No editor do Gode, você pode completar o código Zig, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos. O servidor inicia quando você abre um arquivo Zig em um projeto e para quando não há mais nenhum aberto. Ele usa o compilador Zig no seu PATH.",
+  "ready": "Pronto para ajudar com Zig.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Zig."
+}

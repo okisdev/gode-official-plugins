@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/neocmakelsp/neocmakelsp/releases/download/v0.11.2/neocmakelsp-universal-apple-darwin.tar.gz",
+      "file": "neocmakelsp-universal-apple-darwin.tar.gz",
+      "sha256": "9d44c5dc8eac1f66a4c3abd1123c1086508d72c8f096dc9dc8ce8a027c6f075a"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/neocmakelsp/neocmakelsp/releases/download/v0.11.2/neocmakelsp-universal-apple-darwin.tar.gz",
+      "file": "neocmakelsp-universal-apple-darwin.tar.gz",
+      "sha256": "9d44c5dc8eac1f66a4c3abd1123c1086508d72c8f096dc9dc8ce8a027c6f075a"
+    },
+    "linux-x64": {
+      "url": "https://github.com/neocmakelsp/neocmakelsp/releases/download/v0.11.2/neocmakelsp-x86_64-unknown-linux-gnu.tar.gz",
+      "file": "neocmakelsp-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "d9e71ea1cfd6584689b4fc8e985285c30247f9af393b77cb2460a969ff79abfe"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/neocmakelsp/neocmakelsp/releases/download/v0.11.2/neocmakelsp-aarch64-unknown-linux-gnu.tar.gz",
+      "file": "neocmakelsp-aarch64-unknown-linux-gnu.tar.gz",
+      "sha256": "464135a0d137b7298b22bcee693869e77f895a14393e24adab4ec099e4bfb3bc"
+    }
+  }
+}

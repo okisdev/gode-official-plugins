@@ -1,0 +1,7 @@
+{
+  "name": "Erlang",
+  "description": "使用 ELP 為 Erlang 專案提供程式碼輔助。",
+  "about": "Gode 使用 Erlang Language Platform，為 Erlang 檔案提供程式碼補全、診斷、導覽和重新命名。此 ELP 版本是針對 Erlang/OTP 29.1 建置。請為專案安裝 Erlang/OTP 29.1。",
+  "ready": "已準備好輔助編寫 Erlang 程式碼。",
+  "failed": "無法啟動 Erlang 語言伺服器。"
+}

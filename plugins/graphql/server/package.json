@@ -1,0 +1,8 @@
+{
+  "name": "gode-graphql-server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "graphql-language-service-cli": "3.5.0"
+  }
+}

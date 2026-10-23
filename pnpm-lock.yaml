@@ -48,7 +48,217 @@ importers:
         specifier: link:../../../gode/packages/plugin-sdk
         version: link:../../../gode/packages/plugin-sdk
 
+  plugins/biome:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/clangd:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/clojure:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/cmake:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/csharp:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/css:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/cue:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/dart:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/dockerfile:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/elixir:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/elm:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/erlang:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/eslint:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/fsharp:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/gleam:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/go:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/graphql:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/haskell:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/html:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/java:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/json:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
   plugins/jujutsu:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/julia:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/just:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/kotlin:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/latex:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/lua:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/markdown:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/nix:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/ocaml:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/oxc:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/php:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/postgres:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/powershell:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/prisma:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/protobuf:
     dependencies:
       '@gode/plugin-sdk':
         specifier: link:../../../gode/packages/plugin-sdk
@@ -60,7 +270,49 @@ importers:
         specifier: link:../../../gode/packages/plugin-sdk
         version: link:../../../gode/packages/plugin-sdk
 
+  plugins/r-lang:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/rego:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/ruby:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
   plugins/rust:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/scala:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/shell:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/solidity:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/starlark:
     dependencies:
       '@gode/plugin-sdk':
         specifier: link:../../../gode/packages/plugin-sdk
@@ -72,7 +324,37 @@ importers:
         specifier: link:../../../gode/packages/plugin-sdk
         version: link:../../../gode/packages/plugin-sdk
 
+  plugins/swift:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/tailwindcss:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/terraform:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/toml:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
   plugins/typescript:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/typst:
     dependencies:
       '@gode/plugin-sdk':
         specifier: link:../../../gode/packages/plugin-sdk
@@ -85,6 +367,18 @@ importers:
         version: link:../../../gode/packages/plugin-sdk
 
   plugins/vue:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/yaml:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/zig:
     dependencies:
       '@gode/plugin-sdk':
         specifier: link:../../../gode/packages/plugin-sdk

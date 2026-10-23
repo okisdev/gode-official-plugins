@@ -1,0 +1,8 @@
+{
+  "name": "Haskell",
+  "description": "GHCupでインストールした言語サーバを使い、Haskellのコード作成を支援します。",
+  "about": "GodeのエディタでHaskellファイルのコード補完、エラーと警告の表示、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。GHCupでhaskell-language-serverをインストールし、PATHからhaskell-language-server-wrapperを実行できるようにしてください。このプラグインはプロジェクトの言語サーバとGHCを使用します。プロジェクトでHaskellファイルを開くとサーバが起動し、開いているHaskellファイルがなくなると停止します。",
+  "ready": "Haskellのコードを支援できます。",
+  "failed": "Haskell言語サーバを起動できませんでした。",
+  "missing": "GHCupでhaskell-language-serverをインストールし、PATHからhaskell-language-server-wrapperを実行できるようにしてください。"
+}

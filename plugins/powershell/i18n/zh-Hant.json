@@ -1,0 +1,8 @@
+{
+  "name": "PowerShell",
+  "description": "使用已安裝的 PowerShell，為指令碼提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，你可以補全 PowerShell 程式碼、查看診斷資訊、取得游標懸停提示、前往定義及重新命名。開啟 PowerShell 檔案時，PowerShell Editor Services 會啟動並使用已安裝的 PowerShell。",
+  "ready": "已準備好輔助編寫 PowerShell 程式碼。",
+  "failed": "無法啟動 PowerShell 語言伺服器。",
+  "missing": "請安裝 PowerShell，並確定可透過 PATH 執行 pwsh，以使用 PowerShell 語言伺服器。"
+}

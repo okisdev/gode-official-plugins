@@ -1,0 +1,8 @@
+{
+  "name": "Gleam",
+  "description": "Assistance au code pour les projets Gleam avec votre compilateur Gleam.",
+  "about": "Gode lance gleam lsp depuis votre PATH pour la complétion, les diagnostics, la navigation et le renommage dans les fichiers Gleam. Installez Gleam pour votre projet. La version 1.19.2 a été testée ; le projet est compilé avec votre version installée.",
+  "ready": "Prêt à vous aider avec Gleam.",
+  "failed": "Le serveur de langage Gleam n’a pas pu démarrer.",
+  "missing": "Installez Gleam et rendez la commande gleam accessible dans le PATH."
+}

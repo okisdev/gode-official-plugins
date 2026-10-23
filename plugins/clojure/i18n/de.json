@@ -1,0 +1,7 @@
+{
+  "name": "Clojure",
+  "description": "Codeunterstützung für Clojure-Projekte mit clojure-lsp.",
+  "about": "Im Editor von Gode kannst du für Clojure-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Clojure-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Clojure.",
+  "failed": "Der Clojure-Sprachserver konnte nicht gestartet werden."
+}

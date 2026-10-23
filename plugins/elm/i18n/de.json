@@ -1,0 +1,7 @@
+{
+  "name": "Elm",
+  "description": "Codeunterstützung für Elm-Projekte.",
+  "about": "Im Editor von Gode kannst du für Elm-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Elm-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Er enthält den Elm-Sprachserver und nutzt elm, elm-format und elm-test, wenn sie auf deinem PATH installiert sind.",
+  "ready": "Bereit für Elm.",
+  "failed": "Der Elm-Sprachserver konnte nicht gestartet werden."
+}

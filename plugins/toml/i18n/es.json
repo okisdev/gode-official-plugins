@@ -1,0 +1,7 @@
+{
+  "name": "TOML",
+  "description": "Asistencia de código para archivos TOML.",
+  "about": "En el editor de Gode puedes completar claves y valores TOML, ver errores mientras escribes y consultar información del esquema cuando hay uno configurado. El servidor se inicia al abrir un archivo TOML en un proyecto y se detiene cuando ya no queda ninguno abierto.",
+  "ready": "Listo para trabajar con TOML.",
+  "failed": "No se pudo iniciar el servidor de lenguaje de TOML."
+}

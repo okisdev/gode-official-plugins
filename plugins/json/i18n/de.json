@@ -1,0 +1,7 @@
+{
+  "name": "JSON",
+  "description": "Codeunterstützung für JSON- und JSON-mit-Kommentaren-Dateien.",
+  "about": "Im Editor von Gode kannst du JSON vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen und schema-bewusst in JSON- und JSONC-Dateien validieren. Der Sprachserver startet, sobald du eine solche Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für JSON.",
+  "failed": "Der JSON-Sprachserver konnte nicht gestartet werden."
+}

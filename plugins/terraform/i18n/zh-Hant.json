@@ -1,0 +1,7 @@
+{
+  "name": "Terraform",
+  "description": "為 Terraform 檔案和 Terraform 變數檔案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Terraform 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中開啟 Terraform 檔案時啟動，並在沒有此類檔案開啟時停止。如果 PATH 中有 Terraform CLI，伺服器會使用它進行驗證。沒有 CLI 也能使用程式碼補全和導覽。",
+  "ready": "已準備好輔助編寫 Terraform 程式碼。",
+  "failed": "無法啟動 Terraform 語言伺服器。"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Dart",
+  "description": "DartまたはFlutterのSDKを使い、Dartファイルのコード作成を支援します。",
+  "about": "GodeのエディタでDartファイルのコード補完、エラーと警告の確認、ホバー情報の表示、定義への移動、名前の変更ができます。DartまたはFlutterのSDKをインストールし、PATHからdartを実行できるようにしてください。このプラグインはSDKに含まれる言語サーバを使用します。プロジェクトでDartファイルを開くと起動し、開いているDartファイルがなくなると停止します。",
+  "ready": "Dartのコードを支援できます。",
+  "failed": "Dart言語サーバを起動できませんでした。",
+  "missing": "DartまたはFlutterのSDKをインストールし、PATHからdartを実行できるようにしてください。"
+}

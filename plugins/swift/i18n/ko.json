@@ -1,0 +1,8 @@
+{
+  "name": "Swift",
+  "description": "Swift 도구 체인의 SourceKit-LSP를 사용하여 Swift 파일의 코드 작성을 지원합니다.",
+  "about": "Gode 에디터에서 Swift 파일의 코드 자동 완성, 오류와 경고 확인, 커서를 올렸을 때 정보 보기, 정의로 이동, 이름 변경을 사용할 수 있습니다. macOS에서는 Xcode 또는 명령어 라인 도구를 설치하세요. Linux에서는 PATH에서 sourcekit-lsp를 실행할 수 있는 Swift 도구 체인을 설치하세요. 이 플러그인은 도구 체인의 SourceKit-LSP를 사용합니다. Swift 파일을 열면 서버가 시작되고 열린 Swift 파일이 없어지면 종료됩니다.",
+  "ready": "Swift 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Swift 언어 서버를 시작할 수 없습니다.",
+  "missing": "macOS에서는 Xcode 또는 명령어 라인 도구를, Linux에서는 sourcekit-lsp가 PATH에 있는 Swift 도구 체인을 설치하세요."
+}

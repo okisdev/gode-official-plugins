@@ -1,0 +1,7 @@
+{
+  "name": "Dockerfile",
+  "description": "Assistência para programar em Dockerfiles.",
+  "about": "No editor do Gode, você pode completar instruções, ver erros e avisos enquanto digita, consultar informações ao passar o cursor e ir às definições em Dockerfiles. O servidor inicia quando você abre um Dockerfile em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com Dockerfiles.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Dockerfile."
+}

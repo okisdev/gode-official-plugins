@@ -1,0 +1,7 @@
+{
+  "name": "Elixir",
+  "description": "Assistência para programar em projetos Elixir com sua instalação do Elixir.",
+  "about": "No editor do Gode, você pode completar o código, ver erros e avisos enquanto digita, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos Elixir. O Expert inicia quando você abre um arquivo Elixir em um projeto e para quando não há mais nenhum aberto. Ele usa sua instalação do Elixir e do Erlang para analisar o projeto.",
+  "ready": "Pronto para ajudar com Elixir.",
+  "failed": "Não foi possível iniciar o servidor de linguagem Elixir."
+}

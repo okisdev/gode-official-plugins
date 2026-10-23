@@ -1,0 +1,7 @@
+{
+  "name": "SQL (PostgreSQL)",
+  "description": "Vérification de la syntaxe et mise en forme des fichiers SQL PostgreSQL.",
+  "about": "Dans l’éditeur de Gode, vous pouvez vérifier la syntaxe PostgreSQL et mettre en forme les fichiers SQL sans connexion à une base de données. Le serveur démarre quand vous ouvrez un fichier SQL dans un projet et s’arrête quand aucun n’est ouvert. Pour profiter de la complétion fondée sur le schéma, des informations au survol et des vérifications de la base de données, configurez une connexion PostgreSQL dans le fichier postgres-language-server.jsonc du projet. Ce serveur prend en charge le dialecte PostgreSQL.",
+  "ready": "Prêt à vous aider avec SQL pour PostgreSQL.",
+  "failed": "Le serveur de langage SQL pour PostgreSQL n’a pas pu démarrer."
+}

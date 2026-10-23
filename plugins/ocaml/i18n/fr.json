@@ -1,0 +1,8 @@
+{
+  "name": "OCaml",
+  "description": "Assistance au code pour les projets OCaml avec ocamllsp de votre environnement opam.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les erreurs et les avertissements, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers OCaml. Installez le paquet ocaml-lsp-server dans votre environnement opam et rendez ocamllsp accessible via PATH. Ce plug-in utilise le serveur et le compilateur de l’environnement sélectionné. Le serveur démarre quand vous ouvrez un fichier OCaml dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec OCaml.",
+  "failed": "Le serveur de langage OCaml n’a pas pu démarrer.",
+  "missing": "Installez ocaml-lsp-server dans votre environnement opam et rendez ocamllsp accessible via PATH."
+}

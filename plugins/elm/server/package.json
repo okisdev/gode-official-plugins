@@ -1,0 +1,8 @@
+{
+  "name": "gode-elm-server",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "@elm-tooling/elm-language-server": "2.10.0"
+  }
+}

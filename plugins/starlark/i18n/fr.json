@@ -1,0 +1,7 @@
+{
+  "name": "Starlark",
+  "description": "Assistance au code pour les fichiers BUILD et .bzl de Bazel avec starpls.",
+  "about": "Dans l’éditeur de Gode, starpls propose la complétion du code, des informations au survol, l’accès aux définitions et des diagnostics pour les fichiers Starlark, notamment les fichiers BUILD et .bzl de Bazel. Le serveur démarre quand vous ouvrez un fichier Starlark dans un projet et s’arrête quand aucun n’est ouvert.",
+  "ready": "Prêt à vous aider avec Starlark.",
+  "failed": "Le serveur de langage Starlark n’a pas pu démarrer."
+}

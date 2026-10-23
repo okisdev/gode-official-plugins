@@ -1,0 +1,8 @@
+{
+  "name": "Java",
+  "description": "Codeunterstützung für Java-Projekte mit Eclipse JDT Language Server.",
+  "about": "Im Editor von Gode kannst du für Java-Dateien Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Java-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist. Java 21 oder neuer wird benötigt.",
+  "ready": "Bereit für Java.",
+  "failed": "Der Java-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere Java 21 oder neuer und setze JAVA_HOME oder füge java zum PATH hinzu."
+}

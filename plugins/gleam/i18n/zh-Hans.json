@@ -1,0 +1,8 @@
+{
+  "name": "Gleam",
+  "description": "使用你安装的 Gleam 编译器，为 Gleam 项目提供代码辅助。",
+  "about": "Gode 从 PATH 运行 gleam lsp，为 Gleam 文件提供代码补全、诊断、导航和重命名。请为项目安装 Gleam。已验证 1.19.2 版；项目使用你安装的版本构建。",
+  "ready": "已准备好辅助编写 Gleam 代码。",
+  "failed": "无法启动 Gleam 语言服务器。",
+  "missing": "请安装 Gleam，并确保 PATH 中可以使用 gleam 命令。"
+}

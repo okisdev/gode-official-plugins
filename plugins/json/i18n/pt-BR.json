@@ -1,0 +1,7 @@
+{
+  "name": "JSON",
+  "description": "Assistência para programar em arquivos JSON e JSON com comentários.",
+  "about": "No editor do Gode, você pode completar JSON, ver erros e avisos enquanto digita, consultar informações ao passar o cursor e validar com esquemas em arquivos JSON e JSONC. O servidor inicia quando você abre um desses arquivos em um projeto e para quando não há mais nenhum aberto.",
+  "ready": "Pronto para ajudar com JSON.",
+  "failed": "Não foi possível iniciar o servidor de linguagem JSON."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "OCaml",
+  "description": "Codeunterstützung für OCaml-Projekte mit ocamllsp aus deinem opam-Switch.",
+  "about": "Im Editor von Gode kannst du für OCaml-Dateien Code vervollständigen, Fehler und Warnungen sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Installiere das Paket ocaml-lsp-server in deinem opam-Switch und stelle sicher, dass ocamllsp über PATH erreichbar ist. Dieses Plug-in verwendet den Server und Compiler des gewählten Switches. Der Server startet, wenn du eine OCaml-Datei im Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für OCaml.",
+  "failed": "Der OCaml-Sprachserver konnte nicht gestartet werden.",
+  "missing": "Installiere ocaml-lsp-server in deinem opam-Switch und stelle sicher, dass ocamllsp über PATH erreichbar ist."
+}

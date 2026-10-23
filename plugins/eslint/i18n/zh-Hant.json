@@ -1,0 +1,7 @@
+{
+  "name": "ESLint",
+  "description": "使用專案自身的 ESLint，為 JavaScript、TypeScript、Vue、Svelte 與 Astro 提供程式碼檢查。",
+  "about": "在 Gode 的編輯器中，ESLint 會在你編輯受支援檔案時補充檢查診斷、快速修正與相關程式碼動作。它與各語言的主要語言伺服器並行運作，在專案中開啟此類檔案時啟動，並在沒有此類檔案開啟時停止。它使用專案自己的 ESLint 套件與設定。",
+  "ready": "已準備好使用 ESLint 進行檢查。",
+  "failed": "無法啟動 ESLint 語言伺服器。"
+}

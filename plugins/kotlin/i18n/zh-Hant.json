@@ -1,0 +1,7 @@
+{
+  "name": "Kotlin",
+  "description": "使用 JetBrains kotlin-lsp 為 Kotlin 專案提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，編輯 Kotlin 檔案時可使用程式碼補全、查看輸入時的錯誤和警告、游標懸停資訊、前往定義、尋找參照和重新命名。語言伺服器會在專案中打開 Kotlin 檔案時啟動，並在沒有 Kotlin 檔案開啟時停止。它內建 Java 執行環境，因此啟動伺服器無需另外安裝 Java。",
+  "ready": "已準備好輔助編寫 Kotlin 程式碼。",
+  "failed": "無法啟動 Kotlin 語言伺服器。"
+}

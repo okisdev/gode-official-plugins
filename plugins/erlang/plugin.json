@@ -1,0 +1,23 @@
+{
+  "id": "erlang",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["erlang"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "Erlang Language Platform",
+      "version": "1.1.0+build-2026-10-14",
+      "license": "Apache-2.0",
+      "url": "https://github.com/WhatsApp/erlang-language-platform"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

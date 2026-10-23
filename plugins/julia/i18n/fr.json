@@ -1,0 +1,8 @@
+{
+  "name": "Julia",
+  "description": "Assistance au code pour les projets Julia avec votre propre installation de Julia.",
+  "about": "Dans l’éditeur de Gode, vous pouvez compléter le code, voir les diagnostics, consulter les informations au survol, accéder aux définitions, rechercher des références et renommer des symboles dans les fichiers Julia. LanguageServer.jl s’installe dans les données de Gode avec votre installation de Julia et démarre à l’ouverture d’un fichier Julia.",
+  "ready": "Prêt à vous aider avec Julia.",
+  "failed": "Le serveur de langage Julia n’a pas pu démarrer.",
+  "missing": "Julia n’est pas installé ou n’est pas dans le PATH."
+}

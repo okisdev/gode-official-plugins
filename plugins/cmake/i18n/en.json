@@ -1,0 +1,7 @@
+{
+  "name": "CMake",
+  "description": "Code intelligence for CMake files.",
+  "about": "In Gode’s editor, you can complete code, see diagnostics, inspect hover information and navigate CMake files. The language server starts when a CMake file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with CMake.",
+  "failed": "The CMake language server could not start."
+}

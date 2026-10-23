@@ -1,0 +1,7 @@
+{
+  "name": "Markdown",
+  "description": "Codeunterstützung für Markdown-Dateien.",
+  "about": "Im Editor von Gode kannst du in Markdown-Dateien zu Überschriften springen, Links vervollständigen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet, sobald du eine Markdown-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für Markdown.",
+  "failed": "Der Markdown-Sprachserver konnte nicht gestartet werden."
+}

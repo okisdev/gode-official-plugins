@@ -1,0 +1,7 @@
+{
+  "name": "Rego",
+  "description": "使用 Regal 為 Rego 政策提供程式碼輔助。",
+  "about": "在 Gode 的編輯器中，Regal 為 Rego 檔案提供程式碼補全、游標懸停資訊、前往定義和問題診斷。語言伺服器會在專案中開啟 Rego 檔案時啟動，並在沒有 Rego 檔案開啟時停止。",
+  "ready": "已準備好輔助編寫 Rego 程式碼。",
+  "failed": "無法啟動 Rego 語言伺服器。"
+}

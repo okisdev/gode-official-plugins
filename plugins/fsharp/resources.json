@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/ionide/FsAutoComplete/releases/download/v0.85.4/fsautocomplete.0.85.4.nupkg",
+      "file": "fsautocomplete.0.85.4.nupkg",
+      "sha256": "6610d99bd1ce44acd426e6e9c1b5b05adbc90a96a175c1493e18511ae4027abd"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/ionide/FsAutoComplete/releases/download/v0.85.4/fsautocomplete.0.85.4.nupkg",
+      "file": "fsautocomplete.0.85.4.nupkg",
+      "sha256": "6610d99bd1ce44acd426e6e9c1b5b05adbc90a96a175c1493e18511ae4027abd"
+    },
+    "linux-x64": {
+      "url": "https://github.com/ionide/FsAutoComplete/releases/download/v0.85.4/fsautocomplete.0.85.4.nupkg",
+      "file": "fsautocomplete.0.85.4.nupkg",
+      "sha256": "6610d99bd1ce44acd426e6e9c1b5b05adbc90a96a175c1493e18511ae4027abd"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/ionide/FsAutoComplete/releases/download/v0.85.4/fsautocomplete.0.85.4.nupkg",
+      "file": "fsautocomplete.0.85.4.nupkg",
+      "sha256": "6610d99bd1ce44acd426e6e9c1b5b05adbc90a96a175c1493e18511ae4027abd"
+    }
+  }
+}

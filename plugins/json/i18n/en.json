@@ -1,0 +1,7 @@
+{
+  "name": "JSON",
+  "description": "Code intelligence for JSON and JSON with Comments files.",
+  "about": "In Gode’s editor, you can complete JSON, see errors and warnings as you type, inspect hover information, and use schema-aware validation in JSON and JSONC files. The language server starts when such a file opens in a project and stops when none are open.",
+  "ready": "Ready to assist with JSON.",
+  "failed": "The JSON language server could not start."
+}

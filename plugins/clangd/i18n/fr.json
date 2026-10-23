@@ -1,0 +1,7 @@
+{
+  "name": "C, C++ et Objective-C",
+  "description": "Assistance au code pour C, C++, Objective-C et Objective-C++.",
+  "about": "Complétez le code, consultez les diagnostics et parcourez les symboles des fichiers C, C++, Objective-C et Objective-C++. clangd lit le fichier compile_commands.json du projet pour connaître les options de compilation et les chemins d’inclusion.",
+  "ready": "Prêt à vous aider avec C, C++ et Objective-C.",
+  "failed": "Le serveur de langage clangd n’a pas pu démarrer."
+}

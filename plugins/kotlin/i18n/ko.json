@@ -1,0 +1,7 @@
+{
+  "name": "Kotlin",
+  "description": "JetBrains kotlin-lsp로 Kotlin 코드 작성을 지원합니다.",
+  "about": "Gode 에디터에서 Kotlin 파일의 코드 자동 완성, 입력 중 오류와 경고, 커서를 올렸을 때 정보, 정의로 이동, 참조 찾기와 이름 변경을 사용할 수 있습니다. 프로젝트에서 Kotlin 파일을 열면 언어 서버가 시작되고, 열린 Kotlin 파일이 없어지면 종료됩니다. 서버에 Java 실행 환경이 포함되어 있으므로 서버를 시작하기 위해 Java를 별도로 설치할 필요가 없습니다.",
+  "ready": "Kotlin 코드 작성을 지원할 준비가 되었습니다.",
+  "failed": "Kotlin 언어 서버를 시작할 수 없습니다."
+}

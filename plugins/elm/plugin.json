@@ -1,0 +1,23 @@
+{
+  "id": "elm",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["elm"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "@elm-tooling/elm-language-server",
+      "version": "2.10.0",
+      "license": "MIT",
+      "url": "https://github.com/elm-tooling/elm-language-server"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

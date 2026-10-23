@@ -1,0 +1,7 @@
+{
+  "name": "Zig",
+  "description": "Codeunterstützung für Zig-Projekte mit Zig aus deinem PATH.",
+  "about": "Im Editor von Gode kannst du Zig-Code vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen, zu Definitionen springen, Referenzen finden und Bezeichner umbenennen. Der Sprachserver startet beim Öffnen einer Zig-Datei in einem Projekt und stoppt, wenn keine mehr offen ist. Er verwendet den Zig-Compiler aus deinem PATH.",
+  "ready": "Bereit für Zig.",
+  "failed": "Der Zig-Sprachserver konnte nicht gestartet werden."
+}

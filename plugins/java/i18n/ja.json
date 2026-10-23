@@ -1,0 +1,8 @@
+{
+  "name": "Java",
+  "description": "Eclipse JDT Language ServerでJavaプロジェクトのコード作成を支援します。",
+  "about": "GodeのエディタでJavaファイルのコード補完、入力中のエラーと警告、ホバー情報、定義への移動、参照の検索、シンボル名の変更ができます。プロジェクトでJavaファイルを開くと起動し、開いているJavaファイルがなくなると停止します。Java 21以降が必要です。",
+  "ready": "Javaのコードを支援できます。",
+  "failed": "Java言語サーバを起動できませんでした。",
+  "missing": "Java 21以降をインストールしてJAVA_HOMEを設定するか、javaをPATHに追加してください。"
+}

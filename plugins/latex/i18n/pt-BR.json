@@ -1,0 +1,7 @@
+{
+  "name": "LaTeX",
+  "description": "Assistência para documentos LaTeX com sua distribuição TeX para compilação.",
+  "about": "No editor do Gode, você pode completar comandos, ver erros e avisos, consultar informações ao passar o cursor, ir às definições, buscar referências e renomear símbolos em arquivos LaTeX. O servidor inicia quando você abre um arquivo LaTeX em um projeto e para quando não há mais nenhum aberto. Para compilar documentos, ele usa a distribuição TeX instalada no seu computador.",
+  "ready": "Pronto para ajudar com LaTeX.",
+  "failed": "Não foi possível iniciar o servidor de linguagem LaTeX."
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Protocol Buffers",
+  "description": "使用 Buf 輔助編寫 Protocol Buffers 檔案。",
+  "about": "在 Gode 的編輯器中，Buf 為 Protocol Buffers 檔案提供語言支援。在專案中開啟 .proto 檔案時，語言伺服器會啟動；沒有 .proto 檔案開啟時則會停止。此外掛程式包含 Buf 可執行檔。",
+  "ready": "已準備好輔助編寫 Protocol Buffers 程式碼。",
+  "failed": "無法啟動 Protocol Buffers 語言伺服器。"
+}

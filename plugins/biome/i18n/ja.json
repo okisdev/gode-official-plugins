@@ -1,0 +1,7 @@
+{
+  "name": "Biome",
+  "description": "Biomeを使ってWebプロジェクトのlint診断と修正を行います。",
+  "about": "Godeのエディタで、Biomeが言語固有のサーバと並行してlint診断と修正を提供します。プロジェクトのbiome.jsonを使用し、対応するファイルを開くと起動します。",
+  "ready": "Biomeでコードを検査できます。",
+  "failed": "Biome言語サーバを起動できませんでした。"
+}

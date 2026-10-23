@@ -1,0 +1,23 @@
+{
+  "id": "protobuf",
+  "publisher": "gode",
+  "version": "0.0.1",
+  "minimumAppVersion": "0.1.19-beta.97",
+  "capabilities": ["language-server"],
+  "languages": ["proto"],
+  "about": "about",
+  "includes": [
+    {
+      "name": "Buf",
+      "version": "1.75.0",
+      "license": "Apache-2.0",
+      "url": "https://github.com/bufbuild/buf"
+    },
+    {
+      "name": "Material Icon Theme",
+      "version": "5.39.0",
+      "license": "MIT",
+      "url": "https://github.com/material-extensions/vscode-material-icon-theme"
+    }
+  ]
+}

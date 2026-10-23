@@ -1,0 +1,24 @@
+{
+  "platforms": {
+    "darwin-arm64": {
+      "url": "https://github.com/clojure-lsp/clojure-lsp/releases/download/2026.10.15-11.42.38/clojure-lsp-native-macos-aarch64.zip",
+      "file": "clojure-lsp-darwin-arm64-2026.10.15-11.42.38.zip",
+      "sha256": "84df57e51e27f4ecf20d0cd65aab3296e2ebf28dbaacca4fe216b6cf20485716"
+    },
+    "darwin-x64": {
+      "url": "https://github.com/clojure-lsp/clojure-lsp/releases/download/2026.10.15-11.42.38/clojure-lsp-native-macos-amd64.zip",
+      "file": "clojure-lsp-darwin-x64-2026.10.15-11.42.38.zip",
+      "sha256": "468c261b48a7276c79cb92a82ddfce5474bc563ba6673df30cabf17a7f239ef3"
+    },
+    "linux-x64": {
+      "url": "https://github.com/clojure-lsp/clojure-lsp/releases/download/2026.10.15-11.42.38/clojure-lsp-native-linux-amd64.zip",
+      "file": "clojure-lsp-linux-x64-2026.10.15-11.42.38.zip",
+      "sha256": "d68acf630465cec9d3685fd958f914d9228d90a07222edd301f1a4740b8e8b76"
+    },
+    "linux-arm64": {
+      "url": "https://github.com/clojure-lsp/clojure-lsp/releases/download/2026.10.15-11.42.38/clojure-lsp-native-linux-aarch64.zip",
+      "file": "clojure-lsp-linux-arm64-2026.10.15-11.42.38.zip",
+      "sha256": "232ac0cd191070a3b7b5532135ec9f97217b82324de7e97da0b1bf81353a3c94"
+    }
+  }
+}

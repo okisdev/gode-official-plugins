@@ -1,0 +1,7 @@
+{
+  "name": "YAML",
+  "description": "Codeunterstützung für YAML-Dateien.",
+  "about": "Im Editor von Gode kannst du YAML vervollständigen, Fehler und Warnungen während der Eingabe sehen, Informationen beim Überfahren abrufen und YAML-Dateien anhand von Schemas prüfen. Der Sprachserver startet, sobald du eine YAML-Datei in einem Projekt öffnest, und stoppt, wenn keine mehr offen ist.",
+  "ready": "Bereit für YAML.",
+  "failed": "Der YAML-Sprachserver konnte nicht gestartet werden."
+}

@@ -47,6 +47,300 @@
       "id": "jujutsu",
       "source": "gode/jujutsu/releases.json",
       "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "biome",
+      "source": "gode/biome/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "clangd",
+      "source": "gode/clangd/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "clojure",
+      "source": "gode/clojure/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "cmake",
+      "source": "gode/cmake/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "csharp",
+      "source": "gode/csharp/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "css",
+      "source": "gode/css/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "cue",
+      "source": "gode/cue/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "dart",
+      "source": "gode/dart/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "dockerfile",
+      "source": "gode/dockerfile/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "elixir",
+      "source": "gode/elixir/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "elm",
+      "source": "gode/elm/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "erlang",
+      "source": "gode/erlang/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "eslint",
+      "source": "gode/eslint/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "fsharp",
+      "source": "gode/fsharp/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "gleam",
+      "source": "gode/gleam/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "go",
+      "source": "gode/go/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "graphql",
+      "source": "gode/graphql/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "haskell",
+      "source": "gode/haskell/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "html",
+      "source": "gode/html/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "java",
+      "source": "gode/java/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "json",
+      "source": "gode/json/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "julia",
+      "source": "gode/julia/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "just",
+      "source": "gode/just/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "kotlin",
+      "source": "gode/kotlin/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "latex",
+      "source": "gode/latex/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "lua",
+      "source": "gode/lua/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "markdown",
+      "source": "gode/markdown/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "nix",
+      "source": "gode/nix/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "ocaml",
+      "source": "gode/ocaml/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "oxc",
+      "source": "gode/oxc/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "php",
+      "source": "gode/php/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "postgres",
+      "source": "gode/postgres/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "powershell",
+      "source": "gode/powershell/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "prisma",
+      "source": "gode/prisma/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "protobuf",
+      "source": "gode/protobuf/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "r-lang",
+      "source": "gode/r-lang/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "rego",
+      "source": "gode/rego/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "ruby",
+      "source": "gode/ruby/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "scala",
+      "source": "gode/scala/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "shell",
+      "source": "gode/shell/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "solidity",
+      "source": "gode/solidity/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "starlark",
+      "source": "gode/starlark/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "swift",
+      "source": "gode/swift/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "tailwindcss",
+      "source": "gode/tailwindcss/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "terraform",
+      "source": "gode/terraform/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "toml",
+      "source": "gode/toml/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "typst",
+      "source": "gode/typst/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "yaml",
+      "source": "gode/yaml/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "zig",
+      "source": "gode/zig/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
     }
   ]
 }

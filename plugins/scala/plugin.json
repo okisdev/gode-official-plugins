@@ -2,7 +2,7 @@
   "id": "scala",
   "publisher": "gode",
   "version": "0.0.1",
-  "minimumAppVersion": "0.1.19-beta.97",
+  "minimumAppVersion": "0.1.19-beta.103",
   "capabilities": ["language-server"],
   "languages": ["scala"],
   "about": "about",

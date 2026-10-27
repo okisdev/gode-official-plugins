@@ -1,7 +1,7 @@
 {
   "id": "voice-input",
   "publisher": "gode",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "minimumAppVersion": "0.1.19-beta.97",
   "setupBytes": 2520744288,
   "capabilities": ["dictation"],

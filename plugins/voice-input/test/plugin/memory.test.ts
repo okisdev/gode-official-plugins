@@ -109,8 +109,8 @@ async function setup(
     ])
     cleanups.push(() => plugin.dispose())
     await plugin.start(start)
-    const view = (id: 'history' | 'memory') =>
-      pluginViewDataSchemas[id === 'history' ? 'list' : 'terms'].parse(
+    const view = (id: 'history' | 'memory' | 'suggestions') =>
+      pluginViewDataSchemas[id === 'memory' ? 'terms' : 'list'].parse(
         setView.mock.calls.findLast(([viewId]) => viewId === id)![1],
       )
     return { plugin, setView, view, log }
@@ -158,7 +158,6 @@ async function dictate(
 
 test('declares enabled settings and list actions, and publishes valid empty and populated views', async () => {
   const parsed = pluginManifestSchema.parse(manifest)
-  expect(parsed.version).toBe('0.0.11')
   expect(parsed.groups?.find((group) => group.title === 'group.history')?.fields).toEqual([
     ...['keepHistory', 'learnTerms'].map((key) => ({
       key,
@@ -183,25 +182,27 @@ test('declares enabled settings and list actions, and publishes valid empty and 
   const { plugin, setView, view, directory } = await setup()
   expect(view('history')).toEqual({ items: [], total: 0, empty: 'view.history.empty' })
   expect(view('memory')).toEqual({ items: [], total: 0, empty: 'view.memory.empty' })
+  expect(view('suggestions')).toEqual({ items: [], total: 0, empty: 'view.suggestions.empty' })
   expect(await readdir(directory)).toEqual(['models'])
   await dictate(plugin)
   await dictate(plugin)
   for (const [id, data] of setView.mock.calls) {
-    if (id === 'history' || id === 'memory')
+    if (id === 'history' || id === 'memory' || id === 'suggestions')
       expect(
-        pluginViewDataSchemas[id === 'history' ? 'list' : 'terms'].safeParse(data).success,
+        pluginViewDataSchemas[id === 'memory' ? 'terms' : 'list'].safeParse(data).success,
       ).toBe(true)
   }
-  expect(view('memory').items).toEqual([
+  expect(view('memory').items).toEqual([])
+  expect(view('suggestions').items).toEqual([
     {
       id: 'usecomposertext',
       text: 'useComposerText',
+      time: expect.any(Number),
       detail: 'Heard in 2 dictations',
-      automatic: true,
     },
   ])
   expect(view('history').total).toBe(2)
-  expect(view('memory').total).toBe(1)
+  expect(view('suggestions').total).toBe(1)
 })
 
 test('unknown dictation methods fail without finishing a live session', async () => {
@@ -250,13 +251,13 @@ test('loaded history, learned terms and requested vocabulary never enter the log
       forgotten: [],
     }),
   })
-  expect(view('memory').items[0]?.text).toBe(term)
+  expect(view('suggestions').items[0]?.text).toBe(term)
   expect(view('history').items[0]?.text).toBe('Private history entry')
   expect(log).not.toHaveBeenCalled()
   response.text = 'Private finished transcript'
   await expect(dictate(plugin, ['PrivateVocabulary'])).resolves.toEqual({ text: response.text })
   const body = vi.mocked(fetch).mock.calls[0]![1]!.body as FormData
-  expect(body.get('prompt')).toBe(`PrivateVocabulary, ${term}`)
+  expect(body.get('prompt')).toBe('PrivateVocabulary')
   expect(log.mock.calls).toEqual([
     [
       'info',
@@ -326,7 +327,7 @@ test('pages history newest first, searches without case, and deletes an entry fr
   expect(() => query('', null, 20, 'unknown')).toThrow('Unknown view: unknown')
 })
 
-test('pages learned terms newest first and searches their text without case', async () => {
+test('suggestions view and query page learned terms newest first and search their text without case', async () => {
   const memory = JSON.stringify({
     terms: Array.from({ length: 25 }, (_, index) => ({
       key: `term${index}`,
@@ -338,9 +339,16 @@ test('pages learned terms newest first and searches their text without case', as
   })
   const { plugin, view } = await setup({ memory })
   const query = (search: string, cursor: string | null, limit: number) =>
-    plugin.query({ type: 'query', id: 1, view: 'memory', search, cursor, limit })
-  expect(view('memory').total).toBe(25)
-  expect(view('memory').items).toHaveLength(20)
+    plugin.query({ type: 'query', id: 1, view: 'suggestions', search, cursor, limit })
+  expect(view('memory').items).toEqual([])
+  expect(view('suggestions').total).toBe(25)
+  expect(view('suggestions').items).toHaveLength(20)
+  expect(view('suggestions').items[0]).toEqual({
+    id: 'term24',
+    text: 'Term24',
+    time: 24,
+    detail: 'Heard in 2 dictations',
+  })
   const first = await query('', null, 10)
   const second = await query('', first.cursor, 10)
   const last = await query('', second.cursor, 10)
@@ -433,7 +441,7 @@ test.each(['history', 'memory'])(
     await vi.waitFor(() => expect(disk.failed).toBe(true))
     await expect(dictate(plugin)).resolves.toEqual({ text: 'useComposerText' })
     expect(view('history').items).toHaveLength(2)
-    expect(view('memory').items[0]?.detail).toBe('Heard in 2 dictations')
+    expect(view('suggestions').items[0]?.detail).toBe('Heard in 2 dictations')
     await plugin.dispose()
     const stored = JSON.parse(await readFile(join(directory, `${name}.json`), 'utf8'))
     if (name === 'history') expect(stored).toHaveLength(2)
@@ -451,7 +459,7 @@ test.each(['history', 'memory'])(
     await vi.waitFor(() => expect(disk.release).toBeTypeOf('function'))
     await Promise.all([dictate(plugin), dictate(plugin)])
     expect(view('history').items).toHaveLength(3)
-    expect(view('memory').items[0]?.detail).toBe('Heard in 3 dictations')
+    expect(view('suggestions').items[0]?.detail).toBe('Heard in 3 dictations')
     disk.release!()
     await plugin.dispose()
     const stored = JSON.parse(await readFile(join(directory, `${name}.json`), 'utf8'))
@@ -460,7 +468,7 @@ test.each(['history', 'memory'])(
   },
 )
 
-test('learning can be stopped while existing memory is used, forgotten across restart, and cleared', async () => {
+test('learning can be stopped while suggestions are retained, forgotten across restart, and cleared', async () => {
   const { plugin, response, start, view, launch } = await setup()
   await dictate(plugin)
   await dictate(plugin)
@@ -470,50 +478,107 @@ test('learning can be stopped while existing memory is used, forgotten across re
     settings: settings({ ...start.settings, learnTerms: false }),
   })
   response.text = 'use composer text and newIdentifier'
-  await expect(dictate(plugin)).resolves.toEqual({ text: 'useComposerText and newIdentifier' })
+  await expect(dictate(plugin)).resolves.toEqual({ text: 'use composer text and newIdentifier' })
   await dictate(plugin)
-  expect(view('memory').items).toHaveLength(1)
-  expect(view('memory').items[0]?.detail).toBe('Heard in 2 dictations')
-  await plugin.action('forgetTerm', view('memory').items[0]!.id)
+  expect(view('suggestions').items).toHaveLength(1)
+  expect(view('suggestions').items[0]?.detail).toBe('Heard in 2 dictations')
+  await plugin.action('forgetTerm', view('suggestions').items[0]!.id)
   await plugin.dispose()
   const replacement = await launch()
   response.text = 'useComposerText'
   await dictate(replacement.plugin)
   await dictate(replacement.plugin)
-  expect(replacement.view('memory').items).toEqual([])
+  expect(replacement.view('suggestions').items).toEqual([])
   await replacement.plugin.action('clearMemory')
   await dictate(replacement.plugin)
-  expect(replacement.view('memory').items).toEqual([])
+  expect(replacement.view('suggestions').items).toEqual([])
   await dictate(replacement.plugin)
-  expect(replacement.view('memory').items[0]?.text).toBe('useComposerText')
+  expect(replacement.view('suggestions').items[0]?.text).toBe('useComposerText')
 })
 
-test.each([true, false])(
-  'learned terms reach recognition with request vocabulary (local: %s)',
-  async (local) => {
-    const { plugin, response } = await setup({ local })
-    response.text =
-      Array.from({ length: 55 }, (_, index) => `term${index}`).join(' ') + ' useComposerText'
-    await dictate(plugin)
-    await dictate(plugin)
-    response.text = 'use composer text and G O D E'
-    const words = (
+test('acceptSuggestion moves a learned term into memory and recognition vocabulary', async () => {
+  const { plugin, response, view } = await setup()
+  await dictate(plugin)
+  await dictate(plugin)
+  const suggestion = view('suggestions').items[0]!
+  expect(view('memory').items).toEqual([])
+  await plugin.action('acceptSuggestion', suggestion.id)
+  expect(view('suggestions').items).toEqual([])
+  expect(view('memory').items).toEqual([{ id: suggestion.id, text: suggestion.text }])
+  expect(
+    (
       await plugin.query({
         type: 'query',
         id: 1,
         view: 'memory',
         search: '',
         cursor: null,
+        limit: 10,
+      })
+    ).items,
+  ).toEqual([{ id: suggestion.id, text: suggestion.text }])
+  response.text = 'Nothing else'
+  await dictate(plugin)
+  const body = vi.mocked(fetch).mock.calls.at(-1)![1]!.body as FormData
+  expect(body.get('prompt')).toBe('useComposerText')
+})
+
+test('ignoreSuggestion removes a learned term and prevents it from returning after two more dictations', async () => {
+  const { plugin, view } = await setup()
+  await dictate(plugin)
+  await dictate(plugin)
+  await plugin.action('ignoreSuggestion', view('suggestions').items[0]!.id)
+  expect(view('suggestions').items).toEqual([])
+  expect(view('memory').items).toEqual([])
+  await dictate(plugin)
+  await dictate(plugin)
+  expect(view('suggestions').items).toEqual([])
+  expect(
+    (
+      await plugin.query({
+        type: 'query',
+        id: 1,
+        view: 'suggestions',
+        search: '',
+        cursor: null,
+        limit: 10,
+      })
+    ).items,
+  ).toEqual([])
+  for (const [, init] of vi.mocked(fetch).mock.calls.slice(-2))
+    expect((init!.body as FormData).has('prompt')).toBe(false)
+})
+
+test.each([true, false])(
+  'learned terms stay out of recognition while own and request words reach it (local: %s)',
+  async (local) => {
+    const { plugin, response } = await setup({ local })
+    response.text =
+      Array.from({ length: 55 }, (_, index) => `term${index}`).join(' ') + ' useComposerText'
+    await dictate(plugin)
+    await dictate(plugin)
+    await plugin.action('addTerm', undefined, 'SwiftUI')
+    response.text = 'swift u i and use composer text and G O D E'
+    const words = (
+      await plugin.query({
+        type: 'query',
+        id: 1,
+        view: 'suggestions',
+        search: '',
+        cursor: null,
         limit: 100,
       })
     ).items.map((item) => item.text)
     const request = ['Gode', words[0]!.toUpperCase()]
-    await expect(dictate(plugin, request)).resolves.toEqual({ text: 'useComposerText and Gode' })
+    await expect(dictate(plugin, request)).resolves.toEqual({
+      text: 'SwiftUI and use composer text and Gode',
+    })
     const body = vi.mocked(fetch).mock.calls.at(-1)![1]!.body as FormData
     if (local) expect(body.has('prompt')).toBe(false)
     else {
-      expect(body.get('prompt')).toBe([...request, ...words.slice(1, 51)].join(', '))
-      expect((body.get('prompt') as string).split(', ')).toHaveLength(52)
+      expect(body.get('prompt')).toBe(['SwiftUI', ...request].join(', '))
+      const sent = (body.get('prompt') as string).toLowerCase().split(', ')
+      for (const learned of words.slice(1)) expect(sent).not.toContain(learned.toLowerCase())
     }
   },
 )

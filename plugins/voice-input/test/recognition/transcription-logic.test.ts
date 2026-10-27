@@ -1,7 +1,6 @@
 import { expect, test } from '@gode/plugin-sdk/test'
 import {
   apiURL,
-  applyVocabulary,
   cleanTranscript,
   continuedText,
   formatBytes,
@@ -113,14 +112,3 @@ test('API paths preserve the base and errors preserve the server message', async
   expect(formatBytes(2520744288, 'en')).toBe('2.5 GB')
   expect(formatBytes(2520744288, 'de')).toContain('2,5')
 })
-
-test.each([
-  ['我们有一个 G O D E One，这个 GODE One', ['Gode One'], '我们有一个 Gode One，这个 GODE One'],
-  ['还有 Agent Doc 这个东西', ['agentdoc'], '还有 agentdoc 这个东西'],
-  ['重新部署一些 Relay', ['relay'], '重新部署一些 Relay'],
-  ['把 use composer text 抽出来', ['useComposerText'], '把 useComposerText 抽出来'],
-  ['agent documentation', ['agentdoc'], 'agent documentation'],
-  ['a b', ['ab'], 'a b'],
-])('applies vocabulary to %s', (text, vocabulary, expected) =>
-  expect(applyVocabulary(text, vocabulary)).toBe(expected),
-)

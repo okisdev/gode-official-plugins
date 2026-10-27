@@ -5,12 +5,12 @@ import type { LocalEngine } from '../models/engine'
 import type { Names } from '../names'
 import {
   apiURL,
-  applyVocabulary,
   cleanTranscript,
   readResponse,
   reason,
   transcriptionRequest,
 } from './transcription-logic'
+import { applyVocabulary } from './vocabulary-logic'
 
 async function transcribe(
   base: string,

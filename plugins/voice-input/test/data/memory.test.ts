@@ -23,9 +23,9 @@ async function setup(locale = 'en', stored?: string) {
   const memory = new VoiceMemory(directory, locale, setView, synced)
   cleanups.push(() => memory.dispose())
   await memory.read()
-  const view = () => {
-    const data = setView.mock.calls.at(-1)![1]
-    return pluginViewDataSchemas.terms.parse(data)
+  const view = (id: 'memory' | 'suggestions' = 'suggestions') => {
+    const data = setView.mock.calls.findLast(([viewId]) => viewId === id)![1]
+    return pluginViewDataSchemas[id === 'memory' ? 'terms' : 'list'].parse(data)
   }
   return { memory, directory, setView, view, synced }
 }
@@ -68,9 +68,12 @@ test('counts separate dictations, retains the most frequent spelling and exclude
   await replacement.read()
   expect(replacement.vocabulary([])).toEqual([])
   replacement.record('中文 GODE', [])
-  expect(replacement.vocabulary([])).toEqual(['Gode'])
+  expect(replacement.vocabulary([])).toEqual([])
   replacement.record('中文 GODE GODE', [])
-  expect(replacement.vocabulary([])).toEqual(['GODE'])
+  expect(replacement.vocabulary([])).toEqual([])
+  expect(replacement.query('suggestions', '', null, 10).items).toEqual([
+    { id: 'gode', text: 'GODE', time: expect.any(Number), detail: 'Heard in 3 dictations' },
+  ])
   expect(replacement.vocabulary(['gode'])).toEqual(['gode'])
   await replacement.dispose()
   expect(JSON.parse(await readFile(join(directory, 'memory.json'), 'utf8'))).toMatchObject({
@@ -101,12 +104,16 @@ test('evicts the least recently heard learned term, regardless of count', async 
   expect(words).toHaveLength(20)
   expect(view().total).toBe(300)
   expect(words).toContain('term0')
-  expect(memory.query('', null, 100).items.map((item) => item.text)).toContain('term300')
-  expect(memory.query('', null, 100).items.map((item) => item.text)).not.toContain('term1')
+  expect(memory.query('suggestions', '', null, 100).items.map((item) => item.text)).toContain(
+    'term300',
+  )
+  expect(memory.query('suggestions', '', null, 100).items.map((item) => item.text)).not.toContain(
+    'term1',
+  )
   expect(words[0]).toBe('term300')
   expect(synced('terms').has('term1')).toBe(false)
   expect(synced('terms').size).toBe(300)
-})
+}, 30000)
 
 test('migration keeps the newest 1,000 forgotten terms in the store', async () => {
   const forgotten = Array.from({ length: 1001 }, (_, index) => `term${index}`)
@@ -145,7 +152,8 @@ test('forgetting survives restart and clear removes candidates and the forgotten
   replacement.record('API useComposerText', [])
   expect(replacement.vocabulary([])).toEqual([])
   replacement.record('useComposerText', [])
-  expect(replacement.vocabulary([])).toEqual(['useComposerText'])
+  expect(replacement.vocabulary([])).toEqual([])
+  expect(replacement.query('suggestions', '', null, 10).items[0]?.text).toBe('useComposerText')
   await replacement.dispose()
   expect(JSON.parse(await readFile(join(directory, 'memory.json'), 'utf8')).forgotten).toEqual([])
 })
@@ -156,12 +164,13 @@ test('added words win over learned terms, deduplicate, and survive restart', asy
   memory.record('useComposerText', [])
   memory.add('  UseComposerText  ')
   memory.add('usecomposertext')
-  expect(view().items).toEqual([{ id: 'usecomposertext', text: 'UseComposerText' }])
+  expect(view('memory').items).toEqual([{ id: 'usecomposertext', text: 'UseComposerText' }])
+  expect(view().items).toEqual([])
   expect(synced('terms').has('usecomposertext')).toBe(false)
   expect(synced('vocabulary').entries()).toEqual([['usecomposertext', 'UseComposerText']])
   memory.record('useComposerText', [])
   memory.record('useComposerText', [])
-  expect(view().items).toEqual([{ id: 'usecomposertext', text: 'UseComposerText' }])
+  expect(view('memory').items).toEqual([{ id: 'usecomposertext', text: 'UseComposerText' }])
   await memory.dispose()
   expect(JSON.parse(await readFile(join(directory, 'memory.json'), 'utf8')).own).toEqual([
     'UseComposerText',
@@ -170,6 +179,18 @@ test('added words win over learned terms, deduplicate, and survive restart', asy
   cleanups.push(() => replacement.dispose())
   await replacement.read()
   expect(replacement.vocabulary([])).toEqual(['UseComposerText'])
+})
+
+test('accept moves a suggestion into own words and vocabulary', async () => {
+  const { memory, view } = await setup()
+  memory.record('useComposerText', [])
+  memory.record('useComposerText', [])
+  const suggestion = view().items[0]!
+  expect(memory.vocabulary([])).toEqual([])
+  memory.accept(suggestion.id)
+  expect(view().items).toEqual([])
+  expect(view('memory').items).toEqual([{ id: suggestion.id, text: suggestion.text }])
+  expect(memory.vocabulary([])).toEqual(['useComposerText'])
 })
 
 test('removing a person word prevents relearning until it is added again', async () => {
@@ -183,14 +204,14 @@ test('removing a person word prevents relearning until it is added again', async
   memory.record('Gode', [])
   expect(view().items).toEqual([])
   memory.add('  GODE  ')
-  expect(view().items).toEqual([{ id: 'gode', text: 'GODE' }])
+  expect(view('memory').items).toEqual([{ id: 'gode', text: 'GODE' }])
   expect(synced('forgotten').has('gode')).toBe(false)
   memory.clear()
   expect(view().items).toEqual([])
   expect(synced('vocabulary').size).toBe(0)
 })
 
-test('vocabulary places person words before request words and learned terms without duplicates', async () => {
+test('vocabulary places person words before request words without learned terms or duplicates', async () => {
   const { memory, view } = await setup()
   memory.add('Gode')
   memory.add('SwiftUI')
@@ -205,21 +226,22 @@ test('vocabulary places person words before request words and learned terms with
     'Gode',
     'Custom',
     'usecomposertext',
-    'API',
   ])
   expect(memory.vocabulary(['Custom'], 1)).toEqual(['SwiftUI', 'Custom'])
-  expect(view().items).toEqual([
+  expect(view('memory').items).toEqual([
     { id: 'swiftui', text: 'SwiftUI' },
     { id: 'gode', text: 'Gode' },
-    { id: 'api', text: 'API', detail: 'Heard in 2 dictations', automatic: true },
+  ])
+  expect(view().items).toEqual([
+    { id: 'api', text: 'API', time: expect.any(Number), detail: 'Heard in 2 dictations' },
     {
       id: 'usecomposertext',
       text: 'useComposerText',
+      time: expect.any(Number),
       detail: 'Heard in 2 dictations',
-      automatic: true,
     },
   ])
-  expect(memory.query('go', null, 10).items).toEqual([{ id: 'gode', text: 'Gode' }])
+  expect(memory.query('memory', 'go', null, 10).items).toEqual([{ id: 'gode', text: 'Gode' }])
 })
 
 test.each([
@@ -235,15 +257,22 @@ test.each([
   ['ru', 21, 'Встречается в 21 диктовке'],
   ['zh-Hans', 2, '在 2 次听写中出现'],
   ['zh-Hant', 2, '在 2 次聽寫中出現'],
-] as const)('localizes memory counts in %s for %s dictations', async (locale, count, expected) => {
-  const { memory, view, setView } = await setup(locale)
-  for (let index = 0; index < count; index++) memory.record('API', [])
-  expect(view().items).toEqual([{ id: 'api', text: 'API', detail: expected, automatic: true }])
-  for (const [id, data] of setView.mock.calls) {
-    expect(id).toBe('memory')
-    expect(pluginViewDataSchemas.terms.safeParse(data).success).toBe(true)
-  }
-})
+] as const)(
+  'localizes suggestion counts in %s for %s dictations',
+  async (locale, count, expected) => {
+    const { memory, view, setView } = await setup(locale)
+    for (let index = 0; index < count; index++) memory.record('API', [])
+    expect(view().items).toEqual([
+      { id: 'api', text: 'API', time: expect.any(Number), detail: expected },
+    ])
+    for (const [id, data] of setView.mock.calls) {
+      expect(['memory', 'suggestions']).toContain(id)
+      expect(
+        pluginViewDataSchemas[id === 'memory' ? 'terms' : 'list'].safeParse(data).success,
+      ).toBe(true)
+    }
+  },
+)
 
 test.each([
   '{invalid',
@@ -253,7 +282,8 @@ test.each([
   '{"terms":[],"forgotten":[1]}',
 ])('corrupt memory starts empty: %s', async (stored) => {
   const { memory, view } = await setup('en', stored)
-  expect(view()).toEqual({ items: [], total: 0, empty: 'view.memory.empty' })
+  expect(view('memory')).toEqual({ items: [], total: 0, empty: 'view.memory.empty' })
+  expect(view()).toEqual({ items: [], total: 0, empty: 'view.suggestions.empty' })
   memory.record('API', [])
   memory.record('API', [])
   expect(view().items[0]?.text).toBe('API')

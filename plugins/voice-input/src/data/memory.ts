@@ -236,7 +236,6 @@ export class VoiceMemory {
     }
     for (const word of [...this.own.values()].reverse()) append(word, true)
     for (const word of request) append(word, false)
-    for (const term of this.learned()) append(surface(term), true)
     return words
   }
 
@@ -251,6 +250,11 @@ export class VoiceMemory {
     this.forgotten.delete(key)
     this.syncedForgotten.delete(key)
     this.changed()
+  }
+
+  accept(key: string): void {
+    const term = this.terms.get(key)
+    if (term && term.count >= 2) this.add(surface(term))
   }
 
   forget(key: string): void {
@@ -281,8 +285,13 @@ export class VoiceMemory {
     return this.file.dispose()
   }
 
-  query(search: string, cursor: string | null, limit: number): PluginViewPage {
-    const matches = this.items().filter((item) =>
+  query(
+    view: 'memory' | 'suggestions',
+    search: string,
+    cursor: string | null,
+    limit: number,
+  ): PluginViewPage {
+    const matches = (view === 'memory' ? this.words() : this.suggestions()).filter((item) =>
       item.text.toLowerCase().includes(search.toLowerCase()),
     )
     const offset = cursor === null ? 0 : Number(cursor)
@@ -371,31 +380,38 @@ export class VoiceMemory {
   }
 
   private publish(): void {
-    const items = this.items()
+    const words = this.words()
     this.setView('memory', {
-      items: items.slice(0, 20),
-      total: items.length,
+      items: words.slice(0, 20),
+      total: words.length,
       empty: 'view.memory.empty',
+    })
+    const suggestions = this.suggestions()
+    this.setView('suggestions', {
+      items: suggestions.slice(0, 20),
+      total: suggestions.length,
+      empty: 'view.suggestions.empty',
     })
   }
 
-  private items(): PluginViewPage['items'] {
-    return [
-      ...[...this.own].reverse().map(([id, text]) => ({ id, text })),
-      ...this.learned()
-        .sort((a, b) => b.time - a.time || a.key.localeCompare(b.key))
-        .map((term) => this.item(term)),
-    ]
+  private words(): PluginViewPage['items'] {
+    return [...this.own].reverse().map(([id, text]) => ({ id, text }))
   }
 
-  private item(term: Term): PluginViewPage['items'][number] {
+  private suggestions(): PluginViewPage['items'] {
+    return this.learned()
+      .sort((a, b) => b.time - a.time || a.key.localeCompare(b.key))
+      .map((term) => this.suggestion(term))
+  }
+
+  private suggestion(term: Term): PluginViewPage['items'][number] {
     const strings: Record<string, string> = catalogs[this.locale] ?? en
     const plurals = new Intl.PluralRules(this.locale)
     const numbers = new Intl.NumberFormat(this.locale)
     return {
       id: term.key,
       text: surface(term),
-      automatic: true,
+      time: term.time,
       detail: (
         strings[`memory.heard.${plurals.select(term.count)}`] ?? strings['memory.heard.other']!
       ).replace('{count}', numbers.format(term.count)),

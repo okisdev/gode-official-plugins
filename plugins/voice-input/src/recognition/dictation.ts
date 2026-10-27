@@ -19,7 +19,8 @@ import type { Names } from '../names'
 import type { createPolish } from './polish'
 import type { createRecognition } from './recognition'
 import { detectSpeech, segmentCut, sentencePause, speechPauses } from './speech-logic'
-import { applyVocabulary, continuedText, joinTranscript, logReason } from './transcription-logic'
+import { continuedText, joinTranscript, logReason } from './transcription-logic'
+import { applyVocabulary } from './vocabulary-logic'
 
 export function createDictation({
   ready,

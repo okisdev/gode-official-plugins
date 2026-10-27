@@ -202,7 +202,9 @@ export function createVoicePlugin(
         history.delete(item)
       } else if (action === 'clearHistory') {
         history.clear()
-      } else if (action === 'forgetTerm' && item) {
+      } else if (action === 'acceptSuggestion' && item) {
+        memory.accept(item)
+      } else if ((action === 'forgetTerm' || action === 'ignoreSuggestion') && item) {
         memory.forget(item)
       } else if (action === 'addTerm' && text !== undefined) {
         memory.add(text)
@@ -218,7 +220,8 @@ export function createVoicePlugin(
     },
     query({ view, search, cursor, limit }) {
       if (view === 'history') return history.query(search, cursor, limit)
-      if (view === 'memory') return memory.query(search, cursor, limit)
+      if (view === 'memory' || view === 'suggestions')
+        return memory.query(view, search, cursor, limit)
       throw new Error(`Unknown view: ${view}`)
     },
     call: dictation.call,

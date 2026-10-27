@@ -69,27 +69,6 @@ export function cleanTranscript(text: string, removeFillers: boolean): string {
     : cleaned
 }
 
-const separators = (text: string) => text.match(/[\s\-_.]/gu)?.length ?? 0
-
-/** A vocabulary word the model spelled out or split, such as `G O D E` or `Agent Doc` for `Gode` or `agentdoc`,
- * becomes the word; one that differs only in case stays as said. */
-export function applyVocabulary(text: string, vocabulary: readonly string[]): string {
-  let result = text
-  for (const word of vocabulary) {
-    const letters = Array.from(word.matchAll(/[\p{L}\p{N}]/gu), (match) => match[0])
-    if (letters.length < 3) continue
-    const escaped = letters.map((character) => character.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-    const pattern = new RegExp(
-      `(?<![\\p{L}\\p{N}])${escaped.join('[\\s\\-_.]*')}(?![\\p{L}\\p{N}])`,
-      'giu',
-    )
-    result = result.replace(pattern, (found) =>
-      separators(found) > separators(word) ? word : found,
-    )
-  }
-  return result
-}
-
 export function transcriptionRequest(
   request: { audio: Uint8Array; vocabulary: readonly string[] },
   options: { model: string; language: string; apiKey?: string },

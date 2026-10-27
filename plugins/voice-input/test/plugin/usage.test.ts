@@ -197,6 +197,16 @@ test('declares usage views with the SDK schema and sends empty views without cre
       remove: { id: 'forgetTerm', title: 'action.forgetTerm' },
       actions: ['clearMemory'],
     },
+    {
+      id: 'suggestions',
+      kind: 'list',
+      title: 'view.suggestions',
+      description: 'view.suggestions.description',
+      itemActions: [
+        { id: 'acceptSuggestion', title: 'action.acceptSuggestion' },
+        { id: 'ignoreSuggestion', title: 'action.ignoreSuggestion', destructive: true },
+      ],
+    },
     { id: 'usage', kind: 'figures', title: 'view.usage' },
     {
       id: 'activity',
@@ -211,6 +221,7 @@ test('declares usage views with the SDK schema and sends empty views without cre
     ['activity', { unit: 'view.activity.unit', days: [] }],
     ['history', { items: [], total: 0, empty: 'view.history.empty' }],
     ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
+    ['suggestions', { items: [], total: 0, empty: 'view.suggestions.empty' }],
   ])
   for (const [id, data] of setView.mock.calls)
     expect(
@@ -251,7 +262,7 @@ test('local sessions warm the engine and clean interim and final text', async ()
   expect(body.get('language')).toBe('en')
   expect(body.has('prompt')).toBe(false)
   expect(Buffer.from(await (body.get('file') as File).arrayBuffer())).toEqual(wav(1.25))
-  expect(setView).toHaveBeenCalledTimes(4)
+  expect(setView).toHaveBeenCalledTimes(5)
   await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   await expect(append(plugin, session, pcm(1.25))).resolves.toEqual({ text: 'Gode works.' })
   await expect(finish(plugin, session)).resolves.toEqual({ text: 'Gode works.' })
@@ -408,7 +419,7 @@ test('server sessions append without a request and finish once', async () => {
   await expect(append(plugin, session, pcm(1.5))).resolves.toBeNull()
   expect(listener).not.toHaveBeenCalled()
   expect(use).not.toHaveBeenCalled()
-  expect(setView).toHaveBeenCalledTimes(4)
+  expect(setView).toHaveBeenCalledTimes(5)
   await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   await expect(finish(plugin, session)).resolves.toEqual({ text: 'Hello' })
   expect(listener).toHaveBeenCalledTimes(1)
@@ -447,6 +458,7 @@ test.each([
       ['activity', { unit: 'view.activity.unit', days: [] }],
       ['history', { items: [], total: 0, empty: 'view.history.empty' }],
       ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
+      ['suggestions', { items: [], total: 0, empty: 'view.suggestions.empty' }],
     ])
     await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   },
@@ -578,7 +590,7 @@ test('overlapping local sessions keep their own audio, vocabulary and settings',
     expect(Buffer.from(await file.arrayBuffer())).toEqual(expected)
   }
   expect(setView.mock.calls.at(-2)).toEqual(['usage', figures(2, 2, 0.5, 1)])
-  expect(setView).toHaveBeenCalledTimes(7)
+  expect(setView).toHaveBeenCalledTimes(8)
   await plugin.call({ type: 'call', id: 4, method: 'dictation.cancel', params: { session: first } })
 })
 
@@ -900,6 +912,7 @@ test('statistics survive restart and publish totals and calendar days using the 
     ['activity', { unit: 'view.activity.unit', days: [{ date: '2026-01-02', value: 9 }] }],
     setView.mock.calls.findLast(([id]) => id === 'history'),
     ['memory', { items: [], total: 0, empty: 'view.memory.empty' }],
+    ['suggestions', { items: [], total: 0, empty: 'view.suggestions.empty' }],
   ])
   text = 'Hello again'
   await dictate(replacement, 1.25, [])
@@ -949,7 +962,7 @@ test.each(['', ' \n ', 'language English<asr_text>Um, uh.'])(
       async () => new Response(JSON.stringify({ text })),
     )
     await expect(dictate(plugin)).resolves.toEqual({ text: '' })
-    expect(setView).toHaveBeenCalledTimes(4)
+    expect(setView).toHaveBeenCalledTimes(5)
     await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
   },
 )
@@ -962,7 +975,7 @@ test('failed transcriptions are not counted', async () => {
   await expect(dictate(plugin)).rejects.toMatchObject({
     text: { message: 'error.recognition' },
   })
-  expect(setView).toHaveBeenCalledTimes(4)
+  expect(setView).toHaveBeenCalledTimes(5)
   await expect(readFile(join(directory, 'stats.json'))).rejects.toMatchObject({ code: 'ENOENT' })
 })
 
@@ -979,7 +992,7 @@ test('overlapping transcriptions persist all counts without temporary files left
   )
   await Promise.all(Array.from({ length: 5 }, () => dictate(plugin)))
   expect(setView.mock.calls.at(-2)).toEqual(['usage', figures(10, 10, 12.5, 5)])
-  expect(setView).toHaveBeenCalledTimes(19)
+  expect(setView).toHaveBeenCalledTimes(20)
   expect((await saved(directory, 5)).totals).toEqual({
     words: 10,
     seconds: 12.5,

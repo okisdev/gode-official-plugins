@@ -25,6 +25,16 @@ export default [
     actions: ['clearMemory'],
   },
   {
+    id: 'suggestions',
+    kind: 'list',
+    title: 'view.suggestions',
+    description: 'view.suggestions.description',
+    itemActions: [
+      { id: 'acceptSuggestion', title: 'action.acceptSuggestion' },
+      { id: 'ignoreSuggestion', title: 'action.ignoreSuggestion', destructive: true },
+    ],
+  },
+  {
     id: 'usage',
     kind: 'figures',
     title: 'view.usage',

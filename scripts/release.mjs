@@ -5,8 +5,18 @@ import { basename, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { pluginCatalogSchema } from '@gode/plugin-sdk'
 import { buildPluginRelease } from '@gode/plugin-sdk/release'
-import { pluginPublicKey } from '@gode/plugin-sdk/sign'
-import { archiveMatches, catalogPlan, releasePlan } from './release-logic.mjs'
+import {
+  pluginPublicKey,
+  readSignedPluginReleases,
+  signPluginReleases,
+} from '@gode/plugin-sdk/sign'
+import {
+  archiveMatches,
+  catalogPlan,
+  deletePlan,
+  releasePlan,
+  retainedReleases,
+} from './release-logic.mjs'
 
 const repository = fileURLToPath(new URL('..', import.meta.url))
 const catalogPath = join(repository, 'catalog.json')
@@ -51,14 +61,25 @@ export async function releasePlugin(id) {
   const directory = await mkdtemp(join(tmpdir(), 'gode-plugin-release-'))
   try {
     const previous = previousResponse.status === 404 ? undefined : join(directory, 'previous.json')
-    if (previous) await writeFile(previous, await previousResponse.text())
+    const previousText = previous ? await previousResponse.text() : undefined
+    if (previous) await writeFile(previous, previousText)
+    const previousReleases = previousText
+      ? readSignedPluginReleases(JSON.parse(previousText)).releases
+      : []
     const releases = await buildPluginRelease(archives, {
       privateKey,
       out: directory,
       previous,
+      keep: previousReleases.length + 1,
     })
     if (releases.publisher !== 'gode' || releases.id !== id)
       throw new Error(`Archives do not belong to gode/${id}`)
+    const retained = retainedReleases(releases.releases)
+    await writeFile(
+      join(directory, 'releases.json'),
+      `${JSON.stringify(signPluginReleases({ ...releases, releases: retained }, privateKey))}\n`,
+    )
+    const deletions = deletePlan(id, previousReleases, retained)
     const plan = releasePlan(
       id,
       directory,
@@ -82,6 +103,7 @@ export async function releasePlugin(id) {
     }
     for (const item of uploadArchives) upload(item)
     upload(plan.at(-1))
+    for (const item of deletions) upload(item)
   } finally {
     await rm(directory, { recursive: true, force: true })
   }

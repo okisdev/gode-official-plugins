@@ -8,7 +8,13 @@ import { readSignedPluginReleases } from '@gode/plugin-sdk/sign'
 import { afterEach, test } from 'node:test'
 import { localCatalog } from './index-logic.mjs'
 import { buildIndex } from './index.mjs'
-import { archiveMatches, catalogPlan, releasePlan } from './release-logic.mjs'
+import {
+  archiveMatches,
+  catalogPlan,
+  deletePlan,
+  releasePlan,
+  retainedReleases,
+} from './release-logic.mjs'
 
 const manifest: PluginManifest = {
   id: 'echo',
@@ -91,4 +97,72 @@ test('release plan uploads archives before the signed file and keeps the catalog
   assert.ok(catalogPlan('/tmp/catalog.json').args.includes('gode/updates/plugins/index.json'))
   assert.equal(archiveMatches(Buffer.from('same'), Buffer.from('same')), true)
   assert.equal(archiveMatches(Buffer.from('local'), Buffer.from('remote')), false)
+})
+
+function release(
+  version: string,
+  minimumAppVersion: string,
+  platforms = ['linux-x64', 'darwin-arm64'],
+) {
+  return {
+    manifest: { version, minimumAppVersion },
+    builds: Object.fromEntries(
+      platforms.map((platform) => [platform, { url: `echo-${version}-${platform}.tar.br` }]),
+    ),
+  }
+}
+
+test('retention keeps three newest releases and the newest release for each older app minimum', () => {
+  const releases = [
+    release('1.12.0', '0.3.0'),
+    release('1.11.0', '0.4.0'),
+    release('1.10.0', '0.3.0'),
+    release('1.9.0', '0.3.0'),
+    release('1.8.0', '0.2.0'),
+    release('1.7.0', '0.2.0'),
+    release('1.6.0', '0.1.19'),
+    release('1.5.0', '0.1.19-beta.92'),
+    release('1.4.0', '0.1.19-beta.84'),
+    release('1.3.0', '0.1.19-beta.84'),
+    release('1.2.0', '0.1.19'),
+    release('1.1.0', '0.5.0'),
+  ]
+  const original = structuredClone(releases)
+  assert.deepEqual(
+    retainedReleases(releases).map((item) => item.manifest.version),
+    ['1.12.0', '1.11.0', '1.10.0', '1.8.0', '1.6.0', '1.5.0', '1.4.0'],
+  )
+  assert.deepEqual(releases, original)
+  assert.deepEqual(retainedReleases(releases.slice(0, 2)), releases.slice(0, 2))
+})
+
+test('deletion plan removes only old unreferenced plugin archives from R2', () => {
+  const previous = [
+    release('1.4.0', '0.3.0'),
+    release('1.3.0', '0.3.0'),
+    release('1.2.0', '0.2.0'),
+    release('1.1.0', '0.2.0'),
+    release('1.0.0', '0.1.0'),
+  ]
+  previous[4]!.builds['darwin-arm64'] = { url: 'https://example.com/external.tar.br' }
+  const retained = [release('1.5.0', '0.3.0'), ...previous.slice(0, 3)]
+  const plan = deletePlan('echo', previous, retained)
+  assert.deepEqual(
+    plan.map((item) => item.file),
+    [
+      'gode/echo/echo-1.1.0-linux-x64.tar.br',
+      'gode/echo/echo-1.1.0-darwin-arm64.tar.br',
+      'gode/echo/echo-1.0.0-linux-x64.tar.br',
+    ],
+  )
+  assert.deepEqual(plan[0]?.args, [
+    'exec',
+    'wrangler',
+    'r2',
+    'object',
+    'delete',
+    'gode/updates/plugins/gode/echo/echo-1.1.0-linux-x64.tar.br',
+    '--remote',
+  ])
+  assert.deepEqual(deletePlan('echo', previous, previous), [])
 })

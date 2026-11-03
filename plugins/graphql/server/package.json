@@ -3,6 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "graphql-language-service-cli": "3.5.0"
+    "graphql-language-service-cli": "4.0.1"
   }
 }

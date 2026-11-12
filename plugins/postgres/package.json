@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "gode-plugin build",
-    "check": "gode-plugin check",
+    "check": "gode-plugin check --all-languages",
     "test": "gode-plugin test"
   },
   "dependencies": {

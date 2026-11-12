@@ -17,7 +17,12 @@ import { reason } from './recognition/transcription-logic'
 import { createVoiceStatus } from './status'
 
 export function createVoicePlugin(
-  { setStatus, setView, log, synced }: PluginContext<Names>,
+  {
+    setStatus,
+    setView,
+    log,
+    synced,
+  }: Pick<PluginContext<Names>, 'setStatus' | 'setView' | 'log' | 'synced'>,
   models: readonly ModelSet[] = resources.models,
   polishModels: readonly ModelSet[] = resources.polishModels,
 ): Required<

@@ -1,0 +1,7 @@
+{
+  "name": "Oxfmt",
+  "description": "Formatação com a versão de Oxfmt ou Vite+ do projeto.",
+  "about": "Formata arquivos compatíveis no editor do Gode com a versão de Oxfmt ou Vite+ do projeto e sua configuração. Funciona apenas em projetos que têm Oxfmt ou Vite+ instalado.",
+  "ready": "Pronto para formatar projetos com Oxfmt ou Vite+ instalado.",
+  "failed": "Não foi possível iniciar o servidor de linguagem de Oxfmt ou Vite+ do projeto."
+}

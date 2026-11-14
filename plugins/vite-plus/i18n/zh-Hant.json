@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "為 Vite+ 專案提供程式碼檢查與格式化。",
+  "about": "整合 Vite+ 專案在 Gode 編輯器中使用的外掛模組：Oxc 用於檢查及修正程式碼問題，Oxfmt 用於格式化。兩者皆執行專案自備的 Vite+，並讀取專案的 vite.config.ts。"
+}

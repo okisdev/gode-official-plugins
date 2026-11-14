@@ -1,0 +1,7 @@
+{
+  "name": "Oxfmt",
+  "description": "Formatierung mit der eigenen Version von Oxfmt oder Vite+ des Projekts.",
+  "about": "Formatiert unterstützte Dateien im Gode-Editor mit der eigenen Version von Oxfmt oder Vite+ des Projekts und deren Konfiguration. Unterstützt nur Projekte, in denen Oxfmt oder Vite+ installiert ist.",
+  "ready": "Bereit zum Formatieren von Projekten, in denen Oxfmt oder Vite+ installiert ist.",
+  "failed": "Der Sprachserver der projekteigenen Version von Oxfmt oder Vite+ konnte nicht gestartet werden."
+}

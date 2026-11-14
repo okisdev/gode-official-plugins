@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "Vite+ 프로젝트의 코드를 검사하고 서식을 지정합니다.",
+  "about": "Vite+ 프로젝트가 Gode 에디터에서 사용하는 플러그인을 모았습니다. Oxc는 코드 검사 문제와 수정을, Oxfmt는 서식 지정을 담당합니다. 둘 다 프로젝트에 설치된 Vite+를 실행하고 해당 vite.config.ts를 읽습니다."
+}

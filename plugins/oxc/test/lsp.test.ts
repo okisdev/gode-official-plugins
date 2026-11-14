@@ -8,6 +8,10 @@ test.skipIf(!built())(
     const session = await startLanguageServer(plugin, { language: 'typescript' })
     expect(session.launch.kind).toBe('program')
     expect(session.launch.args).toEqual(['--lsp'])
+    expect(session.launch.project).toEqual([
+      { path: 'node_modules/.bin/vp', args: ['lint', '--lsp'] },
+      { path: 'node_modules/.bin/oxlint', args: ['--lsp'] },
+    ])
     expect(existsSync(session.launch.path)).toBe(true)
     const initialized = await session.initialize()
     expect(initialized.error).toBeUndefined()

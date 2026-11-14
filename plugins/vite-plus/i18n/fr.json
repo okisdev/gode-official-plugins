@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "Analyse et mise en forme du code pour les projets Vite+.",
+  "about": "Réunit les plugins qu’un projet Vite+ utilise dans l’éditeur de Gode\u00a0: Oxc pour les problèmes et les corrections de l’analyse du code, et Oxfmt pour la mise en forme. Tous deux exécutent la version de Vite+ du projet et lisent son fichier vite.config.ts."
+}

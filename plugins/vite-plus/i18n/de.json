@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "Codeprüfung und Formatierung für Vite+-Projekte.",
+  "about": "Vereint die Plugins, die ein Vite+-Projekt im Gode-Editor verwendet: Oxc für Probleme und Korrekturen bei der Codeprüfung und Oxfmt für die Formatierung. Beide führen die eigene Version von Vite+ des Projekts aus und lesen dessen vite.config.ts."
+}

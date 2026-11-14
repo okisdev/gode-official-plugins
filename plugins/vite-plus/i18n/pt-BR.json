@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "Análise e formatação de código para projetos Vite+.",
+  "about": "Reúne os plugins que um projeto Vite+ usa no editor do Gode: Oxc para os problemas e as correções da análise de código, e Oxfmt para a formatação. Ambos executam a versão de Vite+ do projeto e leem seu vite.config.ts."
+}

@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "Linting and formatting for Vite+ projects.",
+  "about": "Brings together the plugins a Vite+ project uses in Gode’s editor: Oxc for lint problems and fixes, and Oxfmt for formatting. Both run the project’s own Vite+ and read its vite.config.ts."
+}

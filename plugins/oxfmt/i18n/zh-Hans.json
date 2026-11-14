@@ -1,0 +1,7 @@
+{
+  "name": "Oxfmt",
+  "description": "使用项目自身的 Oxfmt 或 Vite+ 格式化代码。",
+  "about": "使用项目自身的 Oxfmt 或 Vite+ 及其配置，在 Gode 编辑器中格式化支持的文件。仅适用于已安装 Oxfmt 或 Vite+ 的项目。",
+  "ready": "已准备好为安装了 Oxfmt 或 Vite+ 的项目格式化代码。",
+  "failed": "无法启动项目的 Oxfmt 或 Vite+ 语言服务器。"
+}

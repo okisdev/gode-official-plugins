@@ -1,7 +1,7 @@
 {
   "name": "Oxc",
   "description": "Lint-Diagnosen und Korrekturen für Webprojekte mit Oxc.",
-  "about": "Oxc ergänzt im Gode-Editor den Sprachserver deines Projekts um Lint-Diagnosen und Korrekturen. Es verwendet die .oxlintrc.json des Projekts und startet, wenn du eine unterstützte Datei öffnest.",
+  "about": "Oxc ergänzt im Gode-Editor den Sprachserver deines Projekts um Lint-Diagnosen und Korrekturen. Es verwendet die .oxlintrc.json des Projekts und startet, wenn du eine unterstützte Datei öffnest. Wenn das Projekt eine eigene Version von Oxlint oder Vite+ hat, wird diese verwendet.",
   "ready": "Bereit zum Prüfen mit Oxc.",
   "failed": "Der Oxc-Sprachserver konnte nicht gestartet werden."
 }

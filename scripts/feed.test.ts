@@ -27,6 +27,7 @@ const manifest: PluginManifest = {
   description: 'description',
   groups: [],
   actions: [],
+  tools: [],
   stores: [],
   strings: { en: { name: 'Echo', description: 'Types what it hears.' } },
 }

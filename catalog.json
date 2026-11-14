@@ -230,6 +230,18 @@
     },
     {
       "publisher": "gode",
+      "id": "oxfmt",
+      "source": "gode/oxfmt/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
+      "id": "vite-plus",
+      "source": "gode/vite-plus/releases.json",
+      "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"
+    },
+    {
+      "publisher": "gode",
       "id": "php",
       "source": "gode/php/releases.json",
       "publicKey": "p1FJZSeRaz-OP2mfOUblVXhpzFHDxUndgn3sGCrH6xs"

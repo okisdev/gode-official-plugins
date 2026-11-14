@@ -1,0 +1,5 @@
+{
+  "name": "Vite+",
+  "description": "为 Vite+ 项目提供代码检查和格式化。",
+  "about": "整合 Vite+ 项目在 Gode 编辑器中使用的插件：Oxc 用于检查和修复代码问题，Oxfmt 用于格式化。两者都运行项目自身的 Vite+，并读取项目的 vite.config.ts。"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Oxfmt",
+  "description": "프로젝트에 설치된 Oxfmt 또는 Vite+로 코드 서식을 지정합니다.",
+  "about": "프로젝트에 설치된 Oxfmt 또는 Vite+와 해당 설정을 사용하여 Gode 에디터에서 지원되는 파일의 서식을 지정합니다. Oxfmt 또는 Vite+가 설치된 프로젝트에서만 작동합니다.",
+  "ready": "Oxfmt 또는 Vite+가 설치된 프로젝트에서 코드 서식을 지정할 준비가 되었습니다.",
+  "failed": "프로젝트의 Oxfmt 또는 Vite+ 언어 서버를 시작할 수 없습니다."
+}

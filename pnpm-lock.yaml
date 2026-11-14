@@ -234,6 +234,12 @@ importers:
         specifier: link:../../../gode/packages/plugin-sdk
         version: link:../../../gode/packages/plugin-sdk
 
+  plugins/oxfmt:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
   plugins/php:
     dependencies:
       '@gode/plugin-sdk':
@@ -355,6 +361,12 @@ importers:
         version: link:../../../gode/packages/plugin-sdk
 
   plugins/typst:
+    dependencies:
+      '@gode/plugin-sdk':
+        specifier: link:../../../gode/packages/plugin-sdk
+        version: link:../../../gode/packages/plugin-sdk
+
+  plugins/vite-plus:
     dependencies:
       '@gode/plugin-sdk':
         specifier: link:../../../gode/packages/plugin-sdk

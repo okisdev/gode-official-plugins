@@ -20,7 +20,7 @@ test('pins Oxlint archives for every supported platform', () => {
   }
   for (const [platform, asset] of Object.entries(resources.platforms)) {
     expect(asset.url).toBe(
-      `https://github.com/oxc-project/oxc/releases/download/oxlint_v1.89.0/oxlint-${triples[platform as keyof typeof triples]}.tar.gz`,
+      `https://github.com/oxc-project/oxc/releases/download/oxlint_v1.93.0/oxlint-${triples[platform as keyof typeof triples]}.tar.gz`,
     )
     expect(asset.sha256).toMatch(/^[a-f0-9]{64}$/)
   }

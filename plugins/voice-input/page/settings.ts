@@ -8,10 +8,19 @@ export default [
         key: 'engine',
         kind: 'choice',
         title: 'engine.title',
+        description: 'engine.description',
         options: [
           {
             value: 'local',
             title: 'engine.local',
+          },
+          {
+            value: 'chat',
+            title: 'engine.chat',
+          },
+          {
+            value: 'upload',
+            title: 'engine.upload',
           },
           {
             value: 'server',
@@ -39,6 +48,65 @@ export default [
         visibleWhen: {
           key: 'engine',
           values: ['local'],
+        },
+      },
+      {
+        key: 'chatURL',
+        kind: 'text',
+        format: 'url',
+        title: 'serverURL.title',
+        description: 'serverURL.description',
+        placeholder: 'https://api.openai.com/v1',
+        default: '',
+        visibleWhen: {
+          key: 'engine',
+          values: ['chat'],
+        },
+      },
+      {
+        key: 'chatApiKey',
+        kind: 'secret',
+        title: 'apiKey.title',
+        description: 'apiKey.description',
+        visibleWhen: {
+          key: 'engine',
+          values: ['chat'],
+        },
+      },
+      {
+        key: 'chatModel',
+        kind: 'text',
+        format: 'plain',
+        title: 'model.title',
+        description: 'chatModel.description',
+        placeholder: 'qwen3-asr-flash',
+        default: '',
+        visibleWhen: {
+          key: 'engine',
+          values: ['chat'],
+        },
+      },
+      {
+        key: 'uploadURL',
+        kind: 'text',
+        format: 'url',
+        title: 'serverURL.title',
+        description: 'uploadURL.description',
+        placeholder: 'https://api.deepseek.com/v1/tools/asr',
+        default: '',
+        visibleWhen: {
+          key: 'engine',
+          values: ['upload'],
+        },
+      },
+      {
+        key: 'uploadApiKey',
+        kind: 'secret',
+        title: 'apiKey.title',
+        description: 'apiKey.description',
+        visibleWhen: {
+          key: 'engine',
+          values: ['upload'],
         },
       },
       {

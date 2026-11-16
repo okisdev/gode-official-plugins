@@ -74,6 +74,28 @@ export function segmentCut(
   return longest ? { at: longest.at, pause: longest.length } : { at: 30, pause: 0 }
 }
 
+export function recordingParts(
+  pcm: Uint8Array,
+  maxSeconds: number,
+): { start: number; end: number }[] {
+  const total = pcm.byteLength / 32000
+  const parts: { start: number; end: number }[] = []
+  let start = 0
+  while (total - start > maxSeconds) {
+    const window = pcm.subarray(
+      Math.round(start * 16000) * 2,
+      Math.round((start + maxSeconds) * 16000) * 2,
+    )
+    let cut = { at: maxSeconds, length: 0 }
+    for (const pause of speechPauses(window))
+      if (pause.at >= maxSeconds / 2 && pause.length >= cut.length) cut = pause
+    parts.push({ start, end: start + cut.at })
+    start += cut.at
+  }
+  parts.push({ start, end: total })
+  return parts
+}
+
 export function detectSpeech(pcm: Uint8Array): {
   hasSpeech: boolean
   voicedSeconds: number

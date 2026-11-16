@@ -7,6 +7,8 @@ import type { createVoiceStatus } from '../status'
 import { clearPartials, downloadModels, type ModelSet } from './download'
 import type { LocalEngine } from './engine'
 
+export type DownloadStep = 'model' | 'polish'
+
 export function createModelActions({
   directory,
   locale,
@@ -34,18 +36,22 @@ export function createModelActions({
   status: ReturnType<typeof createVoiceStatus>
   log: PluginContext<Names>['log']
 }) {
-  let download: { controller: AbortController; task: Promise<void>; model: ModelSet } | undefined
-  async function stopDownload(): Promise<void> {
-    download?.controller.abort()
-    await download?.task
+  const downloads = new Map<
+    DownloadStep,
+    { controller: AbortController; task: Promise<void>; model: ModelSet }
+  >()
+  async function stopDownload(step?: DownloadStep): Promise<void> {
+    const stopped = [...downloads].filter(([id]) => !step || id === step).map(([, item]) => item)
+    for (const download of stopped) download.controller.abort()
+    await Promise.all(stopped.map((download) => download.task))
   }
 
   async function action(action: Names['actions'] | Names['itemActions']): Promise<void> {
-    if (action === 'stopDownload') {
-      await stopDownload()
+    if (action === 'stopDownload' || action === 'stopPolishDownload') {
+      await stopDownload(action === 'stopDownload' ? 'model' : 'polish')
       await status.refresh()
     } else if (action === 'removeModel') {
-      await stopDownload()
+      await stopDownload('model')
       await engine().stop()
       await Promise.all(
         selected().files.map((file) => rm(join(directory(), file.file), { force: true })),
@@ -53,7 +59,7 @@ export function createModelActions({
       await status.refresh()
     } else if (action === 'removePolishModel' && !polishService()) {
       const polish = selectedPolish()
-      if (download?.model === polish) await stopDownload()
+      if (downloads.get('polish')?.model === polish) await stopDownload('polish')
       await polishEngine().stop()
       await Promise.all(
         polish.files.map((file) => rm(join(directory(), file.file), { force: true })),
@@ -62,10 +68,12 @@ export function createModelActions({
     } else if (
       ((action === 'downloadModel' && local()) ||
         (action === 'downloadPolishModel' && !polishService())) &&
-      !download
+      !downloads.has(action === 'downloadModel' ? 'model' : 'polish')
     ) {
       const target = action === 'downloadModel' ? selected() : selectedPolish()
       const isPolish = action === 'downloadPolishModel'
+      const step: DownloadStep = isPolish ? 'polish' : 'model'
+      const stop = isPolish ? 'stopPolishDownload' : 'stopDownload'
       if (!isPolish) {
         status.ready = false
         await engine().stop()
@@ -79,7 +87,7 @@ export function createModelActions({
       let lastProgress = 0
       if (!isPolish && status.current)
         status.status({ ...status.current, state: 'setup', message: 'status.setup' })
-      status.updateStep(isPolish ? 'polish' : 'model', {
+      status.updateStep(step, {
         state: 'working',
         message: isPolish ? 'status.polishDownloading' : 'status.downloading',
         values: {
@@ -90,28 +98,29 @@ export function createModelActions({
           ),
         },
         progress: 0,
-        action: 'stopDownload',
+        action: stop,
       })
       const task = (async () => {
         try {
           await downloadModels(directory(), target.files, controller.signal, (done, bytes) => {
             if (done !== 0 && done !== bytes && Date.now() - lastProgress < 100) return
             lastProgress = Date.now()
-            status.updateStep(isPolish ? 'polish' : 'model', {
+            status.updateStep(step, {
               state: 'working',
               message: isPolish ? 'status.polishDownloading' : 'status.downloading',
               progress: done / bytes,
               values: { done: formatBytes(done, locale()), total: formatBytes(bytes, locale()) },
-              action: 'stopDownload',
+              action: stop,
             })
           })
           log('info', `Model download finished: ${files}`)
-          if (!controller.signal.aborted) await status.refresh(false)
+          downloads.delete(step)
+          if (!controller.signal.aborted) await status.refresh()
         } catch (error) {
           if (controller.signal.aborted) log('info', `Model download stopped: ${files}`)
           else {
             log('error', `Model download failed: ${files}: ${logReason(error)}`)
-            status.updateStep(isPolish ? 'polish' : 'model', {
+            status.updateStep(step, {
               state: 'failed',
               message: isPolish ? 'status.polishDownloadFailed' : 'status.downloadFailed',
               values: { reason: reason(error) },
@@ -120,17 +129,15 @@ export function createModelActions({
             })
           }
         } finally {
-          download = undefined
+          downloads.delete(step)
         }
       })()
-      download = { controller, task, model: target }
+      downloads.set(step, { controller, task, model: target })
     }
   }
 
   return {
-    get downloading() {
-      return download?.model
-    },
+    downloading: (step: DownloadStep): ModelSet | undefined => downloads.get(step)?.model,
     async initialize() {
       await mkdir(directory(), { recursive: true })
       await clearPartials(

@@ -2,32 +2,53 @@ import { PluginError, type DictationRecording } from '@gode/plugin-sdk/plugin'
 import type { VoiceMemory } from '../data/memory'
 import type { ModelSet } from '../models/download'
 import type { LocalEngine } from '../models/engine'
-import type { Names } from '../names'
+import type { SpeechServer } from './server'
+import { detectSpeech, recordingParts } from './speech-logic'
 import {
   apiURL,
+  chatRequest,
   cleanTranscript,
+  joinTranscript,
   readResponse,
   reason,
   transcriptionRequest,
+  transcriptText,
 } from './transcription-logic'
 import { applyVocabulary } from './vocabulary-logic'
 
+const dataURLServers = new Set<string>()
+
 async function transcribe(
-  base: string,
+  server: Pick<SpeechServer, 'base' | 'endpoint' | 'apiKey' | 'model' | 'language' | 'chat'>,
   recording: DictationRecording,
   audio: Uint8Array,
   vocabulary: readonly string[],
-  options: { model: string; language: string; apiKey?: string; removeFillers: boolean },
+  removeFillers: boolean,
 ): Promise<{ text: string }> {
   try {
-    const response = await fetch(apiURL(base, 'audio/transcriptions'), {
-      ...transcriptionRequest({ audio, vocabulary }, options),
-      signal: AbortSignal.any([recording.signal, AbortSignal.timeout(180_000)]),
-    })
-    const value = await readResponse(response)
-    if (!value || typeof value !== 'object' || !('text' in value) || typeof value.text !== 'string')
-      throw new Error('The server returned no transcription')
-    return { text: cleanTranscript(value.text, options.removeFillers) }
+    const send = (dataURL: boolean): Promise<Response> =>
+      fetch(apiURL(server.base, server.endpoint), {
+        ...(server.chat
+          ? chatRequest({ audio, vocabulary }, server, dataURL)
+          : transcriptionRequest({ audio, vocabulary }, server)),
+        signal: AbortSignal.any([recording.signal, AbortSignal.timeout(180_000)]),
+      })
+    let response = await send(dataURLServers.has(server.base))
+    if (
+      server.chat &&
+      !dataURLServers.has(server.base) &&
+      [400, 415, 422].includes(response.status)
+    ) {
+      const retry = await send(true)
+      if (retry.ok) {
+        dataURLServers.add(server.base)
+        void response.body?.cancel()
+        response = retry
+      } else void retry.body?.cancel()
+    }
+    const text = transcriptText(await readResponse(response))
+    if (text === undefined) throw new Error('The server returned no transcription')
+    return { text: cleanTranscript(text, removeFillers) }
   } catch (error) {
     const failure = new PluginError({
       message: 'error.recognition',
@@ -38,19 +59,33 @@ async function transcribe(
   }
 }
 
+function part(audio: Uint8Array, span: { start: number; end: number }): Uint8Array {
+  const pcm = audio.subarray(
+    44 + Math.round(span.start * 16000) * 2,
+    44 + Math.round(span.end * 16000) * 2,
+  )
+  const wav = new Uint8Array(44 + pcm.byteLength)
+  wav.set(audio.subarray(0, 44))
+  wav.set(pcm, 44)
+  const header = new DataView(wav.buffer)
+  header.setUint32(4, 36 + pcm.byteLength, true)
+  header.setUint32(40, pcm.byteLength, true)
+  return wav
+}
+
 export function createRecognition({
   local,
-  text,
+  server,
+  language,
   selected,
-  apiKey,
   removeFillers,
   vocabulary,
   engine,
 }: {
   local: () => boolean
-  text: (key: Names['settings'], fallback?: string) => string
+  server: () => SpeechServer
+  language: () => string
   selected: () => ModelSet
-  apiKey: () => string | undefined
   removeFillers: () => boolean
   vocabulary: VoiceMemory['vocabulary']
   engine: () => LocalEngine
@@ -61,37 +96,40 @@ export function createRecognition({
     span: { start: number; end: number },
     final = false,
   ): Promise<{ text: string }> {
-    const isLocal = local()
     const words = vocabulary(recording.vocabulary)
-    const options = {
-      model: isLocal ? selected().files[0]!.file : text('model', 'gpt-4o-transcribe'),
-      language: text('language', 'auto'),
-      apiKey: isLocal ? undefined : apiKey(),
-      removeFillers: removeFillers(),
+    if (!local()) {
+      const chosen = server()
+      const sent = chosen.prompt ? vocabulary(recording.vocabulary, 50) : []
+      const seconds = (audio.byteLength - 44) / 32000
+      const parts =
+        chosen.maxSeconds && seconds > chosen.maxSeconds
+          ? recordingParts(audio.subarray(44), chosen.maxSeconds)
+              .map((span) => part(audio, span))
+              .filter((wav) => detectSpeech(wav.subarray(44)).hasSpeech)
+          : [audio]
+      let text = ''
+      for (const wav of parts)
+        text = joinTranscript(
+          text,
+          (await transcribe(chosen, recording, wav, sent, removeFillers())).text,
+        )
+      return { text: final ? text : applyVocabulary(text, words) }
     }
-    if (!isLocal) {
-      const result = await transcribe(
-        text('serverURL').trim(),
-        recording,
-        audio,
-        vocabulary(recording.vocabulary, 50),
-        options,
-      )
-      return final ? result : { text: applyVocabulary(result.text, words) }
-    }
-    const pcm = audio.subarray(
-      44 + Math.round(span.start * 16000) * 2,
-      44 + Math.round(span.end * 16000) * 2,
-    )
-    const trimmed = new Uint8Array(44 + pcm.byteLength)
-    trimmed.set(audio.subarray(0, 44))
-    trimmed.set(pcm, 44)
-    const header = new DataView(trimmed.buffer)
-    header.setUint32(4, 36 + pcm.byteLength, true)
-    header.setUint32(40, pcm.byteLength, true)
     try {
       const result = await engine().use((base, apiKey) =>
-        transcribe(base, recording, trimmed, [], { ...options, apiKey }),
+        transcribe(
+          {
+            base,
+            endpoint: 'audio/transcriptions',
+            apiKey,
+            model: selected().files[0]!.file,
+            language: language(),
+          },
+          recording,
+          part(audio, span),
+          [],
+          removeFillers(),
+        ),
       )
       return final ? result : { text: applyVocabulary(result.text, words) }
     } catch (error) {

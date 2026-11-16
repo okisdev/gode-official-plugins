@@ -1,7 +1,22 @@
+import type { PluginStep } from '@gode/plugin-sdk'
 import type { PluginContext } from '@gode/plugin-sdk/plugin'
 import type { Names } from '../names'
 import type { createVoiceStatus } from '../status'
 import { apiURL, logReason, readResponse, reason } from './transcription-logic'
+
+export type SpeechServer = {
+  base: string
+  endpoint?: string
+  apiKey?: string
+  model?: string
+  language?: string
+  prompt: boolean
+  maxSeconds?: number
+  chat?: boolean
+  set: boolean
+  check: boolean
+  fields: NonNullable<PluginStep<Names>['fields']>
+}
 
 export function createServerCheck({
   kind,

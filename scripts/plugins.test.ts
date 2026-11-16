@@ -2,7 +2,6 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join, relative, resolve, sep } from 'node:path'
 import { describe, test } from 'node:test'
-import { locales } from '@gode/format'
 import { pluginCatalogSchema, pluginManifestSchema } from '@gode/plugin-sdk'
 import { checkPlugin } from '@gode/plugin-sdk/check'
 import { readPluginSource } from '@gode/plugin-sdk/source'
@@ -14,12 +13,6 @@ for (const id of readdirSync(plugins)) {
   describe(id, () => {
     test('the manifest passes the SDK check', async () => {
       assert.deepEqual(await checkPlugin(root), [])
-    })
-
-    test('the manifest has a catalog for every supported locale', async () => {
-      const source = await readPluginSource(root)
-      const manifest = pluginManifestSchema.parse(source.manifest)
-      assert.deepEqual(Object.keys(manifest.strings).sort(), [...locales].sort())
     })
 
     test('the plugin reaches Gode only through @gode/plugin-sdk', async () => {

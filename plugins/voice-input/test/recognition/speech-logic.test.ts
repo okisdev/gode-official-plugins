@@ -1,6 +1,7 @@
 import { expect, test } from '@gode/plugin-sdk/test'
 import {
   detectSpeech,
+  recordingParts,
   segmentCut,
   sentencePause,
   speechPauses,
@@ -221,4 +222,18 @@ test('full window without an eligible pause cuts at 30 seconds', () => {
 test('waits for more audio when no sentence pause and the window is short', () => {
   expect(segmentCut([], 20)).toBeNull()
   expect(segmentCut([{ at: 15, length: 0.5 }], 29.99)).toBeNull()
+})
+
+test('recordingParts cuts a long recording at the longest late pause, or at the limit', () => {
+  expect(recordingParts(pcm(8), 10)).toEqual([{ start: 0, end: 8 }])
+  expect(recordingParts(pcm(25), 10)).toEqual([
+    { start: 0, end: 10 },
+    { start: 10, end: 20 },
+    { start: 20, end: 25 },
+  ])
+  const paused = Buffer.concat([pcm(7), Buffer.alloc(32000), pcm(7)])
+  const [first, second] = recordingParts(paused, 10)
+  expect(first!.end).toBeGreaterThan(7)
+  expect(first!.end).toBeLessThan(8)
+  expect(second).toEqual({ start: first!.end, end: 15 })
 })

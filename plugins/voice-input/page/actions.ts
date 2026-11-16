@@ -14,6 +14,10 @@ export default [
     title: 'action.stopDownload',
   },
   {
+    id: 'stopPolishDownload',
+    title: 'action.stopDownload',
+  },
+  {
     id: 'removeModel',
     title: 'action.removeModel',
     confirm: 'confirm.removeModel',
@@ -44,7 +48,7 @@ export default [
     title: 'action.checkServer',
     visibleWhen: {
       key: 'engine',
-      values: ['server'],
+      values: ['server', 'chat'],
     },
   },
   {

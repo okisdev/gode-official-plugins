@@ -12,7 +12,7 @@ import type { Names } from './names'
 import { createDictation } from './recognition/dictation'
 import { createPolish } from './recognition/polish'
 import { createRecognition } from './recognition/recognition'
-import { createServerCheck } from './recognition/server'
+import { createServerCheck, type SpeechServer } from './recognition/server'
 import { reason } from './recognition/transcription-logic'
 import { createVoiceStatus } from './status'
 
@@ -44,6 +44,42 @@ export function createVoicePlugin(
   const text = (key: Names['settings'], fallback = ''): string =>
     typeof settings[key] === 'string' ? settings[key] : fallback
   const local = (): boolean => text('engine', 'local') === 'local'
+  const speechServer = (): SpeechServer =>
+    text('engine') === 'upload'
+      ? {
+          base: text('uploadURL').trim(),
+          apiKey: secrets.uploadApiKey,
+          prompt: false,
+          maxSeconds: 110,
+          set: Boolean(text('uploadURL').trim()),
+          check: false,
+          fields: ['engine', 'uploadURL', 'uploadApiKey'],
+        }
+      : text('engine') === 'chat'
+        ? {
+            base: text('chatURL').trim(),
+            endpoint: 'chat/completions',
+            apiKey: secrets.chatApiKey,
+            model: text('chatModel').trim(),
+            language: text('language', 'auto'),
+            prompt: true,
+            maxSeconds: 110,
+            chat: true,
+            set: Boolean(text('chatURL').trim() && text('chatModel').trim()),
+            check: true,
+            fields: ['engine', 'chatURL', 'chatApiKey', 'chatModel'],
+          }
+        : {
+            base: text('serverURL').trim(),
+            endpoint: 'audio/transcriptions',
+            apiKey: secrets.apiKey,
+            model: text('model', 'gpt-4o-transcribe'),
+            language: text('language', 'auto'),
+            prompt: true,
+            set: Boolean(text('serverURL').trim()),
+            check: true,
+            fields: ['engine', 'serverURL', 'apiKey', 'model'],
+          }
   const polishOn = (): boolean => settings.polish === true
   const polishService = (): boolean => text('polishModel') === 'server'
   const selected = (): ModelSet =>
@@ -79,13 +115,14 @@ export function createVoicePlugin(
     directory: () => directory,
     locale: () => locale,
     local,
+    server: speechServer,
     text,
     selected,
     selectedPolish,
     polishService,
     polishOn,
     polishPresent,
-    downloading: () => modelActions.downloading,
+    downloading: (step) => modelActions.downloading(step),
   })
   const modelActions = createModelActions({
     directory: () => directory,
@@ -103,8 +140,8 @@ export function createVoicePlugin(
   })
   const server = createServerCheck({
     kind: 'speech',
-    base: () => text('serverURL').trim(),
-    apiKey: () => secrets.apiKey,
+    base: () => speechServer().base,
+    apiKey: () => speechServer().apiKey,
     status,
     log,
   })
@@ -117,9 +154,9 @@ export function createVoicePlugin(
   })
   const recognize = createRecognition({
     local,
-    text,
+    server: speechServer,
+    language: () => text('language', 'auto'),
     selected,
-    apiKey: () => secrets.apiKey,
     removeFillers: () => settings.removeFillers !== false,
     vocabulary,
     engine: () => engine,
@@ -190,13 +227,12 @@ export function createVoicePlugin(
         previousPolishModel !== (polishService() ? 'server' : selectedPolish().id)
       if ((wasLocal && !local()) || modelChanged) {
         status.ready = false
-        await modelActions.stopDownload()
+        await modelActions.stopDownload('model')
         await engine.stop()
       }
       if (modelChanged) engine = createEngine()
       if ((wasPolish && !polishOn()) || polishChanged) {
-        const downloading = modelActions.downloading
-        if (downloading && polishModels.includes(downloading)) await modelActions.stopDownload()
+        await modelActions.stopDownload('polish')
         await polishEngine.stop()
       }
       if (polishChanged) polishEngine = createPolishEngine()
@@ -215,7 +251,7 @@ export function createVoicePlugin(
         memory.add(text)
       } else if (action === 'clearMemory') {
         memory.clear()
-      } else if (action === 'checkServer' && !local()) {
+      } else if (action === 'checkServer' && !local() && speechServer().check) {
         await server.run()
       } else if (action === 'checkPolishService' && polishService()) {
         await polishServer.run()

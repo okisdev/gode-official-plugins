@@ -1,7 +1,9 @@
 import type { PluginStep, PluginStatus } from '@gode/plugin-sdk'
 import type { PluginContext } from '@gode/plugin-sdk/plugin'
+import type { DownloadStep } from './models/actions'
 import { modelsPresent, type ModelSet } from './models/download'
 import type { Names } from './names'
+import type { SpeechServer } from './recognition/server'
 import { apiURL, formatBytes, reason } from './recognition/transcription-logic'
 
 export function createVoiceStatus({
@@ -9,6 +11,7 @@ export function createVoiceStatus({
   directory,
   locale,
   local,
+  server,
   text,
   selected,
   selectedPolish,
@@ -21,13 +24,14 @@ export function createVoiceStatus({
   directory: () => string
   locale: () => string
   local: () => boolean
+  server: () => SpeechServer
   text: (key: Names['settings'], fallback?: string) => string
   selected: () => ModelSet
   selectedPolish: () => ModelSet
   polishService: () => boolean
   polishOn: () => boolean
   polishPresent: () => Promise<boolean>
-  downloading: () => ModelSet | undefined
+  downloading: (step: DownloadStep) => ModelSet | undefined
 }) {
   let ready = false
   let disposed = false
@@ -45,7 +49,7 @@ export function createVoiceStatus({
       steps: currentStatus.steps?.map((item) => (item.id === id ? { ...item, ...step } : item)),
     })
   }
-  async function refresh(preserveDownload = true): Promise<void> {
+  async function refresh(): Promise<void> {
     const steps: PluginStep<Names>[] = []
     let next: PluginStatus<Names>
     if (local()) {
@@ -72,19 +76,21 @@ export function createVoiceStatus({
         fields: ['engine', 'localModel'],
         action: ready ? 'removeModel' : 'downloadModel',
       })
-    } else if (!text('serverURL').trim()) {
+    } else if (!server().set) {
       ready = false
       next = { state: 'setup', message: 'status.setup' }
       steps.push({
         id: 'server',
         title: 'step.server',
-        message: 'step.serverTodo',
+        message: server().chat ? 'step.chatTodo' : 'step.serverTodo',
         state: 'todo',
-        fields: ['engine', 'serverURL', 'apiKey', 'model'],
+        fields: server().fields,
       })
     } else {
+      const { base, endpoint, fields, check } = server()
+      const action = check ? 'checkServer' : undefined
       try {
-        const url = new URL(apiURL(text('serverURL').trim(), 'audio/transcriptions'))
+        const url = new URL(apiURL(base, endpoint))
         ready = true
         next = { state: 'ready', message: 'status.serverReady', values: { host: url.host } }
         steps.push({
@@ -92,8 +98,8 @@ export function createVoiceStatus({
           title: 'step.server',
           message: 'step.serverDone',
           state: 'done',
-          fields: ['engine', 'serverURL', 'apiKey', 'model'],
-          action: 'checkServer',
+          fields,
+          action,
         })
       } catch (error) {
         ready = false
@@ -104,8 +110,8 @@ export function createVoiceStatus({
           message: 'status.serverFailed',
           values: { reason: reason(error) },
           state: 'failed',
-          fields: ['engine', 'serverURL', 'apiKey', 'model'],
-          action: 'checkServer',
+          fields,
+          action,
         })
       }
     }
@@ -176,9 +182,8 @@ export function createVoiceStatus({
         })
       }
     }
-    const download = downloading()
-    if (preserveDownload && download) {
-      const id = download === selectedPolish() ? 'polish' : 'model'
+    for (const id of ['model', 'polish'] as const) {
+      if (!downloading(id)) continue
       const active = currentStatus?.steps?.find(
         (step) => step.id === id && step.state === 'working',
       )

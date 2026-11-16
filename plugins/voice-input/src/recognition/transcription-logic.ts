@@ -71,12 +71,12 @@ export function cleanTranscript(text: string, removeFillers: boolean): string {
 
 export function transcriptionRequest(
   request: { audio: Uint8Array; vocabulary: readonly string[] },
-  options: { model: string; language: string; apiKey?: string },
+  options: { model?: string; language?: string; apiKey?: string },
 ): RequestInit {
   const body = new FormData()
   body.set('file', new Blob([new Uint8Array(request.audio)], { type: 'audio/wav' }), 'audio.wav')
-  body.set('model', options.model)
-  if (options.language !== 'auto') body.set('language', options.language)
+  if (options.model) body.set('model', options.model)
+  if (options.language && options.language !== 'auto') body.set('language', options.language)
   if (request.vocabulary.length) body.set('prompt', request.vocabulary.join(', '))
   return {
     method: 'POST',
@@ -85,11 +85,65 @@ export function transcriptionRequest(
   }
 }
 
-export function apiURL(base: string, endpoint: string): string {
+export function chatRequest(
+  request: { audio: Uint8Array; vocabulary: readonly string[] },
+  options: { model?: string; language?: string; apiKey?: string },
+  dataURL: boolean,
+): RequestInit {
+  const audio = Buffer.from(request.audio).toString('base64')
+  const content = [
+    'Transcribe the audio exactly as spoken and reply with the transcript alone.',
+    options.language && options.language !== 'auto' ? `The speech is in ${options.language}.` : '',
+    request.vocabulary.length ? `Terms that may be said: ${request.vocabulary.join(', ')}` : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+  return {
+    method: 'POST',
+    body: JSON.stringify({
+      model: options.model,
+      messages: [
+        { role: 'system', content },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_audio',
+              input_audio: {
+                data: dataURL ? `data:audio/wav;base64,${audio}` : audio,
+                format: 'wav',
+              },
+            },
+          ],
+        },
+      ],
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.apiKey ? { Authorization: `Bearer ${options.apiKey}` } : {}),
+    },
+  }
+}
+
+export function transcriptText(value: unknown): string | undefined {
+  const reply = value as {
+    text?: unknown
+    choices?: { message?: { content?: unknown } }[]
+  } | null
+  if (typeof reply?.text === 'string') return reply.text
+  const content = reply?.choices?.[0]?.message?.content
+  if (typeof content === 'string') return content
+  if (!Array.isArray(content)) return undefined
+  return content
+    .map((part: { text?: unknown }) => (typeof part?.text === 'string' ? part.text : ''))
+    .join('')
+}
+
+export function apiURL(base: string, endpoint?: string): string {
   const url = new URL(base)
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password)
     throw new Error('Expected an HTTP or HTTPS API address')
-  url.pathname = `${url.pathname.replace(/\/+$/, '')}/${endpoint}`
+  if (endpoint) url.pathname = `${url.pathname.replace(/\/+$/, '')}/${endpoint}`
   url.hash = ''
   url.search = ''
   return url.href

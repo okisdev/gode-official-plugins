@@ -1211,3 +1211,199 @@ test('preview and finish failures log safe reasons at warning and error level', 
     ['error', 'Dictation finish failed: HTTP 503'],
   ])
 })
+
+test('an upload server receives the recording alone at its exact address, long recordings in parts', async () => {
+  const { plugin, statuses } = await setup()
+  await plugin.settings({
+    type: 'settings',
+    settings: settings({ engine: 'upload', language: 'zh' }),
+    secrets: {},
+  })
+  expect(statuses.at(-1)).toMatchObject({ state: 'setup', message: 'status.setup' })
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    {
+      id: 'server',
+      state: 'todo',
+      message: 'step.serverTodo',
+      fields: ['engine', 'uploadURL', 'uploadApiKey'],
+    },
+  ])
+  await plugin.settings({
+    type: 'settings',
+    settings: settings({
+      engine: 'upload',
+      uploadURL: 'https://api.deepseek.com/v1/tools/asr',
+      serverURL: 'http://127.0.0.1/v1',
+      language: 'zh',
+    }),
+    secrets: { uploadApiKey: 'key', apiKey: 'other' },
+  })
+  expect(statuses.at(-1)).toMatchObject({
+    state: 'ready',
+    message: 'status.serverReady',
+    values: { host: 'api.deepseek.com' },
+  })
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    { id: 'server', state: 'done', fields: ['engine', 'uploadURL', 'uploadApiKey'] },
+  ])
+  expect(statuses.at(-1)?.steps?.[0]?.action).toBeUndefined()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response(JSON.stringify({ text: 'G O D E', duration_ms: 1000 }))),
+  )
+  const dictate = async (chunks: number, seconds: number) => {
+    await plugin.call({
+      type: 'call',
+      id: 1,
+      method: 'dictation.start',
+      params: { session: 'upload', vocabulary: ['Gode'] },
+    })
+    for (let index = 0; index < chunks; index++)
+      await plugin.call({
+        type: 'call',
+        id: 1,
+        method: 'dictation.append',
+        params: { session: 'upload', audio: pcm(seconds) },
+      })
+    return plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.finish',
+      params: { session: 'upload' },
+    })
+  }
+  await expect(dictate(1, 1)).resolves.toEqual({ text: 'Gode' })
+  const [url, init] = vi.mocked(fetch).mock.calls[0]!
+  expect(url).toBe('https://api.deepseek.com/v1/tools/asr')
+  expect(init?.headers).toEqual({ Authorization: 'Bearer key' })
+  expect([...(init!.body as FormData).keys()]).toEqual(['file'])
+  vi.mocked(fetch).mockClear()
+  await expect(dictate(23, 5)).resolves.toEqual({ text: 'Gode Gode' })
+  const sizes = vi
+    .mocked(fetch)
+    .mock.calls.map(([, part]) => ((part!.body as FormData).get('file') as Blob).size)
+  expect(sizes).toEqual([44 + 110 * 32000, 44 + 5 * 32000])
+})
+
+test('a chat model hears the recording as audio input, falling back to a data URL the server asks for', async () => {
+  const { plugin, statuses } = await setup()
+  const chosen = { engine: 'chat', chatURL: 'http://127.0.0.1/compatible/v1', language: 'zh' }
+  await plugin.settings({ type: 'settings', settings: settings(chosen), secrets: {} })
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    {
+      id: 'server',
+      state: 'todo',
+      message: 'step.chatTodo',
+      fields: ['engine', 'chatURL', 'chatApiKey', 'chatModel'],
+    },
+  ])
+  await plugin.settings({
+    type: 'settings',
+    settings: settings({ ...chosen, chatModel: 'qwen3-asr-flash' }),
+    secrets: { chatApiKey: 'key' },
+  })
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    { id: 'server', state: 'done', action: 'checkServer' },
+  ])
+  const audio = (init: RequestInit | undefined) =>
+    JSON.parse(init!.body as string).messages[1].content[0].input_audio as {
+      data: string
+      format: string
+    }
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (_url: string, init?: RequestInit) =>
+      audio(init).data.startsWith('data:audio/wav;base64,')
+        ? new Response(JSON.stringify({ choices: [{ message: { content: '嗯，make test' } }] }))
+        : new Response(JSON.stringify({ error: { message: 'Invalid audio' } }), { status: 400 }),
+    ),
+  )
+  const dictate = async () => {
+    await plugin.call({
+      type: 'call',
+      id: 1,
+      method: 'dictation.start',
+      params: { session: 'chat', vocabulary: ['make test'] },
+    })
+    await plugin.call({
+      type: 'call',
+      id: 1,
+      method: 'dictation.append',
+      params: { session: 'chat', audio: pcm(1) },
+    })
+    return plugin.call({
+      type: 'call',
+      id: 2,
+      method: 'dictation.finish',
+      params: { session: 'chat' },
+    })
+  }
+  await expect(dictate()).resolves.toEqual({ text: 'make test' })
+  const calls = vi.mocked(fetch).mock.calls
+  expect(calls).toHaveLength(2)
+  expect(calls[0]![0]).toBe('http://127.0.0.1/compatible/v1/chat/completions')
+  expect(calls[0]![1]?.headers).toEqual({
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer key',
+  })
+  expect(audio(calls[0]![1])).toMatchObject({ format: 'wav' })
+  expect(audio(calls[0]![1]).data.startsWith('UklGR')).toBe(true)
+  const body = JSON.parse(calls[1]![1]!.body as string)
+  expect(body.model).toBe('qwen3-asr-flash')
+  expect(body.messages[0]).toEqual({
+    role: 'system',
+    content:
+      'Transcribe the audio exactly as spoken and reply with the transcript alone. The speech is in zh. Terms that may be said: make test',
+  })
+  await expect(dictate()).resolves.toEqual({ text: 'make test' })
+  expect(calls).toHaveLength(3)
+})
+
+test('the speech and tidy-up models download at once, each stopped on its own', async () => {
+  const { plugin, statuses, directory } = await setup()
+  await plugin.settings({
+    type: 'settings',
+    settings: settings({ engine: 'local', polish: true }),
+    secrets: {},
+  })
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      async (url: string) =>
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new TextEncoder().encode(url.endsWith('polish') ? 'pol' : 'mod'))
+            },
+          }),
+        ),
+    ),
+  )
+  await plugin.action('downloadModel')
+  await plugin.action('downloadPolishModel')
+  const partials = async () =>
+    (await readdir(join(directory, 'models'))).filter((file) => file.endsWith('.partial'))
+  await vi.waitFor(async () =>
+    expect(await partials()).toEqual(['model.gguf.partial', 'polish.gguf.partial']),
+  )
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    { id: 'model', state: 'working', action: 'stopDownload' },
+    { id: 'polish', state: 'working', action: 'stopPolishDownload' },
+  ])
+  await plugin.action('stopPolishDownload')
+  expect(await partials()).toEqual(['model.gguf.partial'])
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    { id: 'model', state: 'working', action: 'stopDownload' },
+    { id: 'polish', state: 'todo', action: 'downloadPolishModel' },
+  ])
+  await plugin.action('downloadPolishModel')
+  await vi.waitFor(async () => expect(await partials()).toHaveLength(2))
+  await plugin.action('removeModel')
+  expect(await partials()).toEqual(['polish.gguf.partial'])
+  expect(statuses.at(-1)?.steps).toMatchObject([
+    { id: 'model', state: 'todo' },
+    { id: 'polish', state: 'working' },
+  ])
+  await plugin.action('stopPolishDownload')
+  expect(await partials()).toEqual([])
+})
